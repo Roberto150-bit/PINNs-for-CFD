@@ -22,7 +22,7 @@ DT = 0.001
 # Number of time steps
 ## Number of solver iterations
 ## Total simulated time = DT * NT
-NT = 500
+NT = 2000
 
 
 # Pressure solver 
