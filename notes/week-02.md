@@ -35,3 +35,26 @@ The initial boundary-condition implementation is:
 ```python
 u[:, 0] = 0
 u[:, -1] = 0
+
+## Finite-Difference Solver — Baseline Run
+
+Configuration:
+- Grid: 21 × 21
+- DT: 0.001
+- NT: 500
+- Total simulated time: 0.5
+- Density: 1.0
+- Kinematic viscosity: 0.01
+- Lid velocity: 1.0
+- Reynolds number: 100
+
+Results:
+- Solver completed without NaN or infinite values.
+- Runtime: 0.8251 s
+- Final velocity change: 3.427430e-04
+- Velocity field showed the expected clockwise lid-driven cavity circulation.
+- Pressure field showed the strongest pressure variation near the upper corners.
+- The solution remained numerically stable, but convergence has not yet been established.
+
+Next step:
+- Increase NT while keeping the remaining parameters fixed and compare the final velocity change.
