@@ -27,6 +27,7 @@ def plot_velocity_field(x, y, u, v):
     plt.axis("equal")
     plt.tight_layout()
 
+    plt.savefig("velocity_field.png", dpi=300)
     plt.show() 
 
 
@@ -45,6 +46,7 @@ def plot_pressure_field(x, y, p):
     plt.axis("equal")
     plt.tight_layout()
 
+    plt.savefig("pressure_field.png", dpi=300)
     plt.show()
 
 
