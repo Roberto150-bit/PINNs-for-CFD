@@ -22,8 +22,11 @@ DT = 0.001
 # Number of time steps
 ## Number of solver iterations
 ## Total simulated time = DT * NT
-NT = 2000
+NT = 6000
 
+# Convergence criterion
+# Maximum allowed velocity change between consecutive time steps
+VELOCITY_TOLERANCE = 1e-5
 
 # Pressure solver 
 ## Number of iterations used to solve the pressure Poisson equation

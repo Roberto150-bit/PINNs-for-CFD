@@ -9,6 +9,7 @@ from config import (
     NY,
     DT,
     NT,
+    VELOCITY_TOLERANCE,
     PRESSURE_ITERATIONS,
     RHO,
     NU,
@@ -204,7 +205,7 @@ def run_solver():
     u, v = apply_velocity_boundary_conditions(u, v)
 
     # Advance the solution through time
-    for _ in range(NT):
+    for step in range(NT):
         # Save velocities from the previous time step
         u_previous = u.copy()
         v_previous = v.copy()
@@ -220,4 +221,8 @@ def run_solver():
             np.max(np.abs(v - v_previous)),
         )
 
-    return x, y, u, v, p, velocity_change
+        # Stop early if the velocity field is sufficiently steady
+        if velocity_change < VELOCITY_TOLERANCE:
+            break
+
+    return x, y, u, v, p, velocity_change, step + 1

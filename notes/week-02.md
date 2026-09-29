@@ -89,3 +89,19 @@ Convergence trend:
 - NT = 2000: 7.936554e-05
 
 The velocity change consistently decreased as the simulated time increased. This indicates that the numerical solution is approaching a steady state while remaining numerically stable.
+
+### Convergence Result
+
+The maximum number of time steps was increased until the velocity convergence criterion was reached.
+
+Results:
+- Maximum NT: 6000
+- Convergence tolerance: 1e-5
+- Steps completed: 5681
+- Final velocity change: 9.996184e-06
+- Runtime: 6.5968 s
+- No NaN or infinite values were detected.
+
+Interpretation:
+- The solver reached the defined steady-state convergence criterion before the maximum number of time steps.
+- NT = 6000 is sufficient as a maximum iteration limit for the current 21 × 21, Re = 100 configuration.

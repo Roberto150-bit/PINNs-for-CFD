@@ -1,13 +1,13 @@
 import time
 import numpy as np
-
+from config import VELOCITY_TOLERANCE
 from solver import run_solver
 
 
 def main():
     start_time = time.perf_counter()
 
-    x, y, u, v, p, velocity_change = run_solver()
+    x, y, u, v, p, velocity_change, steps_completed = run_solver()
 
     # Check for invalid numerical values
     if (
@@ -36,6 +36,13 @@ def main():
     runtime = end_time - start_time
 
     print(f"Final velocity change: {velocity_change:.6e}")
+    print(f"Steps completed: {steps_completed}")
+
+    if velocity_change < VELOCITY_TOLERANCE:
+        print("Convergence criteria reached.")
+    else:
+        print("Maximum time steps reached before convergence.")
+
     print(f"Runtime: {runtime:.4f} seconds")
 
 
