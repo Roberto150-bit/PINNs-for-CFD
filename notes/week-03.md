@@ -571,3 +571,16 @@ This also showed that the solver's previous convergence test only checked conver
 
 22. The primary vortex-center location will be used to check the finite-difference solution at $Re = 100$. Kamel (2020) reports the primary vortex center at: $(x, y) = (0.6133, 0.7400)$. The finite-difference solver's vortex center will later be calculated from its velocity field and compared against this value. Since the current $21 \times 21$ grid is much coarser than Kamel's $151 \times 151$ grid, an exact coordinate match is not expected.
 
+### Comparing solver with benchmark
+
+23. The primary vortex center of the finite-difference solution will be estimated by fining the interios grid point with the minimum velocity magnitude
+
+$$
+|\mathbf{V}|=\sqrt{u^2+v^2}
+$$
+
+Because the current $21 x 21$ grid has a spacing of $0.05$, the calculated vortex-center location will be limited to the available grid coordinates and is not expected to exactly mathc the benchmark.
+
+24. The finite-difference solver estimated the primary vortex center at $(0.6000, 0.7000)$, compared with Kamel's benchmark of $(0.6133, 0.7400)$. The differences were $0.0133$ in $x$ and $0.0400$ in $y$, with an overall distance of about $0.0422$. This is less than the current grid spacing of $0.05$, suggesting that the baseline produces a reasonably located primary vortex for the coarse $21\times21$ grid. However, the vortex center is only a coarse estimate, so a finer-grid calculation would be needed for stronger validation.
+
+25. This comparison supports using the finite-difference solver as the numerical baseline for the first neural-network experiments, but it does not fully validate the solver. The comparison only checks the primary vortex location at $Re=100$, and the current $21\times21$ grid is relatively coarse. A grid-independence study and additional benchmark quantities would be needed for stronger validation.
