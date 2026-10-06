@@ -561,3 +561,13 @@ Graphs that will be produced:
 | Training | Loss vs epoch | Show training behavior |
 | Fields | $u$, $v$, $p$ field plots | Visually compare solutions |
 | Error | $u$, $v$, $p$ error fields | Show where predictions differ from the finite-difference reference |
+
+
+### Cavity Benchmark:
+
+21. Kamel (2020) was selected as the peer-reviewed journal article for checking the finite-difference solver at $Re = 100$. The paper uses the same one-sided lid-driven cavity boundary conditions as the current solver: the top wall moves with $u = 1$, $v = 0$, while the other three walls are stationary.
+
+This also showed that the solver's previous convergence test only checked convergence over time. A separate grid-independence test will eventually be needed to check how spatial resolution affects the finite-difference solution.
+
+22. The primary vortex-center location will be used to check the finite-difference solution at $Re = 100$. Kamel (2020) reports the primary vortex center at: $(x, y) = (0.6133, 0.7400)$. The finite-difference solver's vortex center will later be calculated from its velocity field and compared against this value. Since the current $21 \times 21$ grid is much coarser than Kamel's $151 \times 151$ grid, an exact coordinate match is not expected.
+
