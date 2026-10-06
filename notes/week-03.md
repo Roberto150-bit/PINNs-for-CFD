@@ -232,3 +232,332 @@ SUMMARY:
 - Physical Consistency: Continuity & Boundary Error.
 - Performance: Training Time & Inference Time.
 
+### Experiments setup
+19. Main rule: An experiment folder should contain enough information to understand, reproduce, and re-analyze that experiment without relying on another experiment. My thesis is based on comparing PINN agains a baseline data-driven neural network and producing indicators that help settle this.
+
+```python
+experiment_001/
+├── experiment_config.json
+├── environment.json
+│
+├── finite_difference/
+│   ├── config.json
+│   ├── solution.npz
+│   └── performance.json
+│
+├── data_driven_nn/
+│   ├── config.json
+|   ├── model.keras
+|   ├── history.csv
+│   ├── predictions.npz
+│   ├── metrics.json
+│   └── performance.json
+│
+└── pinn/
+    ├── config.json
+    ├── model.keras
+    ├── history.csv
+    ├── predictions.npz
+    ├── metrics.json
+    └── performance.json
+```
+
+- `experiment_config.json`: defines the experiment. This is the shared benchmark.
+- Each method keeps its own complete record. This means that when running the experiments we can ask if these models are solving the same experiment. Then analyzing the details that are comparable.
+- We save first and calculate later. This means that is important to see how the neural networks work and produce the experiments result as a last step.
+- Preserve computational evidence as well. This is provided by `environment.json` that tells us what hardware/software was available. And each model run will have `performance.json` that says what this specific method actaully used. Overview, `environment.json` is the environment where I run the experiment (specifications of the laptop) and `performance.json` will be what amount of resource used. 
+
+20. Setting up schemas
+
+`experiment_config.json`
+
+Define the shared problem that every method in this experiment is solving. 
+
+```json
+{
+  "experiment_id": "experiment_001",
+  "problem": "lid_driven_cavity",
+  "description": "Baseline comparison at Re=100",
+
+  "domain": {
+    "x_min": 0.0,
+    "x_max": 1.0,
+    "y_min": 0.0,
+    "y_max": 1.0
+  },
+
+  "grid": {
+    "nx": 21,
+    "ny": 21
+  },
+
+  "physics": {
+    "reynolds_number": 100,
+    "rho": 1.0,
+    "nu": 0.01
+  },
+
+  "boundary_conditions": {
+    "lid_velocity": 1.0,
+    "wall_velocity": 0.0
+  },
+
+  "problem_type": {
+    "time_dependent": false
+  },
+
+  "evaluation": {
+    "outputs": ["u", "v", "p"],
+    "reference_method": "finite_difference"
+  },
+
+  "methods": [
+    "finite_difference",
+    "data_driven_nn",
+    "pinn"
+  ]
+}
+```
+
+`environment.json`
+
+Record the environment available when the experiment ran. 
+
+```json
+{
+  "timestamp": "YYYY-MM-DDTHH:MM:SS",
+
+  "software": {
+    "python_version": "",
+    "tensorflow_version": "",
+    "numpy_version": ""
+  },
+
+  "system": {
+    "operating_system": "",
+    "cpu": "",
+    "cpu_count": 0,
+    "total_ram_bytes": 0
+  },
+
+  "gpu": {
+    "available": false,
+    "device": "",
+    "total_vram_bytes": null
+  }
+}
+```
+
+`finite_difference/config.json`
+
+Record how it was configured for this experiment
+
+```json
+{
+  "numerical_method": "finite_difference",
+
+  "time_step": 0.001,
+  "max_steps": 6000,
+
+  "pressure_solver": {
+    "method": "jacobi",
+    "iterations": 0
+  },
+
+  "convergence": {
+    "enabled": true,
+    "tolerance": 0.00001
+  },
+
+  "initial_conditions": {
+    "u": 0.0,
+    "v": 0.0,
+    "p": 0.0
+  }
+}
+```
+
+`data_driven_nn/config.json`
+
+Records how the data-driven nn was configured and trained for that experiment.
+
+```json
+{
+  "method": "data_driven_nn",
+
+  "model": {
+    "hidden_layers": 0,
+    "neurons_per_layer": 0,
+    "activation": "",
+    "output_size": 3
+  },
+
+  "training": {
+    "epochs": 0,
+    "batch_size": 0,
+    "learning_rate": 0.0,
+    "optimizer": "",
+    "loss_function": "mse"
+  },
+
+  "data": {
+    "input_variables": ["x", "y"],
+    "target_variables": ["u", "v", "p"],
+    "training_samples": 0
+  },
+
+  "reproducibility": {
+    "random_seed": 0
+  }
+}
+```
+
+`pinn/config.json`
+
+Record settings of the PINN for that experiment.
+
+```json
+{
+  "method": "pinn",
+
+  "model": {
+    "hidden_layers": 0,
+    "neurons_per_layer": 0,
+    "activation": "",
+    "output_size": 3
+  },
+
+  "training": {
+    "epochs": 0,
+    "learning_rate": 0.0,
+    "optimizer": ""
+  },
+
+  "physics": {
+    "equations": [
+      "continuity",
+      "x_momentum",
+      "y_momentum"
+    ],
+    "collocation_points": 0
+  },
+
+  "loss": {
+    "continuity_weight": 0.0,
+    "x_momentum_weight": 0.0,
+    "y_momentum_weight": 0.0,
+    "boundary_weight": 0.0
+  },
+
+  "reproducibility": {
+    "random_seed": 0
+  }
+}
+```
+
+`performance.json`
+
+Record the computational resources that method actually used during the experiment.
+
+```json
+{
+  "timing": {
+    "total_runtime_seconds": 0.0,
+    "training_time_seconds": null,
+    "inference_time_seconds": null
+  },
+
+  "memory": {
+    "peak_ram_bytes": 0,
+    "peak_vram_bytes": null
+  },
+
+  "storage": {
+    "model_size_bytes": null,
+    "output_size_bytes": 0,
+    "total_run_size_bytes": 0
+  }
+}
+```
+
+`metrics.json`
+
+Records how well the method performed. 
+
+```json
+{
+  "accuracy": {
+    "mse_u": 0.0,
+    "mse_v": 0.0,
+    "mse_p": 0.0,
+
+    "relative_l2_u": 0.0,
+    "relative_l2_v": 0.0,
+    "relative_l2_p": 0.0
+  },
+
+  "physical_consistency": {
+    "continuity_residual": 0.0,
+    "x_momentum_residual": 0.0,
+    "y_momentum_residual": 0.0
+  }
+}
+```
+
+`predictions.npz` / `solution.npz`
+
+Preserve the actual fields produced by each method so we can calculate new metrics later without rerunning the experiment.
+
+`history.csv`
+
+Preserve how training changed from epoch to epoch.
+
+`experiment_results.csv`
+
+Generated overview that pulls the most useful comparison information from all experiment folders.
+
+Columns that will be used:
+```text
+experiment_id
+problem
+reynolds_number
+grid_nx
+grid_ny
+time_dependent
+method
+
+mse_u
+mse_v
+mse_p
+relative_l2_u
+relative_l2_v
+relative_l2_p
+
+continuity_residual
+x_momentum_residual
+y_momentum_residual
+
+total_runtime_seconds
+training_time_seconds
+inference_time_seconds
+peak_ram_bytes
+peak_vram_bytes
+model_size_bytes
+output_size_bytes
+total_run_size_bytes
+```
+
+Graphs that will be produced:
+
+| Category | Graph | Purpose |
+|---|---|---|
+| Accuracy | MSE by method for $u$, $v$, $p$ | Compare prediction accuracy |
+| Accuracy | Relative $L_2$ by method for $u$, $v$, $p$ | Compare normalized error |
+| Physics | Physics residuals by method | Compare continuity and momentum consistency |
+| Compute | Runtime by method | Compare computational time |
+| Compute | Peak RAM by method | Compare memory requirements |
+| Compute | Peak VRAM by method | Compare GPU memory requirements |
+| Compute | Storage by method | Compare model/run storage |
+| Training | Loss vs epoch | Show training behavior |
+| Fields | $u$, $v$, $p$ field plots | Visually compare solutions |
+| Error | $u$, $v$, $p$ error fields | Show where predictions differ from the finite-difference reference |
