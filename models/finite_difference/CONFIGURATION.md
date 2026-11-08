@@ -36,13 +36,9 @@ The configuration includes two general types of values:
 
 The cavity occupies:
 
-$$
-0 \leq x \leq 1
-$$
+$$ 0 \leq x \leq 1 $$
 
-$$
-0 \leq y \leq 1
-$$
+$$ 0 \leq y \leq 1 $$
 
 which is defined by:
 
@@ -58,13 +54,9 @@ Here, $x$ and $y$ are the spatial coordinates of the two-dimensional cavity.
 
 The resulting geometry of the cavity has a width and height of:
 
-$$
-L_x = X_{\max} - X_{\min} = 1
-$$
+$$ L_x = X_{\max} - X_{\min} = 1 $$
 
-$$
-L_y = Y_{\max} - Y_{\min} = 1
-$$
+$$ L_y = Y_{\max} - Y_{\min} = 1 $$
 
 Which is a normalized $1 \times 1$ square cavity.
 
@@ -86,9 +78,7 @@ NY = 21
 
 The current grid therefore contains:
 
-$$
-21 \times 21 = 441
-$$
+$$ 21 \times 21 = 441 $$
 
 total grid points.
 
@@ -96,29 +86,13 @@ The grid size is different from the domain size. The domain remains $1 \times 1$
 
 For a uniform grid:
 
-$$
-\Delta x
-=
-\frac{X_{\max}-X_{\min}}{N_x-1}
-$$
+$$ \Delta x = \frac{X_{\max}-X_{\min}}{N_x-1} $$
 
-$$
-\Delta y
-=
-\frac{Y_{\max}-Y_{\min}}{N_y-1}
-$$
+$$ \Delta y = \frac{Y_{\max}-Y_{\min}}{N_y-1} $$
 
 For the current configuration:
 
-$$
-\Delta x
-=
-\Delta y
-=
-\frac{1}{21-1}
-=
-0.05
-$$
+$$ \Delta x = \Delta y = \frac{1}{21-1} = 0.05 $$
 
 The $21 \times 21$ grid was selected as the initial baseline because it keeps the simulation inexpensive while the solver is being developed and tested.
 
@@ -134,9 +108,7 @@ DT = 0.001
 
 which means:
 
-$$
-\Delta t = 0.001
-$$
+$$ \Delta t = 0.001 $$
 
 `DT` determines how far the numerical solution advances in simulated time during each solver iteration.
 
@@ -160,25 +132,13 @@ NT = 6000
 
 Combined with:
 
-$$
-\Delta t = 0.001
-$$
+$$ \Delta t = 0.001 $$
 
 the largest simulated time allowed is:
 
-$$
-t_{\max}
-=
-NT\Delta t
-$$
+$$ t_{\max} = NT\Delta t $$
 
-$$
-t_{\max}
-=
-6000(0.001)
-=
-6.0
-$$
+$$ t_{\max} = 6000(0.001) = 6.0 $$
 
 The solver does not necessarily execute all $6000$ steps. It also checks how much the velocity field changes after each iteration and can stop earlier when the solution becomes sufficiently steady.
 
@@ -224,9 +184,7 @@ RHO = 1.0
 
 or:
 
-$$
-\rho = 1
-$$
+$$ \rho = 1 $$
 
 Density represents mass per unit volume.
 
@@ -243,51 +201,31 @@ NU = 0.01
 
 or:
 
-$$
-\nu = 0.01
-$$
+$$ \nu = 0.01 $$
 
 Kinematic viscosity describes how strongly momentum spreads through the fluid because of viscosity.
 
 The value is connected to the Reynolds number:
 
-$$
-Re
-=
-\frac{UL}{\nu}
-$$
+$$ Re = \frac{UL}{\nu} $$
 
 Reynolds number measures the ratio of inertial forces to viscous forces within a fluid flow. It indicates the fluid properties if it is smooth and predicatable it is called laminar, or if it swirls and crashes it is called turbulent.
 
 For the current baseline:
 
-$$
-U=1
-$$
+$$ U=1 $$
 
-$$
-L=1
-$$
+$$ L=1 $$
 
-$$
-\nu=0.01
-$$
+$$ \nu=0.01 $$
 
 which gives:
 
-$$
-Re
-=
-\frac{(1)(1)}{0.01}
-=
-100
-$$
+$$ Re = \frac{(1)(1)}{0.01} = 100 $$
 
 Therefore, `NU = 0.01` is used because it gives the baseline:
 
-$$
-Re=100
-$$
+$$ Re=100 $$
 
 when combined with the unit cavity and unit lid velocity.
 
@@ -309,13 +247,9 @@ V_INITIAL = 0.0
 
 so the fluid begins with:
 
-$$
-u(x,y,0)=0
-$$
+$$ u(x,y,0)=0 $$
 
-$$
-v(x,y,0)=0
-$$
+$$ v(x,y,0)=0 $$
 
 throughout the cavity interior. The fluid therefore begins at rest. The moving top boundary is applied before the first numerical update, so the flow begins developing from the motion of the lid.
 
@@ -329,9 +263,7 @@ P_INITIAL = 0.0
 
 or:
 
-$$
-p(x,y,0)=0
-$$
+$$ p(x,y,0)=0 $$
 
 This value is the starting numerical estimate for the pressure field.
 
@@ -355,11 +287,7 @@ This value is applied to the:
 
 The velocity condition is:
 
-$$
-u = 0,
-\qquad
-v = 0
-$$
+$$ u = 0, \qquad v = 0 $$
 
 which means the fluid velocity at these stationary boundaries is also zero.
 
@@ -373,11 +301,7 @@ LID_VELOCITY = 1.0
 
 which gives:
 
-$$
-u = 1,
-\qquad
-v = 0
-$$
+$$ u = 1, \qquad v = 0 $$
 
 at the top boundary.
 
@@ -387,9 +311,7 @@ This moving boundary drives the fluid inside the cavity and produces the circula
 
 The value:
 
-$$
-U=1
-$$
+$$ U=1 $$
 
 is also used as the characteristic velocity when calculating the Reynolds number.
 
@@ -440,21 +362,11 @@ After every time step, the solver compares the newly calculated velocity field w
 
 The largest change is measured as:
 
-$$
-\epsilon
-=
-\max
-\left(
-\max\left|u^{n+1}-u^n\right|,
-\max\left|v^{n+1}-v^n\right|
-\right)
-$$
+$$ \epsilon = \max \left( \max\left|u^{n+1}-u^n\right|, \max\left|v^{n+1}-v^n\right| \right) $$
 
 The solution is considered sufficiently steady when:
 
-$$
-\epsilon < 10^{-5}
-$$
+$$ \epsilon < 10^{-5} $$
 
 For the current baseline, this condition was reached after:
 
@@ -464,11 +376,7 @@ For the current baseline, this condition was reached after:
 
 with:
 
-$$
-\epsilon
-=
-9.996184 \times 10^{-6}
-$$
+$$ \epsilon = 9.996184 \times 10^{-6} $$
 
 The tolerance and `NT` serve different purposes:
 

@@ -6,13 +6,7 @@ The baseline problem uses a $1 \times 1$ cavity with a moving top wall. The flui
 
 Using the lid velocity $U=1$, cavity length $L=1$, and kinematic viscosity $\nu=0.01$, the Reynolds number is:
 
-$$
-Re = \frac{UL}{\nu}
-=
-\frac{(1)(1)}{0.01}
-=
-100
-$$
+$$ Re = \frac{UL}{\nu} = \frac{(1)(1)}{0.01} = 100 $$
 
 I chose to keep the problem at $Re=100$ because it gives a relatively simple laminar lid-driven cavity case for establishing the numerical baseline before comparing it with the neural-network approaches.
 
@@ -24,61 +18,29 @@ I started from the standard incompressible Navier-Stokes equations for two-dimen
 
 With 21 points across a domain from 0 to 1, there are 20 intervals, so:
 
-$$
-\Delta x
-=
-\Delta y
-=
-\frac{1-0}{21-1}
-=
-0.05
-$$
+$$ \Delta x = \Delta y = \frac{1-0}{21-1} = 0.05 $$
 
 The finite-difference formulas are standard numerical approximations for derivatives. Instead of having a continuous function available everywhere, the solver only has values at neighboring grid points.
 
 For example:
 
-$$
-\frac{\partial u}{\partial x}
-\approx
-\frac{u_{i,j+1}-u_{i,j-1}}{2\Delta x}
-$$
+$$ \frac{\partial u}{\partial x} \approx \frac{u_{i,j+1}-u_{i,j-1}}{2\Delta x} $$
 
 This estimates the change in $u$ in the $x$ direction using the values on either side of the current grid point.
 
 For a second derivative:
 
-$$
-\frac{\partial^2u}{\partial x^2}
-\approx
-\frac{
-u_{i,j+1}
--
-2u_{i,j}
-+
-u_{i,j-1}
-}{
-\Delta x^2
-}
-$$
+$$ \frac{\partial^2u}{\partial x^2} \approx \frac{ u_{i,j+1} - 2u_{i,j} + u_{i,j-1} }{ \Delta x^2 } $$
 
 This is used in the viscous-diffusion terms because those terms depend on how the velocity changes relative to the surrounding values.
 
 The incompressibility condition is:
 
-$$
-\nabla \cdot \mathbf{V}=0
-$$
+$$ \nabla \cdot \mathbf{V}=0 $$
 
 or:
 
-$$
-\frac{\partial u}{\partial x}
-+
-\frac{\partial v}{\partial y}
-=
-0
-$$
+$$ \frac{\partial u}{\partial x} + \frac{\partial v}{\partial y} = 0 $$
 
 This means fluid should not accumulate or disappear at a point. The velocity update by itself does not automatically maintain this condition, so pressure has to be connected to the velocity field.
 
@@ -86,37 +48,11 @@ The pressure source term $b$ and pressure Poisson equation come from the standar
 
 The pressure source term used is:
 
-$$
-b
-=
-\rho
-\left[
-\frac{1}{\Delta t}
-\left(
-\frac{\partial u}{\partial x}
-+
-\frac{\partial v}{\partial y}
-\right)
--
-\left(
-\frac{\partial u}{\partial x}
-\right)^2
--
-2
-\frac{\partial u}{\partial y}
-\frac{\partial v}{\partial x}
--
-\left(
-\frac{\partial v}{\partial y}
-\right)^2
-\right]
-$$
+$$ b = \rho \left[ \frac{1}{\Delta t} \left( \frac{\partial u}{\partial x} + \frac{\partial v}{\partial y} \right) - \left( \frac{\partial u}{\partial x} \right)^2 - 2 \frac{\partial u}{\partial y} \frac{\partial v}{\partial x} - \left( \frac{\partial v}{\partial y} \right)^2 \right] $$
 
 The current velocity field is used to construct $b$, and then $b$ becomes the source term in:
 
-$$
-\nabla^2p=b
-$$
+$$ \nabla^2p=b $$
 
 The pressure field is updated repeatedly using neighboring pressure values. I kept:
 
@@ -132,9 +68,7 @@ Once pressure is updated, the horizontal and vertical momentum equations calcula
 
 The first complete run used a maximum of 500 time steps. With $\Delta t=0.001$, this represents a maximum simulated time of:
 
-$$
-500(0.001)=0.5
-$$
+$$ 500(0.001)=0.5 $$
 
 The solver completed without `NaN` or infinite values, with a final velocity change of `3.427430e-04` and a runtime of approximately `0.8251 s`.
 
@@ -154,23 +88,13 @@ The velocity change kept decreasing as more simulated time was allowed, showing 
 
 To measure this, I used the largest change in either velocity component between consecutive time steps:
 
-$$
-\epsilon
-=
-\max
-\left(
-\max|u^{n+1}-u^n|,
-\max|v^{n+1}-v^n|
-\right)
-$$
+$$ \epsilon = \max \left( \max|u^{n+1}-u^n|, \max|v^{n+1}-v^n| \right) $$
 
 Here, $\epsilon$ is the numerical change being measured. In the code, this is called `velocity_change`.
 
 For the baseline, I used:
 
-$$
-\epsilon < 10^{-5}
-$$
+$$ \epsilon < 10^{-5} $$
 
 as the stopping condition. This means the solver stops once the largest velocity change anywhere on the grid falls below the selected tolerance.
 
@@ -185,11 +109,7 @@ Runtime:               6.5968 s
 
 Since:
 
-$$
-9.996184\times10^{-6}
-<
-1\times10^{-5}
-$$
+$$ 9.996184\times10^{-6} < 1\times10^{-5} $$
 
 the selected steady-state convergence condition was reached.
 

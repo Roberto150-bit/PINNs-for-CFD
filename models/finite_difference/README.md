@@ -42,11 +42,7 @@ The current configuration performs 50 pressure updates inside each main time ste
 
 The physical setup is a continuous $1 \times 1$ domain:
 
-$$
-0 \leq x \leq 1,
-\qquad
-0 \leq y \leq 1
-$$
+$$ 0 \leq x \leq 1, \qquad 0 \leq y \leq 1 $$
 
 A numerical solver cannot calculate the flow at every possible location in this continuous space. Instead, the domain is represented using a finite set of grid points. For the current baseline:
 
@@ -70,29 +66,13 @@ y = np.linspace(Y_MIN, Y_MAX, NY)
 
 The spacing values between grid points are required later by the finite-difference equations, which approximate spatial derivatives by comparing values at neighboring grid points over a known distance. The distance between neighboring grid points is calculated as:
 
-$$
-\Delta x
-=
-\frac{X_{\max}-X_{\min}}{N_x-1}
-$$
+$$ \Delta x = \frac{X_{\max}-X_{\min}}{N_x-1} $$
 
-$$
-\Delta y
-=
-\frac{Y_{\max}-Y_{\min}}{N_y-1}
-$$
+$$ \Delta y = \frac{Y_{\max}-Y_{\min}}{N_y-1} $$
 
 For the current $21 \times 21$ grid:
 
-$$
-\Delta x
-=
-\Delta y
-=
-\frac{1 - 0}{21 - 1}
-=
-0.05
-$$
+$$ \Delta x = \Delta y = \frac{1 - 0}{21 - 1} = 0.05 $$
 
 The function therefore returns:
 
@@ -157,103 +137,29 @@ At this point, the solver already has:
 
 The next step is to determine how the current velocity field should influence the pressure calculation. For incompressible flow, the velocity field must satisfy:
 
-$$
-\nabla \cdot \mathbf{V}=0
-$$
+$$ \nabla \cdot \mathbf{V}=0 $$
 
 In two dimensions:
 
-$$
-\frac{\partial u}{\partial x}
-+
-\frac{\partial v}{\partial y}
-=
-0
-$$
+$$ \frac{\partial u}{\partial x} + \frac{\partial v}{\partial y} = 0 $$
 
 This condition means that the flow cannot create a net accumulation or loss of fluid at a point. The numerical velocity field will not automatically satisfy this condition after every update. Therefore, before pressure can be solved, the solver first summarizes information from the current velocity field into a new array called the pressure source term, $b$. This term is calculated from the spatial changes in $u$ and $v$:
 
-$$
-b
-=
-\rho
-\left[
-\frac{1}{\Delta t}
-\left(
-\frac{\partial u}{\partial x}
-+
-\frac{\partial v}{\partial y}
-\right)
--
-\left(
-\frac{\partial u}{\partial x}
-\right)^2
--
-2
-\frac{\partial u}{\partial y}
-\frac{\partial v}{\partial x}
--
-\left(
-\frac{\partial v}{\partial y}
-\right)^2
-\right]
-$$
+$$ b = \rho \left[ \frac{1}{\Delta t} \left( \frac{\partial u}{\partial x} + \frac{\partial v}{\partial y} \right) - \left( \frac{\partial u}{\partial x} \right)^2 - 2 \frac{\partial u}{\partial y} \frac{\partial v}{\partial x} - \left( \frac{\partial v}{\partial y} \right)^2 \right] $$
 
 The equations above contain derivatives such as:
 
-$$
-\frac{\partial u}{\partial x}
-$$
+$$ \frac{\partial u}{\partial x} $$
 
 but the solver does not have a continuous function for $u$. It only knows the velocity values stored at the grid points. For this we use a technique called central-difference approximation to simplify the spatial derivatives:
 
-$$
-\frac{\partial v}{\partial y}
-\approx
-\frac{
-v_{i+1,j}
--
-v_{i-1,j}
-}{
-2\Delta y
-}
-$$
+$$ \frac{\partial v}{\partial y} \approx \frac{ v_{i+1,j} - v_{i-1,j} }{ 2\Delta y } $$
 
-$$
-\frac{\partial u}{\partial y}
-\approx
-\frac{
-u_{i+1,j}
--
-u_{i-1,j}
-}{
-2\Delta y
-}
-$$
+$$ \frac{\partial u}{\partial y} \approx \frac{ u_{i+1,j} - u_{i-1,j} }{ 2\Delta y } $$
 
-$$
-\frac{\partial v}{\partial x}
-\approx
-\frac{
-v_{i,j+1}
--
-v_{i,j-1}
-}{
-2\Delta x
-}
-$$
+$$ \frac{\partial v}{\partial x} \approx \frac{ v_{i,j+1} - v_{i,j-1} }{ 2\Delta x } $$
 
-$$
-\frac{\partial u}{\partial x}
-\approx
-\frac{
-u_{i,j+1}
--
-u_{i,j-1}
-}{
-2\Delta x
-}
-$$
+$$ \frac{\partial u}{\partial x} \approx \frac{ u_{i,j+1} - u_{i,j-1} }{ 2\Delta x } $$
 
 The previously calculated `dx` and `dy` are what give the distance between these neighboring grid points.
 
@@ -273,17 +179,7 @@ b[1:-1, 1:-1]
 
 For example, the mathematical approximation:
 
-$$
-\frac{\partial u}{\partial x}
-\approx
-\frac{
-u_{i,j+1}
--
-u_{i,j-1}
-}{
-2\Delta x
-}
-$$
+$$ \frac{\partial u}{\partial x} \approx \frac{ u_{i,j+1} - u_{i,j-1} }{ 2\Delta x } $$
 
 appears in the code as:
 
@@ -315,75 +211,24 @@ Central differences require a neighboring grid point on both sides of the curren
 
 The solver can now use $b$ to calculate the pressure field $p$. The relationship is given by the pressure Poisson equation:
 
-$$
-\nabla^2 p=b
-$$
+$$ \nabla^2 p=b $$
 
 For pressure in two dimensions:
 
-$$
-\nabla^2p
-=
-\frac{\partial^2p}{\partial x^2}
-+
-\frac{\partial^2p}{\partial y^2}
-=
-b
-$$
+$$ \nabla^2p = \frac{\partial^2p}{\partial x^2} + \frac{\partial^2p}{\partial y^2} = b $$
 
 The left side describes how pressure varies relative to surrounding pressure values, while the right side contains the source information calculated from the current velocity field. Similar to the velocity derivatives, the second derivatives of pressure must be approximated using neighboring grid points.
 
 
-$$
-\frac{\partial^2p}{\partial x^2}
-\approx
-\frac{
-p_{i,j+1}
--
-2p_{i,j}
-+
-p_{i,j-1}
-}{
-\Delta x^2
-}
-$$
+$$ \frac{\partial^2p}{\partial x^2} \approx \frac{ p_{i,j+1} - 2p_{i,j} + p_{i,j-1} }{ \Delta x^2 } $$
 
 and:
 
-$$
-\frac{\partial^2p}{\partial y^2}
-\approx
-\frac{
-p_{i+1,j}
--
-2p_{i,j}
-+
-p_{i-1,j}
-}{
-\Delta y^2
-}
-$$
+$$ \frac{\partial^2p}{\partial y^2} \approx \frac{ p_{i+1,j} - 2p_{i,j} + p_{i-1,j} }{ \Delta y^2 } $$
 
 Substituting these approximations into the pressure Poisson equation and solving for the pressure at the current point gives:
 
-$$
-p_{i,j}
-=
-\frac{
-\left(p_{i,j+1}+p_{i,j-1}\right)\Delta y^2
-+
-\left(p_{i+1,j}+p_{i-1,j}\right)\Delta x^2
-}{
-2\left(\Delta x^2+\Delta y^2\right)
-}
--
-\frac{
-\Delta x^2\Delta y^2
-}{
-2\left(\Delta x^2+\Delta y^2\right)
-}
-b_{i,j}
-$$
+$$ p_{i,j} = \frac{ \left(p_{i,j+1}+p_{i,j-1}\right)\Delta y^2 + \left(p_{i+1,j}+p_{i-1,j}\right)\Delta x^2 }{ 2\left(\Delta x^2+\Delta y^2\right) } - \frac{ \Delta x^2\Delta y^2 }{ 2\left(\Delta x^2+\Delta y^2\right) } b_{i,j} $$
 
 This equation says that the new pressure at one interior grid point depends on:
 
@@ -409,15 +254,11 @@ pressure updates during every main simulation time step. This repeated-update me
 
 After every pressure update, the boundary conditions are reapplied. On the left and right walls:
 
-$$
-\frac{\partial p}{\partial x}=0
-$$
+$$ \frac{\partial p}{\partial x}=0 $$
 
 and on the bottom wall:
 
-$$
-\frac{\partial p}{\partial y}=0
-$$
+$$ \frac{\partial p}{\partial y}=0 $$
 
 A zero pressure gradient means the pressure does not change in the direction perpendicular to that wall. In the code, this is enforced by copying the neighboring interior value.
 
@@ -446,17 +287,7 @@ and becomes an input to the velocity update in the next stage of the solver.
 
 The pressure field has now been updated for the current time step. The solver can use that pressure, together with the previous velocity field, to calculate the next values of $u$ and $v$. For each interior grid point, the velocity update follows the same general structure:
 
-$$
-\text{Velocity}_{new} 
-=
-\text{Velocity}_{previous}
--
-\text{Advection}
--
-\text{Pressure-gradient}
-+
-\text{Viscous-diffusion}
-$$
+$$ \text{Velocity}_{new} = \text{Velocity}_{previous} - \text{Advection} - \text{Pressure-gradient} + \text{Viscous-diffusion} $$
 
 Advection and viscous diffusion act in both the $x$ and $y$ directions, so each velocity update contains contributions from both directions.
 
@@ -465,142 +296,47 @@ Advection and viscous diffusion act in both the $x$ and $y$ directions, so each 
 
 The horizontal velocity $u$ is governed by the horizontal momentum equation:
 
-$$
-\frac{\partial u}{\partial t}
-+
-u\frac{\partial u}{\partial x}
-+
-v\frac{\partial u}{\partial y}
-=
--\frac{1}{\rho}\frac{\partial p}{\partial x}
-+
-\nu
-\left(
-\frac{\partial^2u}{\partial x^2}
-+
-\frac{\partial^2u}{\partial y^2}
-\right)
-$$
+$$ \frac{\partial u}{\partial t} + u\frac{\partial u}{\partial x} + v\frac{\partial u}{\partial y} = -\frac{1}{\rho}\frac{\partial p}{\partial x} + \nu \left( \frac{\partial^2u}{\partial x^2} + \frac{\partial^2u}{\partial y^2} \right) $$
 
 The finite-difference solver converts this equation into an update for each interior grid point:
 
-$$
-\begin{aligned}
-u_{i,j}^{n+1}
-={}&
-u_{i,j}^{n}
-\\
-&-
-u_{i,j}^{n}
-\frac{\Delta t}{\Delta x}
-\left(
-u_{i,j}^{n}-u_{i,j-1}^{n}
-\right)
-\\
-&-
-v_{i,j}^{n}
-\frac{\Delta t}{\Delta y}
-\left(
-u_{i,j}^{n}-u_{i-1,j}^{n}
-\right)
-\\
-&-
-\frac{\Delta t}{2\rho\Delta x}
-\left(
-p_{i,j+1}-p_{i,j-1}
-\right)
-\\
-&+
-\nu\frac{\Delta t}{\Delta x^2}
-\left(
-u_{i,j+1}^{n}
--2u_{i,j}^{n}
-+u_{i,j-1}^{n}
-\right)
-\\
-&+
-\nu\frac{\Delta t}{\Delta y^2}
-\left(
-u_{i+1,j}^{n}
--2u_{i,j}^{n}
-+u_{i-1,j}^{n}
-\right)
-\end{aligned}
-$$
+$$ \begin{aligned} u_{i,j}^{n+1} ={}& u_{i,j}^{n} \\ &- u_{i,j}^{n} \frac{\Delta t}{\Delta x} \left( u_{i,j}^{n}-u_{i,j-1}^{n} \right) \\ &- v_{i,j}^{n} \frac{\Delta t}{\Delta y} \left( u_{i,j}^{n}-u_{i-1,j}^{n} \right) \\ &- \frac{\Delta t}{2\rho\Delta x} \left( p_{i,j+1}-p_{i,j-1} \right) \\ &+ \nu\frac{\Delta t}{\Delta x^2} \left( u_{i,j+1}^{n} -2u_{i,j}^{n} +u_{i,j-1}^{n} \right) \\ &+ \nu\frac{\Delta t}{\Delta y^2} \left( u_{i+1,j}^{n} -2u_{i,j}^{n} +u_{i-1,j}^{n} \right) \end{aligned} $$
 
 This can be read one contribution at a time.
 
 #### 1. Previous horizontal velocity
 
-$$
-u_{i,j}^{n}
-$$
+$$ u_{i,j}^{n} $$
 
 This is the horizontal velocity already present at the grid point.
 
 #### 2. Horizontal advection
 
-$$
--
-u_{i,j}^{n}
-\frac{\Delta t}{\Delta x}
-\left(
-u_{i,j}^{n}-u_{i,j-1}^{n}
-\right)
-$$
+$$ - u_{i,j}^{n} \frac{\Delta t}{\Delta x} \left( u_{i,j}^{n}-u_{i,j-1}^{n} \right) $$
 
 This represents horizontal motion carrying horizontal momentum through the fluid. The spatial derivative is approximated using the current point and the neighboring point to the left.
 
 #### 3. Vertical advection
 
-$$
--
-v_{i,j}^{n}
-\frac{\Delta t}{\Delta y}
-\left(
-u_{i,j}^{n}-u_{i-1,j}^{n}
-\right)
-$$
+$$ - v_{i,j}^{n} \frac{\Delta t}{\Delta y} \left( u_{i,j}^{n}-u_{i-1,j}^{n} \right) $$
 
 The horizontal velocity can also be transported by fluid moving vertically. Together, these two terms represent the advection of horizontal momentum.
 
 #### 4. Pressure-gradient contribution
 
-$$
--
-\frac{\Delta t}{2\rho\Delta x}
-\left(
-p_{i,j+1}-p_{i,j-1}
-\right)
-$$
+$$ - \frac{\Delta t}{2\rho\Delta x} \left( p_{i,j+1}-p_{i,j-1} \right) $$
 
 A difference in pressure between the left and right sides of a grid point can accelerate the fluid horizontally. The solver estimates this pressure gradient using the pressure values on both sides of the point.
 
 #### 5. Viscous diffusion in the $x$ direction
 
-$$
-+
-\nu\frac{\Delta t}{\Delta x^2}
-\left(
-u_{i,j+1}^{n}
--2u_{i,j}^{n}
-+u_{i,j-1}^{n}
-\right)
-$$
+$$ + \nu\frac{\Delta t}{\Delta x^2} \left( u_{i,j+1}^{n} -2u_{i,j}^{n} +u_{i,j-1}^{n} \right) $$
 
 This compares the current horizontal velocity with its left and right neighbors.
 
 #### 6. Viscous diffusion in the $y$ direction
 
-$$
-+
-\nu\frac{\Delta t}{\Delta y^2}
-\left(
-u_{i+1,j}^{n}
--2u_{i,j}^{n}
-+u_{i-1,j}^{n}
-\right)
-$$
+$$ + \nu\frac{\Delta t}{\Delta y^2} \left( u_{i+1,j}^{n} -2u_{i,j}^{n} +u_{i-1,j}^{n} \right) $$
 
 This performs the same type of calculation using the neighboring velocities above and below the current point. Viscous diffusion tends to smooth differences in velocity between neighboring parts of the fluid. After these contributions are combined, the solver has the new horizontal velocity field $u^{n+1}$.
 
@@ -610,74 +346,15 @@ The vertical component follows the same structure.
 
 Its momentum equation is:
 
-$$
-\frac{\partial v}{\partial t}
-+
-u\frac{\partial v}{\partial x}
-+
-v\frac{\partial v}{\partial y}
-=
--\frac{1}{\rho}\frac{\partial p}{\partial y}
-+
-\nu
-\left(
-\frac{\partial^2v}{\partial x^2}
-+
-\frac{\partial^2v}{\partial y^2}
-\right)
-$$
+$$ \frac{\partial v}{\partial t} + u\frac{\partial v}{\partial x} + v\frac{\partial v}{\partial y} = -\frac{1}{\rho}\frac{\partial p}{\partial y} + \nu \left( \frac{\partial^2v}{\partial x^2} + \frac{\partial^2v}{\partial y^2} \right) $$
 
 The implemented finite-difference update is:
 
-$$
-\begin{aligned}
-v_{i,j}^{n+1}
-={}&
-v_{i,j}^{n}
-\\
-&-
-u_{i,j}^{n}
-\frac{\Delta t}{\Delta x}
-\left(
-v_{i,j}^{n}-v_{i,j-1}^{n}
-\right)
-\\
-&-
-v_{i,j}^{n}
-\frac{\Delta t}{\Delta y}
-\left(
-v_{i,j}^{n}-v_{i-1,j}^{n}
-\right)
-\\
-&-
-\frac{\Delta t}{2\rho\Delta y}
-\left(
-p_{i+1,j}-p_{i-1,j}
-\right)
-\\
-&+
-\nu\frac{\Delta t}{\Delta x^2}
-\left(
-v_{i,j+1}^{n}
--2v_{i,j}^{n}
-+v_{i,j-1}^{n}
-\right)
-\\
-&+
-\nu\frac{\Delta t}{\Delta y^2}
-\left(
-v_{i+1,j}^{n}
--2v_{i,j}^{n}
-+v_{i-1,j}^{n}
-\right)
-\end{aligned}
-$$
+$$ \begin{aligned} v_{i,j}^{n+1} ={}& v_{i,j}^{n} \\ &- u_{i,j}^{n} \frac{\Delta t}{\Delta x} \left( v_{i,j}^{n}-v_{i,j-1}^{n} \right) \\ &- v_{i,j}^{n} \frac{\Delta t}{\Delta y} \left( v_{i,j}^{n}-v_{i-1,j}^{n} \right) \\ &- \frac{\Delta t}{2\rho\Delta y} \left( p_{i+1,j}-p_{i-1,j} \right) \\ &+ \nu\frac{\Delta t}{\Delta x^2} \left( v_{i,j+1}^{n} -2v_{i,j}^{n} +v_{i,j-1}^{n} \right) \\ &+ \nu\frac{\Delta t}{\Delta y^2} \left( v_{i+1,j}^{n} -2v_{i,j}^{n} +v_{i-1,j}^{n} \right) \end{aligned} $$
 
 The calculation contains the same effects as the horizontal update. The main difference is the pressure term. For $v$, it uses the pressure change in the $y$ direction:
 
-$$
-\frac{\partial p}{\partial y}
-$$
+$$ \frac{\partial p}{\partial y} $$
 
 because it is calculating vertical acceleration. In the code, both fields are updated together:
 
@@ -693,19 +370,11 @@ After the velocity equations are evaluated, the wall conditions are reapplied. T
 
 The left, right, and bottom walls remain stationary:
 
-$$
-u = 0,
-\qquad
-v = 0
-$$
+$$ u = 0, \qquad v = 0 $$
 
 The moving top wall is:
 
-$$
-u = 1,
-\qquad
-v = 0
-$$
+$$ u = 1, \qquad v = 0 $$
 
 ## 7. Convergence Check
 
@@ -713,23 +382,11 @@ The solver is looking for a steady-state solution, meaning the velocity field is
 
 The convergence measure is written as:
 
-$$
-\epsilon
-=
-\max
-\left(
-\max\left|u^{n+1}-u^n\right|,
-\max\left|v^{n+1}-v^n\right|
-\right)
-$$
+$$ \epsilon = \max \left( \max\left|u^{n+1}-u^n\right|, \max\left|v^{n+1}-v^n\right| \right) $$
 
 For the current baseline:
 
-$$
-\epsilon
-<
-10^{-5}
-$$
+$$ \epsilon < 10^{-5} $$
 
 The symbol $\epsilon$ is commonly used to represent a small numerical error, difference, or convergence measure. In this solver, it corresponds to the code variable `velocity_change`.
 

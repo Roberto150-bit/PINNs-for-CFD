@@ -41,58 +41,24 @@ File/output settings
 ### Data-Driven Inputs & Outputs:
 7. For current solver, we already know the experiment is fixed at Re = 100 and the finite-difference solver produces the CFD solution on the cavity grid. Thus the setup for the data-driven nn is: 
 
-$$
-(x, y) 
-\rightarrow
-(u, v, p)
-$$
+$$ (x, y) \rightarrow (u, v, p) $$
 
 we are not adding more inputs yet. Since we are setting the baseline for experiments and testing.
 
 8. One input vector is:
 
-$$
-\mathbf{x}_{input}
-=
-[x, y]
-$$
+$$ \mathbf{x}_{input} = [x, y] $$
 
 9. One output vector is:
 
-$$
-\mathbf{y}_{output}
-=
-[u, v, p]
-$$
+$$ \mathbf{y}_{output} = [u, v, p] $$
 
 10. For the current $21 \times 21$ grid: $441$ $samples$
 
-$$
-\bold{X}_{shape} 
-= 
-(441, 2) 
-= 
-\begin{bmatrix} 
-x_1 & y_1 \\ 
-x_2 & y_2 \\
-\vdots & \vdots \\
-x_441 & y_441 \\
-\end{bmatrix} 
-$$
+$$ \bold{X}_{shape} = (441, 2) = \begin{bmatrix} x_1 & y_1 \\ x_2 & y_2 \\ \vdots & \vdots \\ x_441 & y_441 \\ \end{bmatrix} $$
 
 
-$$
-\bold{Y}_{shape}
-=
-(441, 3)
-=
-\begin{bmatrix}
-u_1 & v_1 & p_1 \\ 
-u_2 & v_2 & p_2 \\
-\vdots & \vdots \\
-u_441 & v_441 & p_441 \\
-\end{bmatrix}
-$$
+$$ \bold{Y}_{shape} = (441, 3) = \begin{bmatrix} u_1 & v_1 & p_1 \\ u_2 & v_2 & p_2 \\ \vdots & \vdots \\ u_441 & v_441 & p_441 \\ \end{bmatrix} $$
 
 11. Training data includes all grid points, including boundaries.
 
@@ -100,50 +66,23 @@ $$
 
 13. The number that TensorFlow will use to make the network learn is the mean squared error (MSE):
 
-$$
-\text{MSE}
-=
-\frac{1}{N}
-\sum_{i=1}^{N}
-(y_i - \hat{y})^2
-$$
+$$ \text{MSE} = \frac{1}{N} \sum_{i=1}^{N} (y_i - \hat{y})^2 $$
 
 14. Each output component will be separately calculated:
 
-$$
-\text{MSE}_u, 
-\qquad
-\text{MSE}_v,
-\qquad
-\text{MSE}_p
-$$
+$$ \text{MSE}_u, \qquad \text{MSE}_v, \qquad \text{MSE}_p $$
 
 During trianing the neural network will learn through the combination of the errors:
 
-$$
-\mathcal{L}_{data}
-=
-\frac{MSE_u + MSE_v + MSE_p}{3}
-$$
+$$ \mathcal{L}_{data} = \frac{MSE_u + MSE_v + MSE_p}{3} $$
 
 15. Since the three values differ they will add more weight to the loss function in general. For example:
 
-$$
-\text{MSE}_u=0.001,
-\qquad 
-\text{MSE}_v=0.001,
-\qquad 
-\text{MSE}_p=0.1
-$$
+$$ \text{MSE}_u=0.001, \qquad \text{MSE}_v=0.001, \qquad \text{MSE}_p=0.1 $$
 
 Then:
 
-$$
-\mathcal{L}_{data}
-=
-\frac{0.001+0.001+0.1}{3}
-=0.034
-$$
+$$ \mathcal{L}_{data} = \frac{0.001+0.001+0.1}{3} =0.034 $$
 
 Thus, $u$, $v$, and $p$ will be calculated in the $MSE_{loss}$, with output normalization used to prevent differences from causing one variable to dominate everything.
 
@@ -151,62 +90,26 @@ Thus, $u$, $v$, and $p$ will be calculated in the $MSE_{loss}$, with output norm
 
 $MSE$: Emphasizes larger errors and directly connects to out training loss.
 
-$$
-MSE
-=
-\frac{1}{N}
-\sum_{i=1}^{N}
-(y_i - \hat{y})^2
-$$
+$$ MSE = \frac{1}{N} \sum_{i=1}^{N} (y_i - \hat{y})^2 $$
 
 $MAE$ (Mean Absolute Error): Tells us the average magnitude of the error in a more intuitive way. This is different than the MSE although similar formulas. It's easier to interpreted as the model's typical prediction error.
 
-$$
-\text{MAE}
-=
-\frac{1}{N}
-\sum_{i=1}^{N}|y_i-\hat y_i|
-$$
+$$ \text{MAE} = \frac{1}{N} \sum_{i=1}^{N}|y_i-\hat y_i| $$
 
 $Relative error$: Tells us how large the error is relative to the actual CFD solution, which can make comparisons across $u$, $v$, $p$ easier. 
 
-$$
-\text{Relative Error (\%)}
-=
-\frac{|y-\hat y|}{|y|}\times100
-$$
+$$ \text{Relative Error (\%)} = \frac{|y-\hat y|}{|y|}\times100 $$
 
 17. Make sure that the data-driven neural network satisfy physical law. For incompressible flow, it should satisfy:
 
-$$
-\nabla
-\cdot
-\mathbf{u}
-=
-\frac{\partial u}{\partial x}
-+
-\frac{\partial v}{\partial y}
-=0
-$$
+$$ \nabla \cdot \mathbf{u} = \frac{\partial u}{\partial x} + \frac{\partial v}{\partial y} =0 $$
 
 Thus, we can measure how close the neural network's predicted velocity field comes to satisfying it.
 
-$$
-\text{Continuity error}
-=
-\frac{\partial \hat u}{\partial x}
-+
-\frac{\partial \hat v}{\partial y}
-$$
+$$ \text{Continuity error} = \frac{\partial \hat u}{\partial x} + \frac{\partial \hat v}{\partial y} $$
 
 Ideally
-$$
-\nabla
-\cdot
-\hat{\mathbf{u}}
-\approx
-0
-$$
+$$ \nabla \cdot \hat{\mathbf{u}} \approx 0 $$
 
 This measurement will not be used to train the model.
 
@@ -575,9 +478,7 @@ This also showed that the solver's previous convergence test only checked conver
 
 23. The primary vortex center of the finite-difference solution will be estimated by fining the interios grid point with the minimum velocity magnitude
 
-$$
-|\mathbf{V}|=\sqrt{u^2+v^2}
-$$
+$$ |\mathbf{V}|=\sqrt{u^2+v^2} $$
 
 Because the current $21 x 21$ grid has a spacing of $0.05$, the calculated vortex-center location will be limited to the available grid coordinates and is not expected to exactly mathc the benchmark.
 
