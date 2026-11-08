@@ -259,15 +259,16 @@ def column_rq3(slide):
               fig="v4_trend",
               text=trend_evidence())
     COLUMN_END[3] = panel(slide, x, y,
-                          "RQ3: Satisfying the equations did not make the PINN's flow correct.",
+                          "RQ3: At Re = 400 the PINN obeys the equations but needs far more training "
+                          "to get the flow right.",
                           fig="v4_re400",
-                          text=["Re = 400 at t = 5. The PINN conserves mass better than the data NN "
+                          text=["Flow at t = 5 (✕ = vortex). After 20,000 steps the PINN conserves mass "
+                                "better than the data NN "
                                 f"({num('re400_pinn_gpu_continuity_residual_mean', '{:.2f}')} vs "
-                                f"{num('re400_dnn_gpu_continuity_residual_mean', '{:.2f}')}), yet its "
-                                "vortex (✕) sits against the lid.",
-                                "Trained 5× longer (100,000 steps), the same PINN's error in u falls from "
+                                f"{num('re400_dnn_gpu_continuity_residual_mean', '{:.2f}')}) yet puts the "
+                                "vortex by the lid. After 100,000 steps its error in u falls from "
                                 f"{pct('s5_re400_pinn_u_at_20k_mean')} to {pct('s5_re400_pinn_u_at_100k_mean')} "
-                                "(one seed): it was under-trained, not unable."])
+                                "(one seed): under-trained, not unable."])
 
 
 def column_answer(slide):

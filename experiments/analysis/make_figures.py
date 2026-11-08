@@ -768,6 +768,33 @@ def fig_v4_trend(data):
     return fig, plotted
 
 
+def fig_v4_re400(fields, t_show=5.0):
+    """Re 400, u at t = 5: simulation, data NN, PINN (20,000 steps), PINN after 5x training,
+    each with its primary-vortex center (minimum of the stream function)."""
+    order = [("finite_difference", "FD\nreference", COLORS["finite_difference"]),
+             ("data_driven_nn", "Data\nNN", COLORS["data_driven_nn"]),
+             ("pinn", "PINN\n20k steps", COLORS["pinn"]),
+             ("pinn_long", "PINN\n100k steps", COLORS["pinn"])]
+    order = [o for o in order if o[0] in fields]
+    fig, axes = plt.subplots(1, len(order), figsize=(WIDTH, 3.6), constrained_layout=True)
+    ref = fields["finite_difference"]
+    k = int(np.argmin(np.abs(ref["t"] - t_show)))
+    vmax = max(abs(ref["u"][k]).max(), 1.0)
+    plotted = {}
+    for ax, (m, title, color) in zip(axes, order):
+        f = fields[m]
+        im = ax.imshow(f["u"][k], origin="lower", extent=[0, 1, 0, 1], cmap=DIVERGING, vmin=-vmax, vmax=vmax)
+        cx, cy, psi = vortex_center(f["u"][k], f["x"], f["y"])
+        ax.plot(cx, cy, marker="X", markersize=18, color=INK, markeredgecolor="white", markeredgewidth=2)
+        plotted[m] = {"vortex_x": cx, "vortex_y": cy, "psi_min": psi}
+        ax.set_title(title, color=color, fontweight="bold", fontsize=20)
+        ax.set_xticks([])
+        ax.set_yticks([])
+        ax.grid(False)
+    fig.colorbar(im, ax=axes.tolist(), orientation="horizontal", shrink=0.6, aspect=30, pad=0.03, label="u")
+    return fig, plotted
+
+
 def fig_v4_cost(nums):
     """Finding 5: GPU seconds to a usable flow, split into simulation data and training."""
     fig, ax = plt.subplots(figsize=(WIDTH, 4.4), constrained_layout=True)
@@ -1197,7 +1224,12 @@ def main():
             rid = f"{prefix}_re400_gpu_s1"
             flds[m] = dict(np.load(os.path.join(exp4, m, rid, "predictions.npz")))
             used.append(rid)
-        fig, p = fig_v2_re400(flds, width=WIDTH, title="")
+        long_id = "pinn_re400_gpu_s1_steps100k"
+        long_dir = os.path.join(exp4, "extended", "pinn", long_id)
+        if os.path.exists(os.path.join(long_dir, "performance.json")):
+            flds["pinn_long"] = dict(np.load(os.path.join(long_dir, "predictions.npz")))
+            used.append(long_id)
+        fig, p = fig_v4_re400(flds)
         made.append(save(fig, "v4_re400", used, p))
     if wanted("v2_training_length"):
         d = training_length_data()
