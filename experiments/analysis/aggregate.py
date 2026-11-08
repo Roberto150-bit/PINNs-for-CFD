@@ -1,0 +1,293 @@
+"""Aggregate run results into summary tables and the poster's numbers.
+
+Inputs (all generated):
+  experiments/results/experiment_results.csv   (evaluate_all.py)
+  each run's metrics.json / performance.json / eval_history.csv
+  experiments/results/fd_validation_re100.json, fd_transient_convergence_re100.json
+  experiments/experiment_001_re100/determinism_cost/
+
+Outputs:
+  experiments/results/summary_by_group.csv   mean ± std per (method, device)
+  experiments/results/aggregate.json         every derived result with its run ids
+  experiments/results/poster_numbers.json    the numbers quoted in the poster text
+
+Derived cost results
+  total cost to a usable 64 x 64 x 51 field:
+      FD = solve time;  data NN = FD solve + training;  PINN = training
+  break-even field evaluations n*: smallest n for which
+      cost_to_train + n · inference  <  n · FD solve,
+      i.e. n* = cost_to_train / (FD solve − inference), when inference < FD solve
+  FD scaling exponent: least-squares slope of log(solve time) vs log(N²)
+
+    python experiments/analysis/aggregate.py
+"""
+import csv
+import glob
+import json
+import os
+import statistics
+import sys
+
+REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+sys.path.insert(0, REPO_ROOT)
+
+import numpy as np  # noqa: E402
+
+from models.common import config as C  # noqa: E402
+
+RESULTS = "experiments/results"
+EXP = C.EXPERIMENT_DIR
+METRIC_COLS = (
+    [f"{s}_relative_l2_{k}" for s in ("test_a", "test_b", "full_field") for k in "uvp"]
+    + [f"{s}_mse_{k}" for s in ("test_a", "test_b", "full_field") for k in "uvp"]
+    + ["continuity_residual", "x_momentum_residual", "y_momentum_residual",
+       "stencil_continuity_rms", "stencil_continuity_rms_core", "boundary_rms", "initial_rms",
+       "training_time_seconds", "time_per_step_seconds", "first_step_seconds",
+       "throughput_samples_per_second", "inference_time_seconds", "inference_single_point_seconds",
+       "peak_ram_bytes", "peak_vram_bytes", "model_size_bytes", "output_size_bytes",
+       "total_run_size_bytes", "gpu_utilization_mean_percent", "solve_time_seconds"]
+)
+
+
+def read_rows():
+    with open(os.path.join(RESULTS, "experiment_results.csv")) as f:
+        rows = list(csv.DictReader(f))
+    for r in rows:
+        for k, v in r.items():
+            if v in ("", "None"):
+                r[k] = None
+            elif k in METRIC_COLS:
+                r[k] = float(v)
+    return rows
+
+
+def mean_std(values):
+    vals = [v for v in values if v is not None]
+    if not vals:
+        return None, None, 0
+    return (statistics.fmean(vals), statistics.stdev(vals) if len(vals) > 1 else 0.0, len(vals))
+
+
+def group_key(r):
+    if r["method"] == "finite_difference":
+        return None
+    kind = "timing" if r["timing_run"] == "True" else "full"
+    return (r["method"], r["device"], kind)
+
+
+def summarize(rows):
+    groups = {}
+    for r in rows:
+        k = group_key(r)
+        if k is not None:
+            groups.setdefault(k, []).append(r)
+    out = {}
+    for (method, device, kind), rs in sorted(groups.items()):
+        entry = {"method": method, "device": device, "kind": kind,
+                 "runs": sorted(r["run_id"] for r in rs), "n": len(rs)}
+        for col in METRIC_COLS:
+            m, s, n = mean_std([r.get(col) for r in rs])
+            entry[col] = {"mean": m, "std": s, "n": n}
+        out[f"{method}|{device}|{kind}"] = entry
+    return out
+
+
+def fd_timing():
+    # Solve time per grid: median of the three timing repeats (history logging off)
+    res = {}
+    for n in (32, 64, 128):
+        runs = sorted(glob.glob(os.path.join(EXP, "finite_difference", f"fd_re100_n{n}_transient_timing_r*")))
+        times, ram = [], []
+        for d in runs:
+            p = json.load(open(os.path.join(d, "performance.json")))
+            times.append(p["timing"]["solve_time_seconds"])
+            ram.append(p["memory"]["peak_ram_bytes"])
+        if times:
+            res[n] = {"runs": [os.path.basename(d) for d in runs], "solve_seconds": times,
+                      "median_solve_seconds": statistics.median(times),
+                      "median_peak_ram_bytes": statistics.median(ram),
+                      "output_size_bytes": os.path.getsize(os.path.join(runs[0], "solution.npz"))}
+    if len(res) >= 2:
+        ns = np.array(sorted(res))
+        t = np.array([res[n]["median_solve_seconds"] for n in ns])
+        slope = np.polyfit(np.log(ns.astype(float) ** 2), np.log(t), 1)[0]
+        res["scaling_exponent_vs_unknowns"] = float(slope)
+        res["scaling_note"] = "slope of log(solve time) vs log(N^2) for N = grid points per side, fixed 5,000 steps"
+    return res
+
+
+def determinism_cost():
+    out = {}
+    for method, rid in (("data_driven_nn", "dnn"), ("pinn", "pinn")):
+        per = {}
+        for tag in ("det", "nondet"):
+            p = os.path.join(EXP, "determinism_cost", method, f"{rid}_re100_gpu_s1_{tag}2000", "performance.json")
+            if os.path.exists(p):
+                per[tag] = json.load(open(p))["timing"]["time_per_step_seconds"]
+        if len(per) == 2:
+            out[method] = {"time_per_step_deterministic": per["det"],
+                           "time_per_step_nondeterministic": per["nondet"],
+                           "slowdown_ratio": per["det"] / per["nondet"],
+                           "runs": [f"{rid}_re100_gpu_s1_det2000", f"{rid}_re100_gpu_s1_nondet2000"]}
+    return out
+
+
+def accuracy_vs_time(rows):
+    # Test-A relative L2 vs training wall-clock, per run (from eval_history.csv)
+    curves = {}
+    for r in rows:
+        if r["method"] == "finite_difference" or r["status"] != "evaluated":
+            continue
+        path = os.path.join(EXP, r["method"], r["run_id"], "eval_history.csv")
+        with open(path) as f:
+            h = list(csv.DictReader(f))
+        curves[r["run_id"]] = {k: [float(x[k]) for x in h] for k in
+                               ("step", "train_time_seconds", "rel_l2_u", "rel_l2_v", "rel_l2_p")}
+    return curves
+
+
+def cost_to_solution(summary, fd):
+    fd64 = fd.get(64, {}).get("median_solve_seconds")
+    out = {"fd_solve_seconds_n64": fd64, "fd_runs": fd.get(64, {}).get("runs")}
+    for key, g in summary.items():
+        method, device, kind = key.split("|")
+        if kind != "full":
+            continue
+        train = g["training_time_seconds"]["mean"]
+        infer = g["inference_time_seconds"]["mean"]
+        if train is None:
+            continue
+        total = train + (fd64 if method == "data_driven_nn" else 0.0)
+        entry = {"training_seconds_mean": train, "inference_seconds_mean": infer,
+                 "total_cost_to_field_seconds": total, "runs": g["runs"]}
+        if fd64 is not None and infer is not None and infer < fd64:
+            entry["break_even_evaluations"] = total / (fd64 - infer)
+        else:
+            entry["break_even_evaluations"] = None
+            entry["break_even_note"] = "inference is not faster than an FD solve: never repays"
+        out[f"{method}|{device}"] = entry
+    return out
+
+
+def poster_numbers(summary, fd, det, cost, validation, transient):
+    def g(method, device, col, stat="mean", kind="full"):
+        e = summary.get(f"{method}|{device}|{kind}")
+        return None if e is None else e[col][stat]
+
+    def runs(method, device, kind="full"):
+        e = summary.get(f"{method}|{device}|{kind}")
+        return [] if e is None else e["runs"]
+
+    nums = {}
+
+    def put(key, value, run_ids, desc):
+        nums[key] = {"value": value, "runs": run_ids, "description": desc}
+
+    for m, short in (("data_driven_nn", "dnn"), ("pinn", "pinn")):
+        for split in ("test_a", "test_b"):
+            for k in "uvp":
+                col = f"{split}_relative_l2_{k}"
+                put(f"{short}_gpu_{col}_mean", g(m, "gpu", col), runs(m, "gpu"),
+                    f"{m} GPU runs: mean relative L2 of {k} on {split}")
+                put(f"{short}_gpu_{col}_std", g(m, "gpu", col, "std"), runs(m, "gpu"),
+                    f"{m} GPU runs: std over seeds")
+        for col in ("continuity_residual", "x_momentum_residual", "y_momentum_residual",
+                    "stencil_continuity_rms_core", "boundary_rms", "initial_rms",
+                    "training_time_seconds", "time_per_step_seconds", "inference_time_seconds",
+                    "inference_single_point_seconds", "peak_vram_bytes", "peak_ram_bytes",
+                    "model_size_bytes"):
+            put(f"{short}_gpu_{col}_mean", g(m, "gpu", col), runs(m, "gpu"), f"{m} GPU: mean {col}")
+            put(f"{short}_gpu_{col}_std", g(m, "gpu", col, "std"), runs(m, "gpu"), f"{m} GPU: std {col}")
+    put("dnn_cpu_training_time_seconds_mean", g("data_driven_nn", "cpu", "training_time_seconds"),
+        runs("data_driven_nn", "cpu"), "data NN CPU: mean training time")
+    put("dnn_cpu_time_per_step_seconds_mean", g("data_driven_nn", "cpu", "time_per_step_seconds"),
+        runs("data_driven_nn", "cpu"), "data NN CPU: mean time per step")
+    put("pinn_cpu_time_per_step_seconds_mean",
+        g("pinn", "cpu", "time_per_step_seconds", kind="timing"), runs("pinn", "cpu", "timing"),
+        "PINN CPU timing runs (2,000 steps): mean time per step")
+    put("pinn_cpu_peak_ram_bytes_mean", g("pinn", "cpu", "peak_ram_bytes", kind="timing"),
+        runs("pinn", "cpu", "timing"), "PINN CPU timing runs: mean peak RSS")
+    fd_rows = {r["run_id"]: r for r in read_rows() if r["method"] == "finite_difference"}
+    ref_id = C.fd_reference_run_id(100.0)
+    if ref_id in fd_rows:
+        put("fd_stencil_continuity_rms_core", fd_rows[ref_id]["stencil_continuity_rms_core"], [ref_id],
+            "FD reference: core-region continuity RMS (central stencil)")
+    for n in (32, 64, 128):
+        if n in fd:
+            put(f"fd_n{n}_solve_seconds_median", fd[n]["median_solve_seconds"], fd[n]["runs"],
+                f"FD {n}x{n} transient (5,000 steps) solve time, median of repeats")
+            put(f"fd_n{n}_peak_ram_bytes", fd[n]["median_peak_ram_bytes"], fd[n]["runs"],
+                f"FD {n}x{n} transient: peak RSS, median of repeats")
+    if "scaling_exponent_vs_unknowns" in fd:
+        put("fd_scaling_exponent", fd["scaling_exponent_vs_unknowns"],
+            [r for n in (32, 64, 128) if n in fd for r in fd[n]["runs"]], fd["scaling_note"])
+    for key, e in cost.items():
+        if "|" not in key:
+            continue
+        m, dev = key.split("|")
+        short = "dnn" if m == "data_driven_nn" else "pinn"
+        put(f"{short}_{dev}_total_cost_to_field_seconds", e["total_cost_to_field_seconds"], e["runs"],
+            f"{m} {dev}: total cost to a usable field")
+        put(f"{short}_{dev}_break_even_evaluations", e["break_even_evaluations"], e["runs"],
+            f"{m} {dev}: field evaluations before inference repays training vs rerunning FD")
+    for m, e in det.items():
+        put(f"{'dnn' if m == 'data_driven_nn' else 'pinn'}_determinism_slowdown", e["slowdown_ratio"],
+            e["runs"], f"{m}: time per step with / without enable_op_determinism (GPU, 2,000 steps)")
+    if validation:
+        for r in validation["runs"]:
+            n = r["n"]
+            put(f"fd_val_n{n}_u_max_dev", r["u_centerline_max_abs_dev"], [r["run_id"]],
+                f"FD {n}: max |u - Marchi| on x = 0.5")
+            put(f"fd_val_n{n}_v_max_dev", r["v_centerline_max_abs_dev"], [r["run_id"]],
+                f"FD {n}: max |v - Marchi| on y = 0.5")
+            put(f"fd_val_n{n}_vortex_x", r["vortex_x"], [r["run_id"]], f"FD {n}: vortex center x")
+            put(f"fd_val_n{n}_vortex_y", r["vortex_y"], [r["run_id"]], f"FD {n}: vortex center y")
+            put(f"fd_val_n{n}_vortex_dist_marchi", r["vortex_dist_marchi"], [r["run_id"]],
+                f"FD {n}: vortex center distance to Marchi")
+            put(f"fd_val_n{n}_vortex_dist_hou", r["vortex_dist_hou"], [r["run_id"]],
+                f"FD {n}: vortex center distance to Hou")
+            put(f"fd_val_n{n}_psi_min", r["psi_min"], [r["run_id"]], f"FD {n}: minimum stream function")
+    if transient:
+        tc = transient["time_convergence"]
+        put("fd_dt_halving_max_diff_t5", tc["summary_velocity"]["at_t_end"], tc["runs"],
+            "FD 64: max |velocity difference| between dt and dt/2 at t = 5")
+    return nums
+
+
+def main():
+    rows = read_rows()
+    summary = summarize(rows)
+    fd = fd_timing()
+    det = determinism_cost()
+    cost = cost_to_solution(summary, fd)
+    vpath = os.path.join(RESULTS, "fd_validation_re100.json")
+    tpath = os.path.join(RESULTS, "fd_transient_convergence_re100.json")
+    validation = json.load(open(vpath)) if os.path.exists(vpath) else None
+    transient = json.load(open(tpath)) if os.path.exists(tpath) else None
+
+    with open(os.path.join(RESULTS, "summary_by_group.csv"), "w", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["method", "device", "kind", "n", "runs"] + [f"{c}_{s}" for c in METRIC_COLS for s in ("mean", "std")])
+        for e in summary.values():
+            w.writerow([e["method"], e["device"], e["kind"], e["n"], " ".join(e["runs"])]
+                       + [e[c][s] for c in METRIC_COLS for s in ("mean", "std")])
+
+    agg = {"summary": summary, "fd_timing": {str(k): v for k, v in fd.items()},
+           "determinism_cost": det, "cost_to_solution": cost,
+           "accuracy_vs_time": accuracy_vs_time(rows)}
+    with open(os.path.join(RESULTS, "aggregate.json"), "w") as f:
+        json.dump(agg, f, indent=1)
+    nums = poster_numbers(summary, fd, det, cost, validation, transient)
+    with open(os.path.join(RESULTS, "poster_numbers.json"), "w") as f:
+        json.dump(nums, f, indent=1)
+
+    for key, e in summary.items():
+        print(f"{key:32s} n={e['n']} testA relL2 u {e['test_a_relative_l2_u']['mean']} "
+              f"train {e['training_time_seconds']['mean']}")
+    print("FD timing:", {k: v["median_solve_seconds"] if isinstance(v, dict) else v for k, v in fd.items()})
+    print("cost:", json.dumps(cost, indent=1))
+    print("determinism:", det)
+
+
+if __name__ == "__main__":
+    main()

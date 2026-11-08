@@ -1,0 +1,5 @@
+{
+  "run_id": "fd_re100_n32_transient",
+  "method": "finite_difference",
+  "status": "not on the reference grid (51, 32, 32)"
+}
