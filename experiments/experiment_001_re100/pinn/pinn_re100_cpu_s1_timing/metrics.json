@@ -1,0 +1,5 @@
+{
+  "run_id": "pinn_re100_cpu_s1_timing",
+  "method": "pinn",
+  "status": "timing run (cost only)"
+}

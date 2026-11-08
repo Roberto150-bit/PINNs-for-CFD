@@ -1,0 +1,5 @@
+{
+  "run_id": "fd_re100_n64_steady",
+  "method": "finite_difference",
+  "status": "not on the reference grid (1, 64, 64)"
+}

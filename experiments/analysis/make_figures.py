@@ -60,6 +60,15 @@ plt.rcParams.update({
 
 # ---------------- helpers ----------------
 
+def plain_log_axis(axis, subs=(1.0, 2.0, 5.0)):
+    """Log axis labelled at 1, 2, 5 per decade in plain decimals (0.02, 0.1, ...),
+    with unlabelled minor ticks, so labels stay short at 24 pt."""
+    from matplotlib.ticker import FuncFormatter, LogLocator, NullFormatter
+    axis.set_major_locator(LogLocator(base=10, subs=subs))
+    axis.set_major_formatter(FuncFormatter(lambda v, _: f"{v:g}"))
+    axis.set_minor_formatter(NullFormatter())
+
+
 def run_span(run_ids):
     """Compact run-id label for file names: dnn_re100_gpu_s1-s5."""
     groups = {}
@@ -111,7 +120,7 @@ def fig_accuracy(data):
 
     data = {method: {"test_a": {"u": (mean, std), ...}, "test_b": {...}, "runs": [...]}}
     """
-    fig, axes = plt.subplots(1, 2, figsize=(WIDTH, 4.0), sharey=True, constrained_layout=True)
+    fig, axes = plt.subplots(1, 2, figsize=(WIDTH, 3.6), sharey=True, constrained_layout=True)
     methods = [m for m in ("data_driven_nn", "pinn") if m in data]
     width = 0.8 / len(methods)
     plotted = {}
@@ -125,6 +134,7 @@ def fig_accuracy(data):
             plotted[f"{split}|{m}"] = [float(b.get_height()) for b in bars]
         ax.set_xticks(range(3), ["u", "v", "p"])
         ax.set_yscale("log")
+        plain_log_axis(ax.yaxis)
         ax.set_title(title, color=INK)
         ax.grid(axis="x", visible=False)
     axes[0].set_ylabel("Relative L2")
@@ -134,7 +144,7 @@ def fig_accuracy(data):
 
 def fig_error_vs_time(data):
     """Relative L2 of u per snapshot vs t, mean over seeds. data = {method: {"t": [...], "u": [...]}}"""
-    fig, ax = plt.subplots(figsize=(WIDTH, 3.2), constrained_layout=True)
+    fig, ax = plt.subplots(figsize=(WIDTH, 3.3), constrained_layout=True)
     plotted = {}
     for m in ("data_driven_nn", "pinn"):
         if m not in data:
@@ -142,12 +152,15 @@ def fig_error_vs_time(data):
         t, e = np.array(data[m]["t"]), np.array(data[m]["u"], dtype=float)
         (line,) = ax.plot(t, e, color=COLORS[m], label=LABELS[m], marker="o", markersize=5)
         plotted[m] = [float(v) for v in line.get_ydata()]
-    for tb in C.TEST_B_TIMES:
-        ax.axvline(tb, color=GRIDLINE, linewidth=1.5, linestyle=":", zorder=0)
+    for i, tb in enumerate(C.TEST_B_TIMES):
+        ax.axvline(tb, color=INK2, linewidth=1.2, linestyle=":", zorder=0,
+                   label="Test-B times" if i == 0 else None)
     ax.set_yscale("log")
+    plain_log_axis(ax.yaxis)
     ax.set_xlabel("t")
-    ax.set_ylabel("Rel. L2 of u")
-    ax.legend(frameon=False, loc="best", ncols=2)
+    ax.set_ylabel("Rel. L2, u")
+    fig.legend(frameon=False, loc="outside lower center", ncols=3, handlelength=1.0,
+               columnspacing=0.8, fontsize=22)
     return fig, plotted
 
 
@@ -156,7 +169,7 @@ def fig_residuals(data):
 
     data = {method: {"continuity": (m, s), "x_momentum": (m, s), "y_momentum": (m, s)}}
     """
-    fig, ax = plt.subplots(figsize=(WIDTH, 3.2), constrained_layout=True)
+    fig, ax = plt.subplots(figsize=(WIDTH, 3.0), constrained_layout=True)
     names = ["continuity", "x_momentum", "y_momentum"]
     methods = [m for m in ("data_driven_nn", "pinn") if m in data]
     width = 0.8 / len(methods)
@@ -170,9 +183,10 @@ def fig_residuals(data):
         plotted[m] = [float(b.get_height()) for b in bars]
     ax.set_xticks(range(3), ["Contin.", "x-mom.", "y-mom."])
     ax.set_yscale("log")
-    ax.set_ylabel("RMS residual")
+    plain_log_axis(ax.yaxis, subs=(1.0,))
+    ax.set_ylabel("RMS resid.")
     ax.grid(axis="x", visible=False)
-    ax.legend(frameon=False, loc="best", ncols=2)
+    fig.legend(frameon=False, loc="outside lower center", ncols=2)
     return fig, plotted
 
 
@@ -187,9 +201,12 @@ def fig_snapshots(fields, times):
     ref = fields["finite_difference"]
     vmax = max(abs(ref["u"]).max(), 1.0)
     plotted = {}
-    err_max = 0.0
-    for m in ("data_driven_nn", "pinn"):
-        err_max = max(err_max, float(np.abs(fields[m]["u"] - ref["u"]).max()))
+    # Error colour scale: 99th percentile of |error| over both networks and the shown
+    # times, so the lid-corner spikes (largest errors) do not wash out the interior
+    shown = [int(np.argmin(np.abs(ref["t"] - tt))) for tt in times]
+    errs = np.concatenate([np.abs(fields[m]["u"][shown] - ref["u"][shown]).ravel()
+                           for m in ("data_driven_nn", "pinn")])
+    err_max = float(np.percentile(errs, 99))
     for r, row in enumerate(rows):
         for c, tt in enumerate(times):
             ax = axes[r, c]
@@ -199,12 +216,12 @@ def fig_snapshots(fields, times):
                 img = np.abs(fields[m]["u"][k] - ref["u"][k])
                 im_err = ax.imshow(img, origin="lower", extent=[0, 1, 0, 1], cmap=SEQUENTIAL,
                                    vmin=0, vmax=err_max)
-                label = f"|err| {'NN' if m == 'data_driven_nn' else 'PINN'}"
+                label = f"{'NN' if m == 'data_driven_nn' else 'PINN'}\nerror"
             else:
                 img = fields[row]["u"][k]
                 im = ax.imshow(img, origin="lower", extent=[0, 1, 0, 1], cmap=DIVERGING,
                                vmin=-vmax, vmax=vmax)
-                label = {"finite_difference": "FD", "data_driven_nn": "Data NN", "pinn": "PINN"}[row]
+                label = {"finite_difference": "FD", "data_driven_nn": "Data\nNN", "pinn": "PINN"}[row]
             plotted[f"{row}|t={tt}"] = {"max": float(img.max()), "min": float(img.min())}
             ax.set_xticks([])
             ax.set_yticks([])
@@ -214,14 +231,15 @@ def fig_snapshots(fields, times):
             if c == 0:
                 ax.set_ylabel(label, color=INK)
     fig.colorbar(im, ax=axes[:3, :].ravel().tolist(), shrink=0.9, label="u")
-    fig.colorbar(im_err, ax=axes[3:, :].ravel().tolist(), shrink=0.9, label="|u error|")
+    fig.colorbar(im_err, ax=axes[3:, :].ravel().tolist(), shrink=0.9, extend="max",
+                 label="|u error|")
     return fig, plotted
 
 
 def fig_accuracy_vs_time(curves):
     """Test-A relative L2 of u vs training time; one line per run, color by method,
     solid = GPU, dashed = CPU. curves = {run_id: {"method", "device", "time": [], "err": []}}"""
-    fig, ax = plt.subplots(figsize=(WIDTH, 4.4), constrained_layout=True)
+    fig, ax = plt.subplots(figsize=(WIDTH, 3.7), constrained_layout=True)
     plotted = {}
     seen = set()
     for run_id, c in sorted(curves.items()):
@@ -233,8 +251,10 @@ def fig_accuracy_vs_time(curves):
         plotted[run_id] = [float(v) for v in line.get_ydata()]
     ax.set_xscale("log")
     ax.set_yscale("log")
+    plain_log_axis(ax.xaxis, subs=(1.0,))
+    plain_log_axis(ax.yaxis, subs=(1.0, 3.0))
     ax.set_xlabel("Training time (s)")
-    ax.set_ylabel("Test-A rel. L2 of u")
+    ax.set_ylabel("Rel. L2, u")
     fig.legend(frameon=False, loc="outside lower center", ncols=2)
     return fig, plotted
 
@@ -264,7 +284,7 @@ def fig_centerlines(val):
 
 def fig_grid_convergence(val):
     """Max centerline deviation from Marchi vs grid spacing (log-log)."""
-    fig, ax = plt.subplots(figsize=(WIDTH, 4.4), constrained_layout=True)
+    fig, ax = plt.subplots(figsize=(WIDTH, 4.0), constrained_layout=True)
     dx = np.array([r["dx"] for r in val["runs"]])
     du = np.array([r["u_centerline_max_abs_dev"] for r in val["runs"]])
     dv = np.array([r["v_centerline_max_abs_dev"] for r in val["runs"]])
@@ -274,6 +294,8 @@ def fig_grid_convergence(val):
     ax.plot(dx, ref, ":", color=INK2, linewidth=2, label="slope 2")
     ax.set_xscale("log")
     ax.set_yscale("log")
+    plain_log_axis(ax.xaxis)
+    plain_log_axis(ax.yaxis)
     ax.set_xlabel("Grid spacing Δx")
     ax.set_ylabel("Max |FD − Marchi|")
     ax.legend(frameon=False, loc="upper left")
@@ -304,7 +326,7 @@ def fig_vortex_center(val):
 
 def fig_schematic():
     """Cavity with boundary conditions and the lid ramp (no data)."""
-    fig, (ax, ax2) = plt.subplots(1, 2, figsize=(WIDTH, 4.0), constrained_layout=True,
+    fig, (ax, ax2) = plt.subplots(1, 2, figsize=(WIDTH, 3.8), constrained_layout=True,
                                   gridspec_kw={"width_ratios": [1.15, 1]})
     ax.add_patch(Rectangle((0, 0), 1, 1, fill=False, lw=4, ec=INK))
     ax.add_patch(Rectangle((0, 1), 1, 0.05, color=COLORS["finite_difference"]))
@@ -329,7 +351,7 @@ def fig_schematic():
 
 def fig_pipelines():
     """FD → data → data NN; physics → PINN; one shared evaluator."""
-    fig, ax = plt.subplots(figsize=(WIDTH, 4.2), constrained_layout=True)
+    fig, ax = plt.subplots(figsize=(WIDTH, 3.5), constrained_layout=True)
     ax.axis("off")
     ax.set_xlim(0, 15)
     ax.set_ylim(0, 8.4)

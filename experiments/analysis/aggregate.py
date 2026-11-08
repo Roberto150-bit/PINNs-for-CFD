@@ -202,6 +202,10 @@ def poster_numbers(summary, fd, det, cost, validation, transient):
         runs("data_driven_nn", "cpu"), "data NN CPU: mean training time")
     put("dnn_cpu_time_per_step_seconds_mean", g("data_driven_nn", "cpu", "time_per_step_seconds"),
         runs("data_driven_nn", "cpu"), "data NN CPU: mean time per step")
+    put("dnn_cpu_inference_time_seconds_mean", g("data_driven_nn", "cpu", "inference_time_seconds"),
+        runs("data_driven_nn", "cpu"), "data NN CPU: mean full-field inference time")
+    put("dnn_cpu_peak_ram_bytes_mean", g("data_driven_nn", "cpu", "peak_ram_bytes"),
+        runs("data_driven_nn", "cpu"), "data NN CPU: mean peak RSS")
     put("pinn_cpu_time_per_step_seconds_mean",
         g("pinn", "cpu", "time_per_step_seconds", kind="timing"), runs("pinn", "cpu", "timing"),
         "PINN CPU timing runs (2,000 steps): mean time per step")
