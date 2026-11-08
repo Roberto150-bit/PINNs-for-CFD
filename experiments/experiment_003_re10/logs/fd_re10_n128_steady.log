@@ -1,0 +1,2 @@
+fd_re10_n128_steady: steps=27554 t=1.378 solve=144.2s dV=4.999e-08 div_rms=1.241e-06 finite=True
+written to experiments/experiment_003_re10/finite_difference/fd_re10_n128_steady

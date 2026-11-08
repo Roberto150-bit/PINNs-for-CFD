@@ -1,0 +1,2 @@
+fd_re10_n64_steady: steps=5509 t=1.377 solve=8.5s dV=2.499e-07 div_rms=1.016e-05 finite=True
+written to experiments/experiment_003_re10/finite_difference/fd_re10_n64_steady

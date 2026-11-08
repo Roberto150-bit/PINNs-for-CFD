@@ -1,0 +1,47 @@
+{
+  "run_id": "fd_re10_n64_transient_dthalf",
+  "numerical_method": "finite_difference",
+  "mode": "transient",
+  "reynolds_number": 10.0,
+  "rho": 1.0,
+  "nu": 0.1,
+  "grid": {
+    "nx": 64,
+    "ny": 64,
+    "dx": 0.015873015873015872
+  },
+  "time_step": 0.000125,
+  "max_steps": 40000,
+  "advection_scheme": "central",
+  "time_scheme": "incremental_projection",
+  "pressure_solver": {
+    "method": "direct",
+    "iterations": null,
+    "boundary_condition": "neumann"
+  },
+  "lid": {
+    "velocity": 1.0,
+    "ramp": true,
+    "ramp_profile": "tanh(k t)",
+    "ramp_rate": 10.0
+  },
+  "convergence": {
+    "enabled": false,
+    "tolerance": 0.0
+  },
+  "snapshots": {
+    "interval": 0.1,
+    "count": 51
+  },
+  "initial_conditions": {
+    "u": 0.0,
+    "v": 0.0,
+    "p": 0.0
+  },
+  "device": "cpu",
+  "seed": null,
+  "python_version": "3.14.4",
+  "tf_version": null,
+  "deterministic_ops": null,
+  "created": "2026-11-08T10:51:58"
+}

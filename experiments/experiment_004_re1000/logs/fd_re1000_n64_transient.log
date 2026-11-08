@@ -1,0 +1,2 @@
+fd_re1000_n64_transient: steps=5000 t=5.000 solve=6.6s dV=1.120e-04 div_rms=2.329e-03 finite=True
+written to experiments/experiment_004_re1000/finite_difference/fd_re1000_n64_transient

@@ -1,0 +1,2 @@
+fd_re10_n64_transient_dthalf: steps=40000 t=5.000 solve=50.0s dV=7.216e-16 div_rms=1.015e-05 finite=True
+written to experiments/experiment_003_re10/finite_difference/fd_re10_n64_transient_dthalf

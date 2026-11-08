@@ -1,0 +1,44 @@
+{
+  "reynolds_number": 10.0,
+  "source_run_id": "fd_re10_n64_transient",
+  "source_file": "experiments/experiment_003_re10/finite_difference/fd_re10_n64_transient/solution.npz",
+  "source_sha256": "8ae0e4b0b1a7643a915c7d990d5974d9d136c33d75ccdec0334839397d063d15",
+  "rows": 208896,
+  "row_order": "time-major, then y, then x: k*ny*nx + j*nx + i",
+  "split_seed": 0,
+  "split_fractions": [
+    0.7,
+    0.15,
+    0.15
+  ],
+  "test_b_times": [
+    0.5,
+    1.0,
+    1.5,
+    2.0,
+    2.5,
+    3.0,
+    3.5,
+    4.0,
+    4.5,
+    5.0
+  ],
+  "counts": {
+    "train": 117555,
+    "val": 25190,
+    "test_a": 25191,
+    "test_b": 40960
+  },
+  "input_scaling": "scaled = 2 (X - low) / (high - low) - 1",
+  "input_low": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "input_high": [
+    1.0,
+    1.0,
+    5.0
+  ],
+  "dataset_sha256": "28ff651d298098577197095c617d2551cfce86c5b7feda7ce666114770fa9f51"
+}

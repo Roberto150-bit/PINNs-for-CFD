@@ -1,0 +1,2 @@
+fd_re10_n32_transient: steps=5000 t=5.000 solve=1.7s dV=9.770e-15 div_rms=8.497e-05 finite=True
+written to experiments/experiment_003_re10/finite_difference/fd_re10_n32_transient
