@@ -88,6 +88,11 @@ def run_span(run_ids):
 def save(fig, name, runs, plotted):
     os.makedirs(OUT, exist_ok=True)
     stem = f"{name}__{run_span(runs)}" if runs else name
+    if len(stem) > 120:
+        # Windows path limit: long run lists are replaced by a short hash; the full
+        # list of runs is always in the .values.json next to the figure
+        import hashlib
+        stem = f"{name}__{len(runs)}runs_{hashlib.sha1(' '.join(sorted(runs)).encode()).hexdigest()[:8]}"
     path = os.path.join(OUT, stem + ".png")
     fig.savefig(path, dpi=DPI)
     plt.close(fig)
@@ -1096,6 +1101,8 @@ def main():
 
     for old in glob.glob(os.path.join(OUT, "*")):
         base = os.path.basename(old).split("__")[0].split(".")[0]
+        if base.startswith("analysis_"):      # made by training_analysis.py, not by this script
+            continue
         if want is None or base in want:
             os.remove(old)
 

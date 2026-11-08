@@ -1,21 +1,33 @@
 {
  "figure": "v3_rq3",
  "runs": [
+  "dnn_re1000_gpu_s1",
+  "dnn_re1000_gpu_s2",
+  "dnn_re1000_gpu_s3",
   "dnn_re100_gpu_s1",
   "dnn_re100_gpu_s2",
   "dnn_re100_gpu_s3",
   "dnn_re100_gpu_s4",
   "dnn_re100_gpu_s5",
+  "dnn_re10_gpu_s1",
+  "dnn_re10_gpu_s2",
+  "dnn_re10_gpu_s3",
   "dnn_re400_gpu_s1",
   "dnn_re400_gpu_s2",
   "dnn_re400_gpu_s3",
   "dnn_re400_gpu_s4",
   "dnn_re400_gpu_s5",
+  "pinn_re1000_gpu_s1",
+  "pinn_re1000_gpu_s2",
+  "pinn_re1000_gpu_s3",
   "pinn_re100_gpu_s1",
   "pinn_re100_gpu_s2",
   "pinn_re100_gpu_s3",
   "pinn_re100_gpu_s4",
   "pinn_re100_gpu_s5",
+  "pinn_re10_gpu_s1",
+  "pinn_re10_gpu_s2",
+  "pinn_re10_gpu_s3",
   "pinn_re400_gpu_s1",
   "pinn_re400_gpu_s2",
   "pinn_re400_gpu_s3",
@@ -23,6 +35,16 @@
   "pinn_re400_gpu_s5"
  ],
  "plotted": {
+  "10|data_driven_nn": [
+   0.016911473058933427,
+   0.02185354054693077,
+   0.017496738453936525
+  ],
+  "10|pinn": [
+   0.16839903013520743,
+   0.15118700243381913,
+   0.15816927792373245
+  ],
   "100|data_driven_nn": [
    0.018076065382546774,
    0.01748673402398716,
@@ -50,6 +72,16 @@
    0.3238824607806176,
    0.3710083912981535,
    0.3650962123637631
+  ],
+  "1000|data_driven_nn": [
+   0.017169870996181173,
+   0.02013353799291064,
+   0.014157737368367855
+  ],
+  "1000|pinn": [
+   0.4125544665537079,
+   0.4127600832079491,
+   0.4036542862579852
   ]
  }
 }
