@@ -1,0 +1,55 @@
+{
+  "timing": {
+    "total_runtime_seconds": 1992.352606016997,
+    "training_time_seconds": 1981.580290591548,
+    "first_step_seconds": 5.381668781999906,
+    "time_per_step_seconds": 0.0988148718340691,
+    "evaluation_during_training_seconds": 7.171241064024798,
+    "steps": 20000,
+    "samples_per_step": 28096,
+    "throughput_samples_per_second": 284329.67101530096,
+    "timing_run": false,
+    "timing_valid": false,
+    "inference_time_seconds": 0.02276927850107313
+  },
+  "inference": {
+    "full_field_points": 208896,
+    "full_field_seconds": 0.02276927850107313,
+    "single_point_seconds": 0.0016272809989459347,
+    "batch_sweep_seconds": {
+      "1": 0.0016272809989459347,
+      "64": 0.0017513629973109346,
+      "1024": 0.0016472639981657267,
+      "16384": 0.0014037774999451358,
+      "208896": 0.02276927850107313
+    },
+    "batch_sweep_points_per_second": {
+      "1": 614.5220159565228,
+      "64": 36542.96687680762,
+      "1024": 621636.8482163466,
+      "16384": 11671365.298731701,
+      "208896": 9174467.253767157
+    },
+    "method": "median of 20 calls after 3 warm-ups"
+  },
+  "memory": {
+    "peak_ram_bytes": 1593507840,
+    "peak_vram_bytes": 739139840,
+    "free_ram_at_start_bytes": 5490671616,
+    "ram_sample_interval_seconds": 0.5
+  },
+  "gpu_monitor": {
+    "samples": 1965,
+    "gpu_utilization_mean_percent": 99.89770992366412,
+    "gpu_utilization_max_percent": 100.0,
+    "gpu_memory_used_max_mib": 2697.0,
+    "sm_clock_max_mhz": 2055.0,
+    "sm_clock_mean_mhz": 1804.320610687023,
+    "temperature_max_c": 58.0
+  },
+  "storage": {
+    "model_size_bytes": 97414,
+    "output_size_bytes": 5016362,
+    "total_run_size_bytes": 5540467
+  }
+}
