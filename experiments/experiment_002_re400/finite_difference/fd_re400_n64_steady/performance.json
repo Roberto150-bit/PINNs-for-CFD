@@ -1,0 +1,26 @@
+{
+  "timing": {
+    "total_runtime_seconds": 25.341527696999037,
+    "solve_time_seconds": 25.341527696999037,
+    "steps": 24494,
+    "time_per_step_seconds": 0.0010346014410467477,
+    "training_time_seconds": null,
+    "inference_time_seconds": null
+  },
+  "convergence": {
+    "final_velocity_change": 9.999583231723452e-07,
+    "converged": true,
+    "final_divergence_rms": 0.0004960405821298362,
+    "finite": true
+  },
+  "memory": {
+    "peak_ram_bytes": 73629696,
+    "peak_vram_bytes": null,
+    "free_ram_at_start_bytes": 7078477824
+  },
+  "storage": {
+    "model_size_bytes": null,
+    "output_size_bytes": 100762,
+    "total_run_size_bytes": 344335
+  }
+}

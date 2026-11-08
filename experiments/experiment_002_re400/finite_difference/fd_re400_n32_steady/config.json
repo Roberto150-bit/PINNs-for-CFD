@@ -1,0 +1,47 @@
+{
+  "run_id": "fd_re400_n32_steady",
+  "numerical_method": "finite_difference",
+  "mode": "steady",
+  "reynolds_number": 400.0,
+  "rho": 1.0,
+  "nu": 0.0025,
+  "grid": {
+    "nx": 32,
+    "ny": 32,
+    "dx": 0.03225806451612903
+  },
+  "time_step": 0.001,
+  "max_steps": 200000,
+  "advection_scheme": "central",
+  "time_scheme": "incremental_projection",
+  "pressure_solver": {
+    "method": "direct",
+    "iterations": null,
+    "boundary_condition": "neumann"
+  },
+  "lid": {
+    "velocity": 1.0,
+    "ramp": true,
+    "ramp_profile": "tanh(k t)",
+    "ramp_rate": 10.0
+  },
+  "convergence": {
+    "enabled": true,
+    "tolerance": 1e-06
+  },
+  "snapshots": {
+    "interval": null,
+    "count": 1
+  },
+  "initial_conditions": {
+    "u": 0.0,
+    "v": 0.0,
+    "p": 0.0
+  },
+  "device": "cpu",
+  "seed": null,
+  "python_version": "3.14.4",
+  "tf_version": null,
+  "deterministic_ops": null,
+  "created": "2026-11-08T03:15:44"
+}
