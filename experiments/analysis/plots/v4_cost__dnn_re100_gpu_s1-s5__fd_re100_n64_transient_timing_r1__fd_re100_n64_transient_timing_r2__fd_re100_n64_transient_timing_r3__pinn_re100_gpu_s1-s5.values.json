@@ -1,0 +1,24 @@
+{
+ "figure": "v4_cost",
+ "runs": [
+  "dnn_re100_gpu_s1",
+  "dnn_re100_gpu_s2",
+  "dnn_re100_gpu_s3",
+  "dnn_re100_gpu_s4",
+  "dnn_re100_gpu_s5",
+  "fd_re100_n64_transient_timing_r1",
+  "fd_re100_n64_transient_timing_r2",
+  "fd_re100_n64_transient_timing_r3",
+  "pinn_re100_gpu_s1",
+  "pinn_re100_gpu_s2",
+  "pinn_re100_gpu_s3",
+  "pinn_re100_gpu_s4",
+  "pinn_re100_gpu_s5"
+ ],
+ "plotted": {
+  "time_fd_data": 3.9274441010002192,
+  "time_dnn_train": 137.00257639621015,
+  "time_pinn_train": 781.9692135369447,
+  "ratio": 5.548634781844961
+ }
+}

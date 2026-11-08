@@ -368,7 +368,7 @@ def fig_pipelines():
     box(0.2, 6.0, 3.0, 2.0, "FD\nsolver", COLORS["finite_difference"])
     box(4.6, 6.0, 3.0, 2.0, "FD\ndata", COLORS["finite_difference"])
     box(9.0, 6.0, 2.6, 2.0, "Data\nNN", COLORS["data_driven_nn"])
-    box(0.2, 0.4, 3.0, 2.0, "Flow\nequations", INK2)
+    box(0.2, 0.4, 3.0, 2.0, "Physics", INK2)
     box(9.0, 0.4, 2.6, 2.0, "PINN", COLORS["pinn"])
     box(12.4, 3.2, 2.4, 2.0, "Eval.", INK)
     arrow(3.4, 7.0, 4.6, 7.0)
@@ -497,7 +497,7 @@ def fig_v2_re400(fields, t_show=5.0, width=WIDE, title=None):
         ax.set_xticks([])
         ax.set_yticks([])
         ax.grid(False)
-    fig.colorbar(im, ax=axes.tolist(), shrink=0.85, label="u" if title else "u (horizontal velocity)",
+    fig.colorbar(im, ax=axes.tolist(), shrink=0.85, label="u" if width < WIDE else "u (horizontal velocity)",
                  pad=0.02)
     return fig, plotted
 
@@ -668,6 +668,129 @@ def fig_v3_rq4(nums):
     rq_title(ax, "RQ4  Cost to train")
     plotted = {"time_fd_data": float(b1[0].get_width()), "time_dnn_train": float(b2[0].get_width()),
                "time_pinn_train": float(b2[1].get_width()), "vram_mb": [float(b.get_height()) for b in b3]}
+    return fig, plotted
+
+
+# ---------------- poster v4 figures: one finding each, key point annotated on the chart ----------------
+
+def callout(ax, text, xy, xytext, color=INK):
+    """Annotation box with an arrow pointing at the key data (the 'so what' of the figure)."""
+    ax.annotate(text, xy=xy, xytext=xytext, textcoords="axes fraction", xycoords="data",
+                fontsize=22, color=color, ha="center", va="center",
+                bbox={"boxstyle": "round,pad=0.35", "fc": "white", "ec": color, "lw": 2},
+                arrowprops={"arrowstyle": "-|>", "color": color, "lw": 2.2, "shrinkB": 6})
+
+
+def fig_v4_accuracy(data):
+    """Finding 1: test-A error of u, v, p (%); callout = ratio of the u errors."""
+    fig, ax = plt.subplots(figsize=(WIDTH, 5.6), constrained_layout=True)
+    width = 0.38
+    plotted = {}
+    for i, m in enumerate(("data_driven_nn", "pinn")):
+        means = [100 * data[m]["test_a"][k][0] for k in "uvp"]
+        stds = [100 * data[m]["test_a"][k][1] for k in "uvp"]
+        xs = np.arange(3) + (i - 0.5) * width
+        bars = ax.bar(xs, means, width * 0.92, yerr=stds, color=COLORS[m], label=LABELS[m],
+                      capsize=5, error_kw={"elinewidth": 2, "ecolor": INK})
+        value_labels(ax, bars, lambda h: f"{h:.0f}%" if h >= 10 else f"{h:.1f}%", stds)
+        plotted[m] = [float(b.get_height()) / 100 for b in bars]
+    ratio = plotted["pinn"][0] / plotted["data_driven_nn"][0]
+    callout(ax, f"{ratio:.0f}× lower error in u\nfor the data NN", xy=(-0.5 * width, 100 * plotted["data_driven_nn"][0] * 0.5),
+            xytext=(0.35, 0.80), color=COLORS["data_driven_nn"])
+    ax.set_xticks(range(3), ["u", "v", "p"])
+    ax.set_ylabel("Error (%)")
+    ax.set_ylim(0, max(max(v) for v in plotted.values()) * 100 * 1.35)
+    ax.grid(axis="x", visible=False)
+    fig.legend(*ax.get_legend_handles_labels(), frameon=False, loc="outside lower center", ncols=2)
+    plotted["ratio_u"] = ratio
+    return fig, plotted
+
+
+def fig_v4_physics(data):
+    """Finding 2: RMS violation of mass and momentum conservation; callout = mass ratio."""
+    fig, ax = plt.subplots(figsize=(WIDTH, 5.6), constrained_layout=True)
+    names = ["continuity", "x_momentum", "y_momentum"]
+    width = 0.38
+    plotted = {}
+    for i, m in enumerate(("data_driven_nn", "pinn")):
+        means = [data[m][n][0] for n in names]
+        stds = [data[m][n][1] for n in names]
+        xs = np.arange(3) + (i - 0.5) * width
+        bars = ax.bar(xs, means, width * 0.92, yerr=stds, color=COLORS[m], label=LABELS[m], capsize=5,
+                      error_kw={"elinewidth": 2, "ecolor": INK})
+        value_labels(ax, bars, lambda h: f"{h:.2g}", stds)
+        plotted[m] = [float(b.get_height()) for b in bars]
+    ratio = plotted["data_driven_nn"][0] / plotted["pinn"][0]
+    callout(ax, f"{ratio:.0f}× less mass\nviolation for the PINN", xy=(0.5 * width, plotted["pinn"][0] * 1.6),
+            xytext=(0.30, 0.86), color=COLORS["pinn"])
+    ax.set_xticks(range(3), ["Mass", "Momentum\n(x)", "Momentum\n(y)"])
+    ax.set_yscale("log")
+    ax.set_ylim(top=max(max(v) for v in plotted.values()) * 120)
+    plain_log_axis(ax.yaxis, subs=(1.0,))
+    ax.set_ylabel("Equation violation")
+    ax.grid(axis="x", visible=False)
+    ax.legend(frameon=False, loc="upper right")
+    plotted["ratio_mass"] = ratio
+    return fig, plotted
+
+
+def fig_v4_trend(data):
+    """Finding 3: error of u vs Reynolds number, every seed as a dot, mean as a line."""
+    fig, ax = plt.subplots(figsize=(WIDTH, 5.4), constrained_layout=True)
+    res = sorted(data)
+    plotted = {}
+    offset = {"data_driven_nn": -0.08, "pinn": 0.08}
+    for m in ("data_driven_nn", "pinn"):
+        xs_mean, ys_mean = [], []
+        for i, re in enumerate(res):
+            if m not in data[re]:
+                continue
+            ys = 100 * np.array(data[re][m]["err"])
+            xs = i + offset[m] + np.linspace(-0.05, 0.05, len(ys))
+            sc = ax.scatter(xs, ys, s=90, color=COLORS[m], edgecolor="white", linewidth=1.2, zorder=3)
+            plotted[f"{re:g}|{m}"] = [float(v) / 100 for v in sc.get_offsets()[:, 1]]
+            xs_mean.append(i + offset[m])
+            ys_mean.append(float(np.mean(ys)))
+        ax.plot(xs_mean, ys_mean, "-", color=COLORS[m], linewidth=3, label=LABELS[m], zorder=2)
+    if 400.0 in res and "pinn" in data[400.0]:
+        i = res.index(400.0)
+        callout(ax, "PINN stuck: equations\nsatisfied, flow wrong", xy=(i + 0.08, 100 * min(data[400.0]["pinn"]["err"]) * 0.85),
+                xytext=(0.30, 0.86), color=COLORS["pinn"])
+    ax.set_xticks(range(len(res)), [f"Re {re:g}" for re in res])
+    ax.set_xlim(-0.5, len(res) - 0.5)
+    ax.set_yscale("log")
+    ax.set_ylim(top=100 * max(max(v) for v in plotted.values()) * 2.2)
+    plain_log_axis(ax.yaxis, subs=(1.0, 3.0))
+    ax.set_ylabel("Error in u (%)")
+    ax.set_xlabel("Flow speed (Reynolds number)")
+    ax.grid(axis="x", visible=False)
+    ax.legend(frameon=False, loc="center right")
+    return fig, plotted
+
+
+def fig_v4_cost(nums):
+    """Finding 5: GPU seconds to a usable flow, split into simulation data and training."""
+    fig, ax = plt.subplots(figsize=(WIDTH, 4.4), constrained_layout=True)
+    fd = nums["fd_n64_solve_seconds_median"]["value"]
+    dnn = nums["dnn_gpu_training_time_seconds_mean"]["value"]
+    pinn = nums["pinn_gpu_training_time_seconds_mean"]["value"]
+    b_data = ax.barh([1], [fd], color=COLORS["finite_difference"], height=0.5, label="Making simulation data")
+    b_tr = ax.barh([1, 0], [dnn, pinn], left=[fd, 0], color=[COLORS["data_driven_nn"], COLORS["pinn"]],
+                   height=0.5)
+    for y, tot in ((1, fd + dnn), (0, pinn)):
+        ax.annotate(f"{tot:.0f} s", (tot, y), xytext=(8, 0), textcoords="offset points", va="center",
+                    fontsize=24, color=INK)
+    ratio = pinn / (fd + dnn)
+    ax.annotate(f"PINN needs {ratio:.1f}× more GPU time", xy=(pinn * 0.6, 0.5), xycoords="data",
+                fontsize=22, color=COLORS["pinn"], ha="center", va="center",
+                bbox={"boxstyle": "round,pad=0.35", "fc": "white", "ec": COLORS["pinn"], "lw": 2})
+    ax.set_yticks([1, 0], ["Data NN", "PINN"])
+    ax.set_xlim(0, max(fd + dnn, pinn) * 1.22)
+    ax.set_ylim(-0.6, 1.6)
+    ax.set_xlabel("Seconds (making data + training)")
+    ax.grid(axis="y", visible=False)
+    plotted = {"time_fd_data": float(b_data[0].get_width()), "time_dnn_train": float(b_tr[0].get_width()),
+               "time_pinn_train": float(b_tr[1].get_width()), "ratio": ratio}
     return fig, plotted
 
 
@@ -862,6 +985,31 @@ def check_against_results(rows, agg):
             nums = json.load(open(os.path.join(RESULTS, "poster_numbers.json")))
             for key, w in plotted.items():
                 good &= close(w, nums[key]["value"])
+        elif name == "v4_accuracy":
+            for m in ("data_driven_nn", "pinn"):
+                runs = [r for r in v["runs"] if by_id[r]["method"] == m]
+                for k, h in zip("uvp", plotted[m]):
+                    good &= np.isclose(h, np.mean([float(by_id[r][f"test_a_relative_l2_{k}"]) for r in runs]),
+                                       rtol=1e-9)
+            good &= np.isclose(plotted["ratio_u"], plotted["pinn"][0] / plotted["data_driven_nn"][0])
+        elif name == "v4_physics":
+            for m in ("data_driven_nn", "pinn"):
+                runs = [r for r in v["runs"] if by_id[r]["method"] == m]
+                for n, h in zip(("continuity", "x_momentum", "y_momentum"), plotted[m]):
+                    good &= close(h, np.mean([float(by_id[r][f"{n}_residual"]) for r in runs]))
+            good &= np.isclose(plotted["ratio_mass"], plotted["data_driven_nn"][0] / plotted["pinn"][0])
+        elif name == "v4_trend":
+            src = rq3_data()
+            for key, ys in plotted.items():
+                re, m = key.split("|")
+                good &= np.allclose(ys, src[float(re)][m]["err"], rtol=1e-9)
+        elif name == "v4_cost":
+            nums = json.load(open(os.path.join(RESULTS, "poster_numbers.json")))
+            fd = nums["fd_n64_solve_seconds_median"]["value"]
+            dnn = nums["dnn_gpu_training_time_seconds_mean"]["value"]
+            pinn = nums["pinn_gpu_training_time_seconds_mean"]["value"]
+            good &= close(plotted["time_fd_data"], fd) and close(plotted["time_dnn_train"], dnn)
+            good &= close(plotted["time_pinn_train"], pinn) and close(plotted["ratio"], pinn / (fd + dnn))
         elif name == "v3_rq1":
             for m, heights in plotted.items():
                 runs = [r for r in v["runs"] if by_id[r]["method"] == m]
@@ -1023,6 +1171,34 @@ def main():
         keys = ("fd_n64_solve_seconds_median", "dnn_gpu_training_time_seconds_mean",
                 "pinn_gpu_training_time_seconds_mean")
         made.append(save(fig, "v3_rq4", sorted({r for k in keys for r in nums[k]["runs"]}), p))
+    if wanted("v4_accuracy"):
+        d = accuracy_data(agg)
+        fig, p = fig_v4_accuracy(d)
+        made.append(save(fig, "v4_accuracy", sum((d[m]["runs"] for m in d), []), p))
+    if wanted("v4_physics"):
+        d = residual_data(agg)
+        fig, p = fig_v4_physics(d)
+        made.append(save(fig, "v4_physics", sum((d[m]["runs"] for m in d), []), p))
+    if wanted("v4_trend"):
+        d = rq3_data()
+        fig, p = fig_v4_trend(d)
+        made.append(save(fig, "v4_trend", [r for re in d for m in d[re] for r in d[re][m]["runs"]], p))
+    if wanted("v4_cost") and nums:
+        fig, p = fig_v4_cost(nums)
+        keys = ("fd_n64_solve_seconds_median", "dnn_gpu_training_time_seconds_mean",
+                "pinn_gpu_training_time_seconds_mean")
+        made.append(save(fig, "v4_cost", sorted({r for k in keys for r in nums[k]["runs"]}), p))
+    if wanted("v4_re400"):
+        exp4 = C.experiment_dir(400.0)
+        ref_id = C.fd_reference_run_id(400.0)
+        flds = {"finite_difference": dict(np.load(os.path.join(exp4, "finite_difference", ref_id, "solution.npz")))}
+        used = [ref_id]
+        for m, prefix in (("data_driven_nn", "dnn"), ("pinn", "pinn")):
+            rid = f"{prefix}_re400_gpu_s1"
+            flds[m] = dict(np.load(os.path.join(exp4, m, rid, "predictions.npz")))
+            used.append(rid)
+        fig, p = fig_v2_re400(flds, width=WIDTH, title="")
+        made.append(save(fig, "v4_re400", used, p))
     if wanted("v2_training_length"):
         d = training_length_data()
         if d:

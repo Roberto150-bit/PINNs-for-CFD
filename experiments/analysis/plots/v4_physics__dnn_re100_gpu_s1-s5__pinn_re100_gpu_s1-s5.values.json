@@ -1,0 +1,28 @@
+{
+ "figure": "v4_physics",
+ "runs": [
+  "dnn_re100_gpu_s1",
+  "dnn_re100_gpu_s2",
+  "dnn_re100_gpu_s3",
+  "dnn_re100_gpu_s4",
+  "dnn_re100_gpu_s5",
+  "pinn_re100_gpu_s1",
+  "pinn_re100_gpu_s2",
+  "pinn_re100_gpu_s3",
+  "pinn_re100_gpu_s4",
+  "pinn_re100_gpu_s5"
+ ],
+ "plotted": {
+  "data_driven_nn": [
+   0.54559165720832,
+   5.569002847914746,
+   2.061979585092833
+  ],
+  "pinn": [
+   0.07053461705108653,
+   0.09637463455501205,
+   0.05369598623230387
+  ],
+  "ratio_mass": 7.735090655034833
+ }
+}

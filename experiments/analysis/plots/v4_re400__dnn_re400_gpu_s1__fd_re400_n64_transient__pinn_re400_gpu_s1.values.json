@@ -1,0 +1,25 @@
+{
+ "figure": "v4_re400",
+ "runs": [
+  "dnn_re400_gpu_s1",
+  "fd_re400_n64_transient",
+  "pinn_re400_gpu_s1"
+ ],
+ "plotted": {
+  "finite_difference": {
+   "vortex_x": 0.6666666666666666,
+   "vortex_y": 0.6984126984126984,
+   "psi_min": -0.08467956473423935
+  },
+  "data_driven_nn": {
+   "vortex_x": 0.6666666666666666,
+   "vortex_y": 0.6984126984126984,
+   "psi_min": -0.08265545776867794
+  },
+  "pinn": {
+   "vortex_x": 0.7936507936507936,
+   "vortex_y": 0.873015873015873,
+   "psi_min": -0.025170907259933532
+  }
+ }
+}
