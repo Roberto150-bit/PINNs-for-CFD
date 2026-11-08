@@ -1514,6 +1514,114 @@
   ],
   "description": "Re 1000 data_driven_nn GPU runs: max continuity_residual"
  },
+ "re1000_pinn_gpu_test_a_relative_l2_u_mean": {
+  "value": 0.4096562786732141,
+  "runs": [
+   "pinn_re1000_gpu_s1",
+   "pinn_re1000_gpu_s2",
+   "pinn_re1000_gpu_s3"
+  ],
+  "description": "Re 1000 pinn GPU runs: mean test_a_relative_l2_u"
+ },
+ "re1000_pinn_gpu_test_a_relative_l2_u_min": {
+  "value": 0.4036542862579852,
+  "runs": [
+   "pinn_re1000_gpu_s1",
+   "pinn_re1000_gpu_s2",
+   "pinn_re1000_gpu_s3"
+  ],
+  "description": "Re 1000 pinn GPU runs: min test_a_relative_l2_u"
+ },
+ "re1000_pinn_gpu_test_a_relative_l2_u_max": {
+  "value": 0.4127600832079491,
+  "runs": [
+   "pinn_re1000_gpu_s1",
+   "pinn_re1000_gpu_s2",
+   "pinn_re1000_gpu_s3"
+  ],
+  "description": "Re 1000 pinn GPU runs: max test_a_relative_l2_u"
+ },
+ "re1000_pinn_gpu_test_a_relative_l2_v_mean": {
+  "value": 0.9834860101343045,
+  "runs": [
+   "pinn_re1000_gpu_s1",
+   "pinn_re1000_gpu_s2",
+   "pinn_re1000_gpu_s3"
+  ],
+  "description": "Re 1000 pinn GPU runs: mean test_a_relative_l2_v"
+ },
+ "re1000_pinn_gpu_test_a_relative_l2_v_min": {
+  "value": 0.9756028631307107,
+  "runs": [
+   "pinn_re1000_gpu_s1",
+   "pinn_re1000_gpu_s2",
+   "pinn_re1000_gpu_s3"
+  ],
+  "description": "Re 1000 pinn GPU runs: min test_a_relative_l2_v"
+ },
+ "re1000_pinn_gpu_test_a_relative_l2_v_max": {
+  "value": 0.9934073318394604,
+  "runs": [
+   "pinn_re1000_gpu_s1",
+   "pinn_re1000_gpu_s2",
+   "pinn_re1000_gpu_s3"
+  ],
+  "description": "Re 1000 pinn GPU runs: max test_a_relative_l2_v"
+ },
+ "re1000_pinn_gpu_test_a_relative_l2_p_mean": {
+  "value": 1.016049198166236,
+  "runs": [
+   "pinn_re1000_gpu_s1",
+   "pinn_re1000_gpu_s2",
+   "pinn_re1000_gpu_s3"
+  ],
+  "description": "Re 1000 pinn GPU runs: mean test_a_relative_l2_p"
+ },
+ "re1000_pinn_gpu_test_a_relative_l2_p_min": {
+  "value": 0.9929930373116264,
+  "runs": [
+   "pinn_re1000_gpu_s1",
+   "pinn_re1000_gpu_s2",
+   "pinn_re1000_gpu_s3"
+  ],
+  "description": "Re 1000 pinn GPU runs: min test_a_relative_l2_p"
+ },
+ "re1000_pinn_gpu_test_a_relative_l2_p_max": {
+  "value": 1.0482315077573712,
+  "runs": [
+   "pinn_re1000_gpu_s1",
+   "pinn_re1000_gpu_s2",
+   "pinn_re1000_gpu_s3"
+  ],
+  "description": "Re 1000 pinn GPU runs: max test_a_relative_l2_p"
+ },
+ "re1000_pinn_gpu_continuity_residual_mean": {
+  "value": 0.010474229837681875,
+  "runs": [
+   "pinn_re1000_gpu_s1",
+   "pinn_re1000_gpu_s2",
+   "pinn_re1000_gpu_s3"
+  ],
+  "description": "Re 1000 pinn GPU runs: mean continuity_residual"
+ },
+ "re1000_pinn_gpu_continuity_residual_min": {
+  "value": 0.010005906863884537,
+  "runs": [
+   "pinn_re1000_gpu_s1",
+   "pinn_re1000_gpu_s2",
+   "pinn_re1000_gpu_s3"
+  ],
+  "description": "Re 1000 pinn GPU runs: min continuity_residual"
+ },
+ "re1000_pinn_gpu_continuity_residual_max": {
+  "value": 0.01115005859907002,
+  "runs": [
+   "pinn_re1000_gpu_s1",
+   "pinn_re1000_gpu_s2",
+   "pinn_re1000_gpu_s3"
+  ],
+  "description": "Re 1000 pinn GPU runs: max continuity_residual"
+ },
  "re400_dnn_gpu_test_a_relative_l2_u_mean": {
   "value": 0.023067831286254385,
   "runs": [
@@ -1804,5 +1912,26 @@
    "dnn_re100_gpu_s3_steps100k"
   ],
   "description": "S5 Re 100 data_driven_nn: completed 100k-step runs"
+ },
+ "s5_re100_pinn_u_at_20k_mean": {
+  "value": 0.10007198674747991,
+  "runs": [
+   "pinn_re100_gpu_s1_steps100k"
+  ],
+  "description": "S5 Re 100 pinn: test-A rel. L2 u at step 20,000"
+ },
+ "s5_re100_pinn_u_at_100k_mean": {
+  "value": 0.08278056107713158,
+  "runs": [
+   "pinn_re100_gpu_s1_steps100k"
+  ],
+  "description": "S5 Re 100 pinn: test-A rel. L2 u at step 100,000"
+ },
+ "s5_re100_pinn_n_runs": {
+  "value": 1,
+  "runs": [
+   "pinn_re100_gpu_s1_steps100k"
+  ],
+  "description": "S5 Re 100 pinn: completed 100k-step runs"
  }
 }

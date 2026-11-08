@@ -122,6 +122,18 @@
    "36%"
   ]
  },
+ "re1000_pinn_gpu_test_a_relative_l2_u_mean": {
+  "value": 0.4096562786732141,
+  "description": "Re 1000 pinn GPU runs: mean test_a_relative_l2_u",
+  "runs": [
+   "pinn_re1000_gpu_s1",
+   "pinn_re1000_gpu_s2",
+   "pinn_re1000_gpu_s3"
+  ],
+  "printed_as": [
+   "41%"
+  ]
+ },
  "re400_pinn_gpu_continuity_residual_mean": {
   "value": 0.02880396621741886,
   "description": "Re 400 pinn GPU runs: mean continuity_residual",
