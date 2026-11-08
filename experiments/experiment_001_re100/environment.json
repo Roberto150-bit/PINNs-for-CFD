@@ -1,0 +1,33 @@
+{
+  "timestamp": "2026-11-08T00:09:06",
+  "software": {
+    "python_version": "3.14.4",
+    "tensorflow_version": "2.22.0-rc0",
+    "keras_version": "3.16.0.dev2026110803",
+    "numpy_version": "2.5.4",
+    "scipy_version": "1.18.1",
+    "psutil_version": "7.2.2",
+    "tf_built_cuda_version": null,
+    "tf_built_cudnn_version": null
+  },
+  "system": {
+    "operating_system": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+    "kernel": "6.18.54.1-microsoft-standard-WSL2",
+    "cpu": "12th Gen Intel(R) Core(TM) i5-12450H",
+    "cpu_count": 12,
+    "cpu_physical_cores": 6,
+    "total_ram_bytes": 8175529984,
+    "available_ram_bytes": 6890844160
+  },
+  "gpu": {
+    "available": true,
+    "tensorflow_visible_gpus": [
+      "/physical_device:GPU:0"
+    ],
+    "device": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "total_vram_bytes": 8585740288,
+    "driver_version": "610.78",
+    "driver_cuda_version": "13.3"
+  },
+  "python_executable": "/home/rober/venvs/thesis/bin/python"
+}
