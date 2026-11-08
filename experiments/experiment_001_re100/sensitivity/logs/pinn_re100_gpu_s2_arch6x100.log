@@ -1,0 +1,48 @@
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1794140887.065967   63447 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1794140888.861785   63447 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+first step (trace + compile) 4.59s
+step      1 total 7.647e-01 ic 2.04e-02 bc 2.95e-01 c 7.83e-02 x 1.17e-01 y 2.54e-01 | relL2 u 1.103 v 1.744 p 0.962 | t 4.6s
+step    500 total 2.984e-02 ic 4.49e-03 bc 1.99e-02 c 1.16e-03 x 3.78e-03 y 5.55e-04 | relL2 u 0.442 v 1.111 p 0.938 | t 44.0s
+step   1000 total 2.141e-02 ic 1.46e-03 bc 1.67e-02 c 3.07e-04 x 2.45e-03 y 4.98e-04 | relL2 u 0.418 v 1.045 p 0.927 | t 83.5s
+step   1500 total 1.856e-02 ic 8.16e-04 bc 1.56e-02 c 5.84e-04 x 1.05e-03 y 5.25e-04 | relL2 u 0.383 v 1.014 p 0.922 | t 123.0s
+lambda check at step 2000: ratio 21.7 -> {'step': 2000, 'imbalance_ratio': 21.651712960002044, 'components': {'ic': 0.0009757686639204621, 'bc': 0.014010760001838207, 'c': 0.0006470970693044364, 'm': 0.005026769358664751}, 'changed': False}
+step   2000 total 2.066e-02 ic 9.76e-04 bc 1.40e-02 c 6.47e-04 x 4.34e-03 y 6.90e-04 | relL2 u 0.358 v 1.056 p 0.913 | t 162.6s
+step   2500 total 2.123e-02 ic 1.52e-03 bc 1.45e-02 c 1.81e-03 x 2.62e-03 y 8.03e-04 | relL2 u 0.335 v 1.003 p 0.914 | t 202.1s
+step   3000 total 1.722e-02 ic 3.56e-04 bc 1.43e-02 c 2.53e-04 x 1.55e-03 y 7.95e-04 | relL2 u 0.385 v 0.902 p 0.907 | t 241.6s
+step   3500 total 1.522e-02 ic 3.16e-04 bc 1.24e-02 c 2.16e-04 x 1.28e-03 y 9.94e-04 | relL2 u 0.357 v 0.955 p 0.899 | t 281.1s
+step   4000 total 1.367e-02 ic 2.04e-04 bc 1.14e-02 c 1.76e-04 x 1.14e-03 y 7.59e-04 | relL2 u 0.344 v 0.919 p 0.883 | t 320.6s
+step   4500 total 1.216e-02 ic 1.70e-04 bc 1.02e-02 c 4.62e-04 x 6.58e-04 y 6.27e-04 | relL2 u 0.322 v 0.869 p 0.863 | t 360.1s
+step   5000 total 1.072e-02 ic 1.76e-04 bc 9.12e-03 c 2.96e-04 x 5.79e-04 y 5.49e-04 | relL2 u 0.285 v 0.800 p 0.838 | t 399.6s
+step   5500 total 1.009e-02 ic 1.81e-04 bc 8.07e-03 c 2.96e-04 x 1.04e-03 y 5.06e-04 | relL2 u 0.261 v 0.745 p 0.802 | t 439.2s
+step   6000 total 9.131e-03 ic 9.65e-05 bc 6.60e-03 c 4.14e-04 x 1.41e-03 y 6.14e-04 | relL2 u 0.255 v 0.607 p 0.729 | t 478.6s
+step   6500 total 7.444e-03 ic 1.13e-04 bc 4.78e-03 c 8.38e-04 x 1.37e-03 y 3.46e-04 | relL2 u 0.200 v 0.480 p 0.628 | t 518.1s
+step   7000 total 5.199e-03 ic 1.79e-04 bc 3.78e-03 c 2.41e-04 x 3.31e-04 y 6.71e-04 | relL2 u 0.134 v 0.347 p 0.530 | t 557.6s
+step   7500 total 3.908e-03 ic 5.05e-05 bc 3.05e-03 c 2.84e-04 x 2.27e-04 y 2.98e-04 | relL2 u 0.155 v 0.304 p 0.462 | t 597.1s
+step   8000 total 3.965e-03 ic 6.38e-05 bc 2.88e-03 c 2.92e-04 x 4.48e-04 y 2.82e-04 | relL2 u 0.177 v 0.286 p 0.429 | t 636.6s
+step   8500 total 4.411e-03 ic 6.00e-05 bc 2.63e-03 c 8.97e-04 x 6.52e-04 y 1.69e-04 | relL2 u 0.142 v 0.249 p 0.391 | t 676.1s
+step   9000 total 3.060e-03 ic 3.47e-05 bc 2.23e-03 c 1.82e-04 x 4.33e-04 y 1.80e-04 | relL2 u 0.121 v 0.208 p 0.354 | t 715.6s
+step   9500 total 3.521e-03 ic 6.21e-05 bc 2.14e-03 c 7.87e-04 x 3.50e-04 y 1.81e-04 | relL2 u 0.123 v 0.224 p 0.346 | t 755.1s
+step  10000 total 3.164e-03 ic 7.20e-05 bc 1.98e-03 c 3.33e-04 x 6.19e-04 y 1.58e-04 | relL2 u 0.141 v 0.221 p 0.325 | t 794.6s
+step  10500 total 2.677e-03 ic 3.38e-05 bc 1.78e-03 c 2.54e-04 x 1.35e-04 y 4.78e-04 | relL2 u 0.098 v 0.200 p 0.307 | t 834.1s
+step  11000 total 3.203e-03 ic 5.05e-05 bc 1.93e-03 c 3.22e-04 x 5.56e-04 y 3.47e-04 | relL2 u 0.137 v 0.193 p 0.300 | t 873.6s
+step  11500 total 5.595e-03 ic 2.42e-04 bc 1.91e-03 c 8.71e-04 x 2.00e-03 y 5.80e-04 | relL2 u 0.110 v 0.238 p 0.306 | t 913.2s
+step  12000 total 4.246e-03 ic 7.64e-05 bc 1.59e-03 c 6.88e-04 x 6.40e-04 y 1.25e-03 | relL2 u 0.085 v 0.211 p 0.281 | t 952.6s
+step  12500 total 2.001e-03 ic 1.44e-05 bc 1.35e-03 c 3.33e-04 x 1.15e-04 y 1.92e-04 | relL2 u 0.094 v 0.151 p 0.268 | t 992.1s
+step  13000 total 2.436e-03 ic 2.20e-05 bc 1.28e-03 c 8.14e-04 x 1.80e-04 y 1.41e-04 | relL2 u 0.075 v 0.159 p 0.267 | t 1031.6s
+step  13500 total 1.936e-03 ic 2.35e-05 bc 1.21e-03 c 1.76e-04 x 3.21e-04 y 2.09e-04 | relL2 u 0.099 v 0.161 p 0.262 | t 1071.1s
+step  14000 total 1.468e-03 ic 1.11e-05 bc 1.12e-03 c 1.21e-04 x 9.80e-05 y 1.23e-04 | relL2 u 0.085 v 0.146 p 0.260 | t 1110.6s
+step  14500 total 2.470e-03 ic 1.79e-05 bc 1.62e-03 c 2.16e-04 x 2.50e-04 y 3.63e-04 | relL2 u 0.092 v 0.162 p 0.270 | t 1150.2s
+step  15000 total 1.607e-03 ic 1.35e-05 bc 1.06e-03 c 1.10e-04 x 2.53e-04 y 1.71e-04 | relL2 u 0.079 v 0.151 p 0.262 | t 1189.6s
+step  15500 total 1.522e-03 ic 8.63e-06 bc 9.66e-04 c 1.91e-04 x 2.17e-04 y 1.39e-04 | relL2 u 0.086 v 0.147 p 0.255 | t 1229.1s
+step  16000 total 3.021e-03 ic 6.82e-05 bc 1.01e-03 c 8.10e-05 x 1.65e-03 y 2.19e-04 | relL2 u 0.072 v 0.182 p 0.258 | t 1268.6s
+step  16500 total 3.434e-03 ic 7.48e-05 bc 1.72e-03 c 7.23e-04 x 5.77e-04 y 3.38e-04 | relL2 u 0.101 v 0.226 p 0.288 | t 1308.2s
+step  17000 total 2.488e-03 ic 2.34e-05 bc 1.12e-03 c 4.35e-04 x 6.07e-04 y 2.99e-04 | relL2 u 0.117 v 0.152 p 0.257 | t 1347.8s
+step  17500 total 1.606e-03 ic 1.14e-05 bc 8.63e-04 c 1.25e-04 x 4.33e-04 y 1.74e-04 | relL2 u 0.086 v 0.148 p 0.260 | t 1387.3s
+step  18000 total 2.511e-03 ic 2.95e-05 bc 9.08e-04 c 1.11e-03 x 3.13e-04 y 1.52e-04 | relL2 u 0.086 v 0.145 p 0.261 | t 1426.9s
+step  18500 total 2.270e-03 ic 2.03e-05 bc 1.02e-03 c 1.01e-04 x 4.70e-04 y 6.59e-04 | relL2 u 0.104 v 0.161 p 0.273 | t 1466.3s
+step  19000 total 4.076e-03 ic 1.96e-04 bc 1.95e-03 c 4.69e-04 x 9.15e-04 y 5.47e-04 | relL2 u 0.082 v 0.201 p 0.288 | t 1505.8s
+step  19500 total 3.316e-03 ic 1.05e-04 bc 8.54e-04 c 1.96e-04 x 1.83e-03 y 3.32e-04 | relL2 u 0.094 v 0.172 p 0.280 | t 1545.4s
+step  20000 total 1.608e-03 ic 3.33e-05 bc 7.97e-04 c 2.19e-04 x 4.08e-04 y 1.52e-04 | relL2 u 0.110 v 0.154 p 0.266 | t 1584.9s
+done pinn_re100_gpu_s2_arch6x100: train 1584.9s, per step 79.0 ms, peak RAM 1557 MiB, peak VRAM 1315 MiB
