@@ -43,6 +43,9 @@ def compare(a, b_fields):
             "max_abs_du": float(np.abs(a["u"][k] - b_fields["u"][k]).max()),
             "max_abs_dv": float(np.abs(a["v"][k] - b_fields["v"][k]).max()),
             "max_abs_dp": float(np.abs(mean_removed(a["p"])[k] - mean_removed(b_fields["p"])[k]).max()),
+            "rms_du": float(np.sqrt(np.mean((a["u"][k] - b_fields["u"][k]) ** 2))),
+            "rms_dv": float(np.sqrt(np.mean((a["v"][k] - b_fields["v"][k]) ** 2))),
+            "rms_dp": float(np.sqrt(np.mean((mean_removed(a["p"])[k] - mean_removed(b_fields["p"])[k]) ** 2))),
         })
     return rows
 
@@ -71,6 +74,8 @@ def main():
             "max_over_snapshots_p": max(r["max_abs_dp"] for r in rows),
             "at_t_end": max(last["max_abs_du"], last["max_abs_dv"]),
             "at_t_end_p": last["max_abs_dp"],
+            "rms_at_t_end_u": last["rms_du"], "rms_at_t_end_v": last["rms_dv"],
+            "rms_at_t_end_p": last["rms_dp"],
         }
 
     out = {
@@ -86,16 +91,16 @@ def main():
         json.dump(out, f, indent=2)
     with open(stem + ".csv", "w", newline="") as f:
         w = csv.writer(f)
-        w.writerow(["t", "dt_max_abs_du", "dt_max_abs_dv", "dt_max_abs_dp",
-                    "grid_max_abs_du", "grid_max_abs_dv", "grid_max_abs_dp"])
+        cols = ["max_abs_du", "max_abs_dv", "max_abs_dp", "rms_du", "rms_dv", "rms_dp"]
+        w.writerow(["t"] + [f"dt_{c}" for c in cols] + [f"grid_{c}" for c in cols])
         for a, b in zip(time_rows, grid_rows):
-            w.writerow([a["t"], a["max_abs_du"], a["max_abs_dv"], a["max_abs_dp"],
-                        b["max_abs_du"], b["max_abs_dv"], b["max_abs_dp"]])
+            w.writerow([a["t"]] + [a[c] for c in cols] + [b[c] for c in cols])
 
     for name in ("time_convergence", "grid_convergence"):
         s = out[name]["summary_velocity"]
         print(f"{name}: max over snapshots (u,v) {s['max_over_snapshots']:.3e}; at t=5 (u,v) "
-              f"{s['at_t_end']:.3e}; p max {s['max_over_snapshots_p']:.3e}, p at t=5 {s['at_t_end_p']:.3e}")
+              f"{s['at_t_end']:.3e}; p max {s['max_over_snapshots_p']:.3e}, p at t=5 {s['at_t_end_p']:.3e}; "
+              f"RMS at t=5 u {s['rms_at_t_end_u']:.3e} v {s['rms_at_t_end_v']:.3e} p {s['rms_at_t_end_p']:.3e}")
     for r in time_rows[::10]:
         print(f"  dt  t={r['t']:.1f} du={r['max_abs_du']:.2e} dv={r['max_abs_dv']:.2e} dp={r['max_abs_dp']:.2e}")
     for r in grid_rows[::10]:

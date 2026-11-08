@@ -13,6 +13,7 @@
   "time_step": 0.001,
   "max_steps": 5000,
   "advection_scheme": "central",
+  "time_scheme": "incremental_projection",
   "pressure_solver": {
     "method": "direct",
     "iterations": null,
@@ -42,5 +43,5 @@
   "python_version": "3.14.4",
   "tf_version": null,
   "deterministic_ops": null,
-  "created": "2026-11-08T00:22:44"
+  "created": "2026-11-08T00:29:44"
 }
