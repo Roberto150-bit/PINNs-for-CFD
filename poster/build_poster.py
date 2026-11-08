@@ -214,7 +214,7 @@ def column_question(slide):
                           fig="pipelines",
                           text=["Test flow: fluid in a box driven by a sliding lid. Reference: a "
                                 "finite-difference (FD) simulation that matches published results [1, 2]. "
-                                "Both networks: 17,091 parameters, 20,000 training steps, 5 seeds, scored on "
+                                "Both networks: 17,091 parameters, 20,000 training steps, 3-5 seeds, scored on "
                                 "points and times never seen in training."],
                           size=BODY_PT)
 
@@ -237,14 +237,27 @@ def column_rq12(slide):
                                 f"{num('dnn_gpu_continuity_residual_mean', '{:.2g}')} for the data NN."])
 
 
+def trend_evidence():
+    """One line of evidence for the Reynolds-number trend, listing every Re that has results."""
+    res = [r for r in ("10", "100", "400", "1000")
+           if r == "100" or f"re{r}_dnn_gpu_test_a_relative_l2_u_mean" in NUMS]
+
+    def key(r, m):
+        return f"{m}_gpu_test_a_relative_l2_u_mean" if r == "100" else f"re{r}_{m}_gpu_test_a_relative_l2_u_mean"
+
+    dnn = ", ".join(pct(key(r, "dnn")) for r in res)
+    pinn_res = [r for r in res if key(r, "pinn") in NUMS]
+    pinn = ", ".join(pct(key(r, "pinn")) for r in pinn_res)
+    return [f"Every seed is a dot. Error in u at Re = {', '.join(res)}: data NN {dnn}; "
+            f"PINN {pinn} (Re = {', '.join(pinn_res)})."]
+
+
 def column_rq3(slide):
     x = COL_X[2]
     y = panel(slide, x, TOP,
-              "RQ3: As the flow speeds up, the data NN stays reliable and the PINN does not.",
+              "RQ3: Across flow speeds the data NN stays reliable; the PINN does not.",
               fig="v4_trend",
-              text=["Every seed is a dot. At Re = 400 the data NN stays near "
-                    f"{pct('re400_dnn_gpu_test_a_relative_l2_u_mean')} error; all five PINN seeds fail "
-                    f"({pct('re400_pinn_gpu_test_a_relative_l2_u_mean')})."])
+              text=trend_evidence())
     COLUMN_END[3] = panel(slide, x, y,
                           "RQ3: Satisfying the equations did not make the PINN's flow correct.",
                           fig="v4_re400",

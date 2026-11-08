@@ -263,26 +263,27 @@ def poster_numbers(summary, fd, det, cost, validation, transient):
 
 
 def re400_numbers():
-    """Re 400 GPU runs (Phase B): mean test-A relative L2 and continuity residual per method."""
-    path = os.path.join(RESULTS, "experiment_results_re400.csv")
-    if not os.path.exists(path):
-        return {}
-    with open(path) as f:
-        rows = [r for r in csv.DictReader(f) if r["device"] == "gpu" and r["timing_run"] in ("False", "")]
+    """GPU runs at every Reynolds number other than 100 (experiment_results_re<Re>.csv):
+    mean, min and max of test-A relative L2 and continuity residual per method.
+    Keys: re<Re>_<dnn|pinn>_gpu_<column>_<mean|min|max> (e.g. re400_..., re10_..., re1000_...)."""
     out = {}
-    for m, short in (("data_driven_nn", "dnn"), ("pinn", "pinn")):
-        sel = [r for r in rows if r["method"] == m and r["run_id"].endswith(tuple(f"_s{s}" for s in range(1, 6)))]
-        ids = sorted(r["run_id"] for r in sel)
-        for col in ["test_a_relative_l2_" + k for k in "uvp"] + ["continuity_residual"]:
-            vals = [float(r[col]) for r in sel if r[col] not in ("", "None")]
-            if vals:
-                out[f"re400_{short}_gpu_{col}_mean"] = {
-                    "value": statistics.mean(vals), "runs": ids,
-                    "description": f"Re 400 {m} GPU runs: mean {col}"}
-                out[f"re400_{short}_gpu_{col}_min"] = {
-                    "value": min(vals), "runs": ids, "description": f"Re 400 {m} GPU runs: min {col}"}
-                out[f"re400_{short}_gpu_{col}_max"] = {
-                    "value": max(vals), "runs": ids, "description": f"Re 400 {m} GPU runs: max {col}"}
+    for path in sorted(glob.glob(os.path.join(RESULTS, "experiment_results_re*.csv"))):
+        re = os.path.basename(path)[len("experiment_results_re"):-4]
+        with open(path) as f:
+            rows = [r for r in csv.DictReader(f) if r["device"] == "gpu" and r["timing_run"] in ("False", "")]
+        for m, short in (("data_driven_nn", "dnn"), ("pinn", "pinn")):
+            sel = [r for r in rows if r["method"] == m and r["run_id"].endswith(tuple(f"_s{s}" for s in range(1, 6)))]
+            ids = sorted(r["run_id"] for r in sel)
+            for col in ["test_a_relative_l2_" + k for k in "uvp"] + ["continuity_residual"]:
+                vals = [float(r[col]) for r in sel if r[col] not in ("", "None")]
+                if vals:
+                    out[f"re{re}_{short}_gpu_{col}_mean"] = {
+                        "value": statistics.mean(vals), "runs": ids,
+                        "description": f"Re {re} {m} GPU runs: mean {col}"}
+                    out[f"re{re}_{short}_gpu_{col}_min"] = {
+                        "value": min(vals), "runs": ids, "description": f"Re {re} {m} GPU runs: min {col}"}
+                    out[f"re{re}_{short}_gpu_{col}_max"] = {
+                        "value": max(vals), "runs": ids, "description": f"Re {re} {m} GPU runs: max {col}"}
     return out
 
 

@@ -58,6 +58,18 @@
    "0.071"
   ]
  },
+ "re10_dnn_gpu_test_a_relative_l2_u_mean": {
+  "value": 0.018753917353266907,
+  "description": "Re 10 data_driven_nn GPU runs: mean test_a_relative_l2_u",
+  "runs": [
+   "dnn_re10_gpu_s1",
+   "dnn_re10_gpu_s2",
+   "dnn_re10_gpu_s3"
+  ],
+  "printed_as": [
+   "1.9%"
+  ]
+ },
  "re400_dnn_gpu_test_a_relative_l2_u_mean": {
   "value": 0.023067831286254385,
   "description": "Re 400 data_driven_nn GPU runs: mean test_a_relative_l2_u",
@@ -70,6 +82,30 @@
   ],
   "printed_as": [
    "2.3%"
+  ]
+ },
+ "re1000_dnn_gpu_test_a_relative_l2_u_mean": {
+  "value": 0.017153715452486555,
+  "description": "Re 1000 data_driven_nn GPU runs: mean test_a_relative_l2_u",
+  "runs": [
+   "dnn_re1000_gpu_s1",
+   "dnn_re1000_gpu_s2",
+   "dnn_re1000_gpu_s3"
+  ],
+  "printed_as": [
+   "1.7%"
+  ]
+ },
+ "re10_pinn_gpu_test_a_relative_l2_u_mean": {
+  "value": 0.15925177016425301,
+  "description": "Re 10 pinn GPU runs: mean test_a_relative_l2_u",
+  "runs": [
+   "pinn_re10_gpu_s1",
+   "pinn_re10_gpu_s2",
+   "pinn_re10_gpu_s3"
+  ],
+  "printed_as": [
+   "16%"
   ]
  },
  "re400_pinn_gpu_test_a_relative_l2_u_mean": {

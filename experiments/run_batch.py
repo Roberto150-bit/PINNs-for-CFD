@@ -106,20 +106,22 @@ def extended_jobs():
     Same setup as the main runs (5 x 64, Adam 1e-3, same data, collocation
     points and seeds) but 100,000 optimizer steps instead of 20,000. Test-A
     error is logged every 500 steps, so each run also gives the error after
-    20,000, 40,000, ... steps. Order: data NN Re 100 (short), PINN Re 100,
-    then PINN Re 400 (the case that failed at 20,000 steps).
+    20,000, 40,000, ... steps. Order: data NN Re 100 (short), then one PINN
+    seed at Re 100 and one at Re 400 (the case that failed at 20,000 steps),
+    then the remaining PINN seeds.
     """
+    scripts = {"data_driven_nn": ("models/data_driven_nn/src/train.py", "dnn"),
+               "pinn": ("models/pinn/src/train.py", "pinn")}
+    order = [(100.0, "data_driven_nn", s) for s in (1, 2, 3)] + [
+        (100.0, "pinn", 1), (400.0, "pinn", 1), (100.0, "pinn", 2), (400.0, "pinn", 2), (100.0, "pinn", 3)]
     out = []
-    for re, method, script, short, seeds in (
-            (100.0, "data_driven_nn", "models/data_driven_nn/src/train.py", "dnn", (1, 2, 3)),
-            (100.0, "pinn", "models/pinn/src/train.py", "pinn", (1, 2, 3)),
-            (400.0, "pinn", "models/pinn/src/train.py", "pinn", (1, 2))):
+    for re, method, s in order:
+        script, short = scripts[method]
         EXP = f"{C.experiment_dir(re)}/extended"
-        for s in seeds:
-            rid = f"{short}_re{re:g}_gpu_s{s}_steps{EXTENDED_STEPS // 1000}k"
-            out.append((f"{EXP}/{method}/{rid}",
-                        [PY, script, "--device", "gpu", "--seed", str(s), "--re", f"{re:g}",
-                         "--steps", str(EXTENDED_STEPS), "--run-id", rid, "--exp-dir", EXP]))
+        rid = f"{short}_re{re:g}_gpu_s{s}_steps{EXTENDED_STEPS // 1000}k"
+        out.append((f"{EXP}/{method}/{rid}",
+                    [PY, script, "--device", "gpu", "--seed", str(s), "--re", f"{re:g}",
+                     "--steps", str(EXTENDED_STEPS), "--run-id", rid, "--exp-dir", EXP]))
     return out
 
 
