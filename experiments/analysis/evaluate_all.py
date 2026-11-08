@@ -263,6 +263,8 @@ def main():
     parser.add_argument("--only", nargs="*", default=None)
     parser.add_argument("--device", choices=["cpu", "gpu"], default="cpu",
                         help="device for the autodiff residuals")
+    parser.add_argument("--exp-dir", default=None,
+                        help="folder of runs to score (default: the experiment folder for --re)")
     parser.add_argument("--out", default=None,
                         help="default: experiments/results/experiment_results.csv (Re 100), "
                              "experiment_results_re<Re>.csv otherwise")
@@ -278,7 +280,7 @@ def main():
     ref, data = load_reference(args.re)
     nu = C.kinematic_viscosity(args.re)
     rows = []
-    for run_dir in find_runs(C.experiment_dir(args.re)):
+    for run_dir in find_runs(args.exp_dir or C.experiment_dir(args.re)):
         run_id = os.path.basename(run_dir)
         if args.only and run_id not in args.only:
             continue

@@ -35,6 +35,10 @@ def main():
     parser.add_argument("--lr-drop-step", type=int, default=0,
                         help="overfit test only: lower the learning rate 10x at this step")
     parser.add_argument("--no-determinism", action="store_true")
+    parser.add_argument("--train-fraction", type=float, default=1.0,
+                        help="use this fraction of the train split (sensitivity study S1)")
+    parser.add_argument("--hidden-layers", type=int, default=config.HIDDEN_LAYERS)
+    parser.add_argument("--neurons", type=int, default=config.NEURONS_PER_LAYER)
     parser.add_argument("--run-id", default=None)
     parser.add_argument("--exp-dir", default=None, help="default: the experiment folder for --re")
     args = parser.parse_args()
@@ -50,6 +54,12 @@ def main():
     if args.overfit:
         idx_train = np.random.default_rng(args.seed).choice(idx_train, args.overfit, replace=False)
         args.batch = args.overfit
+    if args.train_fraction < 1.0:
+        # Same subset for every seed (fixed split seed), so seeds differ only in
+        # initialization and batch order
+        n_keep = int(round(args.train_fraction * len(idx_train)))
+        idx_train = np.sort(np.random.default_rng(C.SPLIT_SEED).choice(idx_train, n_keep, replace=False))
+    args.batch = min(args.batch, len(idx_train))
 
     # Standardization from the train split only
     y_mean = Y_all[idx_train].mean(axis=0)
@@ -61,7 +71,7 @@ def main():
     X_val = tf.constant(X_all[data["idx_val"]])
     Y_val = tf.constant(Ys_all[data["idx_val"]])
 
-    model = build_network(seed=args.seed)
+    model = build_network(args.hidden_layers, args.neurons, seed=args.seed)
     optimizer = tf.keras.optimizers.Adam(learning_rate=config.LEARNING_RATE)
     if args.lr_drop_step and not args.overfit:
         raise SystemExit("--lr-drop-step is only for the overfit test")
@@ -116,14 +126,15 @@ def main():
         recorder = run_record.RunRecorder(config.METHOD, run_id, args.device, args.seed, args.re,
                                           exp_dir=args.exp_dir)
         recorder.write_config({
-            "model": {"hidden_layers": config.HIDDEN_LAYERS, "neurons_per_layer": config.NEURONS_PER_LAYER,
+            "model": {"hidden_layers": args.hidden_layers, "neurons_per_layer": args.neurons,
                       "activation": config.ACTIVATION, "initializer": C.KERNEL_INITIALIZER,
                       "output_size": 3, "trainable_parameters": count_parameters(model)},
             "training": {"steps": args.steps, "batch_size": args.batch,
                          "learning_rate": config.LEARNING_RATE, "optimizer": config.OPTIMIZER,
                          "loss_function": config.LOSS, "batches_per_epoch": batches_per_epoch},
             "data": {"input_variables": ["x", "y", "t"], "target_variables": ["u", "v", "p"],
-                     "training_samples": int(n_train), "validation_samples": int(len(data["idx_val"])),
+                     "training_samples": int(n_train), "train_fraction": args.train_fraction,
+                     "validation_samples": int(len(data["idx_val"])),
                      "dataset": C.dataset_path(args.re), "input_scaling": "[-1, 1]",
                      "target_mean": y_mean.tolist(), "target_std": y_std.tolist()},
             "reproducibility": {"random_seed": args.seed, "split_seed": C.SPLIT_SEED},

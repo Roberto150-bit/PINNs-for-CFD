@@ -7,6 +7,7 @@ only, the cost of deterministic ops. A job is skipped when its run folder
 already holds a performance.json, so the batch can be restarted safely.
 
     python experiments/run_batch.py [--re 400] [--dry-run]
+    python experiments/run_batch.py --sensitivity      (studies S1-S3, Re 100)
 """
 import argparse
 import os
@@ -62,15 +63,46 @@ def jobs(re):
     return out
 
 
+def sensitivity_jobs():
+    """S1 data NN train fraction, S2 PINN collocation points, S3 network size.
+
+    Re 100, GPU, seeds 1-3, everything else as in the main runs. Order: the
+    shortest studies first.
+    """
+    EXP = f"{C.experiment_dir(100.0)}/sensitivity"
+    dnn = [PY, "models/data_driven_nn/src/train.py", "--device", "gpu"]
+    pinn = [PY, "models/pinn/src/train.py", "--device", "gpu"]
+    out = []
+    for frac, name in ((0.01, "frac1"), (0.10, "frac10")):
+        for s in (1, 2, 3):
+            rid = f"dnn_re100_gpu_s{s}_{name}"
+            out.append((f"{EXP}/data_driven_nn/{rid}", dnn + ["--seed", str(s), "--train-fraction", str(frac),
+                                                            "--run-id", rid, "--exp-dir", EXP]))
+    for n_col in (5000, 10000):
+        for s in (1, 2, 3):
+            rid = f"pinn_re100_gpu_s{s}_col{n_col}"
+            out.append((f"{EXP}/pinn/{rid}", pinn + ["--seed", str(s), "--n-collocation", str(n_col),
+                                                     "--run-id", rid, "--exp-dir", EXP]))
+    for layers, width in ((4, 50), (6, 100)):
+        for method, cmd, short in (("data_driven_nn", dnn, "dnn"), ("pinn", pinn, "pinn")):
+            for s in (1, 2, 3):
+                rid = f"{short}_re100_gpu_s{s}_arch{layers}x{width}"
+                out.append((f"{EXP}/{method}/{rid}", cmd + ["--seed", str(s), "--hidden-layers", str(layers),
+                                                          "--neurons", str(width), "--run-id", rid,
+                                                          "--exp-dir", EXP]))
+    return out
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--re", type=float, default=100.0)
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--sensitivity", action="store_true")
     args = parser.parse_args()
-    LOG_DIR = os.path.join(C.experiment_dir(args.re), "logs")
+    LOG_DIR = os.path.join(C.experiment_dir(args.re), "sensitivity" if args.sensitivity else "", "logs")
     os.makedirs(LOG_DIR, exist_ok=True)
     env = dict(os.environ, PYTHONDONTWRITEBYTECODE="1", TF_CPP_MIN_LOG_LEVEL="2")
-    for run_dir, cmd in jobs(args.re):
+    for run_dir, cmd in (sensitivity_jobs() if args.sensitivity else jobs(args.re)):
         name = os.path.basename(run_dir)
         if os.path.exists(os.path.join(run_dir, "performance.json")):
             print(f"skip {name} (complete)", flush=True)

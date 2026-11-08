@@ -28,6 +28,8 @@ def main():
     parser.add_argument("--re", type=float, default=100.0)
     parser.add_argument("--steps", type=int, default=config.TRAINING_STEPS)
     parser.add_argument("--n-collocation", type=int, default=config.N_COLLOCATION)
+    parser.add_argument("--hidden-layers", type=int, default=config.HIDDEN_LAYERS)
+    parser.add_argument("--neurons", type=int, default=config.NEURONS_PER_LAYER)
     parser.add_argument("--no-determinism", action="store_true")
     parser.add_argument("--tag", default=None, help="suffix added to the run id (e.g. timing)")
     parser.add_argument("--run-id", default=None)
@@ -49,7 +51,7 @@ def main():
     bc_is_lid = tf.constant(pts["bc_is_lid"].astype("float32"))
     samples_per_step = sum(len(a[0]) for a in (pts["col"], pts["ic"], pts["bc"]))
 
-    model = build_network(seed=args.seed)
+    model = build_network(args.hidden_layers, args.neurons, seed=args.seed)
     fields = network_fields(model)
     optimizer = tf.keras.optimizers.Adam(learning_rate=config.LEARNING_RATE)
     # Loss weights as variables so a one-time rebalance does not retrace
@@ -77,7 +79,7 @@ def main():
 
     def cfg(lambda_adjustment=None):
         return {
-            "model": {"hidden_layers": config.HIDDEN_LAYERS, "neurons_per_layer": config.NEURONS_PER_LAYER,
+            "model": {"hidden_layers": args.hidden_layers, "neurons_per_layer": args.neurons,
                       "activation": config.ACTIVATION, "initializer": C.KERNEL_INITIALIZER,
                       "output_size": 3, "trainable_parameters": count_parameters(model)},
             "training": {"steps": args.steps, "learning_rate": config.LEARNING_RATE,
