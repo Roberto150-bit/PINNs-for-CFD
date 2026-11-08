@@ -1453,5 +1453,29 @@
    "pinn_re400_gpu_s5"
   ],
   "description": "Re 400 pinn GPU runs: max continuity_residual"
+ },
+ "s5_re100_dnn_u_at_20k_mean": {
+  "value": 0.01778139970326697,
+  "runs": [
+   "dnn_re100_gpu_s1_steps100k",
+   "dnn_re100_gpu_s2_steps100k"
+  ],
+  "description": "S5 Re 100 data_driven_nn: test-A rel. L2 u at step 20,000"
+ },
+ "s5_re100_dnn_u_at_100k_mean": {
+  "value": 0.011746761440289449,
+  "runs": [
+   "dnn_re100_gpu_s1_steps100k",
+   "dnn_re100_gpu_s2_steps100k"
+  ],
+  "description": "S5 Re 100 data_driven_nn: test-A rel. L2 u at step 100,000"
+ },
+ "s5_re100_dnn_n_runs": {
+  "value": 2,
+  "runs": [
+   "dnn_re100_gpu_s1_steps100k",
+   "dnn_re100_gpu_s2_steps100k"
+  ],
+  "description": "S5 Re 100 data_driven_nn: completed 100k-step runs"
  }
 }
