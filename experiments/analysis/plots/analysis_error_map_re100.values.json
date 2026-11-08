@@ -1,0 +1,34 @@
+{
+ "re": 100.0,
+ "data_driven_nn": {
+  "runs": [
+   "dnn_re100_gpu_s1",
+   "dnn_re100_gpu_s2",
+   "dnn_re100_gpu_s3"
+  ],
+  "mean_abs_error": 0.002125286593917244,
+  "max_abs_error": 0.04363382358787272,
+  "argmax_xy": [
+   0.031746031746031744,
+   0.9841269841269841
+  ],
+  "top_rows_mean": 0.004767128509222464,
+  "rest_mean": 0.0017478806060164979
+ },
+ "pinn": {
+  "runs": [
+   "pinn_re100_gpu_s1",
+   "pinn_re100_gpu_s2",
+   "pinn_re100_gpu_s3"
+  ],
+  "mean_abs_error": 0.011442153450469675,
+  "max_abs_error": 0.35518556244248645,
+  "argmax_xy": [
+   1.0,
+   1.0
+  ],
+  "top_rows_mean": 0.01820777513718344,
+  "rest_mean": 0.010475636066653426
+ },
+ "color_max_99th_percentile": 0.03255296235587825
+}
