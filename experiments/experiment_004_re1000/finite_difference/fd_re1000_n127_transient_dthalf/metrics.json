@@ -1,0 +1,5 @@
+{
+  "run_id": "fd_re1000_n127_transient_dthalf",
+  "method": "finite_difference",
+  "status": "not on the reference grid (51, 127, 127)"
+}
