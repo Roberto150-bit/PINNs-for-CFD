@@ -1,0 +1,10 @@
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1794124257.238711   22334 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1794124258.911196   22334 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+step      1 loss 8.926e-01 val 8.111e-01 relL2 u 9.767e-01 v 8.332e-01 p 9.458e-01 t 1.7s
+step    500 loss 5.246e-02 val 4.878e-02 relL2 u 1.792e-01 v 1.615e-01 p 3.015e-01 t 4.5s
+step   1000 loss 2.975e-02 val 3.562e-02 relL2 u 1.600e-01 v 1.120e-01 p 2.576e-01 t 8.1s
+step   1500 loss 2.498e-02 val 2.966e-02 relL2 u 1.403e-01 v 9.343e-02 p 2.442e-01 t 11.5s
+step   2000 loss 2.723e-02 val 2.725e-02 relL2 u 1.122e-01 v 8.062e-02 p 2.471e-01 t 14.6s
+done dnn_re100_gpu_s1_det2000: train 14.6s, per step 6.47 ms, peak RAM 1441 MiB, peak VRAM 122 MiB

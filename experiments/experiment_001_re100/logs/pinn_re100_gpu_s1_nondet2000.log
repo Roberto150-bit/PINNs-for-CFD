@@ -1,0 +1,12 @@
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1794124398.550339   22940 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1794124400.431725   22940 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+first step (trace + compile) 3.70s
+step      1 total 1.989e+00 ic 3.04e-02 bc 3.28e-01 c 7.71e-02 x 1.17e+00 y 3.86e-01 | relL2 u 1.075 v 1.229 p 1.952 | t 3.7s
+step    500 total 3.287e-02 ic 5.86e-03 bc 2.37e-02 c 6.79e-04 x 1.89e-03 y 7.38e-04 | relL2 u 0.529 v 1.020 p 0.944 | t 23.1s
+step   1000 total 2.263e-02 ic 2.01e-03 bc 1.82e-02 c 3.26e-04 x 1.67e-03 y 4.04e-04 | relL2 u 0.410 v 1.034 p 0.944 | t 42.6s
+step   1500 total 1.960e-02 ic 1.13e-03 bc 1.64e-02 c 2.13e-04 x 1.42e-03 y 4.36e-04 | relL2 u 0.391 v 1.016 p 0.931 | t 61.9s
+lambda check at step 2000: ratio 21.1 -> {'step': 2000, 'imbalance_ratio': 21.09996150006444, 'components': {'ic': 0.0009332294575870037, 'bc': 0.015066755935549736, 'c': 0.0007140655652619898, 'm': 0.002206213539466262}, 'changed': False}
+step   2000 total 1.892e-02 ic 9.33e-04 bc 1.51e-02 c 7.14e-04 x 1.73e-03 y 4.81e-04 | relL2 u 0.384 v 1.032 p 0.920 | t 81.4s
+done pinn_re100_gpu_s1_nondet2000: train 81.4s, per step 38.8 ms, peak RAM 1520 MiB, peak VRAM 704 MiB
