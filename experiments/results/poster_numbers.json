@@ -1189,5 +1189,269 @@
    "fd_re100_n64_transient_dthalf"
   ],
   "description": "FD 64: max |velocity difference| between dt and dt/2 at t = 5"
+ },
+ "re400_dnn_gpu_test_a_relative_l2_u_mean": {
+  "value": 0.023067831286254385,
+  "runs": [
+   "dnn_re400_gpu_s1",
+   "dnn_re400_gpu_s2",
+   "dnn_re400_gpu_s3",
+   "dnn_re400_gpu_s4",
+   "dnn_re400_gpu_s5"
+  ],
+  "description": "Re 400 data_driven_nn GPU runs: mean test_a_relative_l2_u"
+ },
+ "re400_dnn_gpu_test_a_relative_l2_u_min": {
+  "value": 0.02102000798992003,
+  "runs": [
+   "dnn_re400_gpu_s1",
+   "dnn_re400_gpu_s2",
+   "dnn_re400_gpu_s3",
+   "dnn_re400_gpu_s4",
+   "dnn_re400_gpu_s5"
+  ],
+  "description": "Re 400 data_driven_nn GPU runs: min test_a_relative_l2_u"
+ },
+ "re400_dnn_gpu_test_a_relative_l2_u_max": {
+  "value": 0.024968038152520966,
+  "runs": [
+   "dnn_re400_gpu_s1",
+   "dnn_re400_gpu_s2",
+   "dnn_re400_gpu_s3",
+   "dnn_re400_gpu_s4",
+   "dnn_re400_gpu_s5"
+  ],
+  "description": "Re 400 data_driven_nn GPU runs: max test_a_relative_l2_u"
+ },
+ "re400_dnn_gpu_test_a_relative_l2_v_mean": {
+  "value": 0.025380313922960064,
+  "runs": [
+   "dnn_re400_gpu_s1",
+   "dnn_re400_gpu_s2",
+   "dnn_re400_gpu_s3",
+   "dnn_re400_gpu_s4",
+   "dnn_re400_gpu_s5"
+  ],
+  "description": "Re 400 data_driven_nn GPU runs: mean test_a_relative_l2_v"
+ },
+ "re400_dnn_gpu_test_a_relative_l2_v_min": {
+  "value": 0.022309627664227838,
+  "runs": [
+   "dnn_re400_gpu_s1",
+   "dnn_re400_gpu_s2",
+   "dnn_re400_gpu_s3",
+   "dnn_re400_gpu_s4",
+   "dnn_re400_gpu_s5"
+  ],
+  "description": "Re 400 data_driven_nn GPU runs: min test_a_relative_l2_v"
+ },
+ "re400_dnn_gpu_test_a_relative_l2_v_max": {
+  "value": 0.028303782106543225,
+  "runs": [
+   "dnn_re400_gpu_s1",
+   "dnn_re400_gpu_s2",
+   "dnn_re400_gpu_s3",
+   "dnn_re400_gpu_s4",
+   "dnn_re400_gpu_s5"
+  ],
+  "description": "Re 400 data_driven_nn GPU runs: max test_a_relative_l2_v"
+ },
+ "re400_dnn_gpu_test_a_relative_l2_p_mean": {
+  "value": 0.1606604235602986,
+  "runs": [
+   "dnn_re400_gpu_s1",
+   "dnn_re400_gpu_s2",
+   "dnn_re400_gpu_s3",
+   "dnn_re400_gpu_s4",
+   "dnn_re400_gpu_s5"
+  ],
+  "description": "Re 400 data_driven_nn GPU runs: mean test_a_relative_l2_p"
+ },
+ "re400_dnn_gpu_test_a_relative_l2_p_min": {
+  "value": 0.15421670279562555,
+  "runs": [
+   "dnn_re400_gpu_s1",
+   "dnn_re400_gpu_s2",
+   "dnn_re400_gpu_s3",
+   "dnn_re400_gpu_s4",
+   "dnn_re400_gpu_s5"
+  ],
+  "description": "Re 400 data_driven_nn GPU runs: min test_a_relative_l2_p"
+ },
+ "re400_dnn_gpu_test_a_relative_l2_p_max": {
+  "value": 0.17444001292678502,
+  "runs": [
+   "dnn_re400_gpu_s1",
+   "dnn_re400_gpu_s2",
+   "dnn_re400_gpu_s3",
+   "dnn_re400_gpu_s4",
+   "dnn_re400_gpu_s5"
+  ],
+  "description": "Re 400 data_driven_nn GPU runs: max test_a_relative_l2_p"
+ },
+ "re400_dnn_gpu_continuity_residual_mean": {
+  "value": 0.5477731169152559,
+  "runs": [
+   "dnn_re400_gpu_s1",
+   "dnn_re400_gpu_s2",
+   "dnn_re400_gpu_s3",
+   "dnn_re400_gpu_s4",
+   "dnn_re400_gpu_s5"
+  ],
+  "description": "Re 400 data_driven_nn GPU runs: mean continuity_residual"
+ },
+ "re400_dnn_gpu_continuity_residual_min": {
+  "value": 0.5178005194374447,
+  "runs": [
+   "dnn_re400_gpu_s1",
+   "dnn_re400_gpu_s2",
+   "dnn_re400_gpu_s3",
+   "dnn_re400_gpu_s4",
+   "dnn_re400_gpu_s5"
+  ],
+  "description": "Re 400 data_driven_nn GPU runs: min continuity_residual"
+ },
+ "re400_dnn_gpu_continuity_residual_max": {
+  "value": 0.577327553900026,
+  "runs": [
+   "dnn_re400_gpu_s1",
+   "dnn_re400_gpu_s2",
+   "dnn_re400_gpu_s3",
+   "dnn_re400_gpu_s4",
+   "dnn_re400_gpu_s5"
+  ],
+  "description": "Re 400 data_driven_nn GPU runs: max continuity_residual"
+ },
+ "re400_pinn_gpu_test_a_relative_l2_u_mean": {
+  "value": 0.35648975080247475,
+  "runs": [
+   "pinn_re400_gpu_s1",
+   "pinn_re400_gpu_s2",
+   "pinn_re400_gpu_s3",
+   "pinn_re400_gpu_s4",
+   "pinn_re400_gpu_s5"
+  ],
+  "description": "Re 400 pinn GPU runs: mean test_a_relative_l2_u"
+ },
+ "re400_pinn_gpu_test_a_relative_l2_u_min": {
+  "value": 0.3238824607806176,
+  "runs": [
+   "pinn_re400_gpu_s1",
+   "pinn_re400_gpu_s2",
+   "pinn_re400_gpu_s3",
+   "pinn_re400_gpu_s4",
+   "pinn_re400_gpu_s5"
+  ],
+  "description": "Re 400 pinn GPU runs: min test_a_relative_l2_u"
+ },
+ "re400_pinn_gpu_test_a_relative_l2_u_max": {
+  "value": 0.3710083912981535,
+  "runs": [
+   "pinn_re400_gpu_s1",
+   "pinn_re400_gpu_s2",
+   "pinn_re400_gpu_s3",
+   "pinn_re400_gpu_s4",
+   "pinn_re400_gpu_s5"
+  ],
+  "description": "Re 400 pinn GPU runs: max test_a_relative_l2_u"
+ },
+ "re400_pinn_gpu_test_a_relative_l2_v_mean": {
+  "value": 0.904950954119864,
+  "runs": [
+   "pinn_re400_gpu_s1",
+   "pinn_re400_gpu_s2",
+   "pinn_re400_gpu_s3",
+   "pinn_re400_gpu_s4",
+   "pinn_re400_gpu_s5"
+  ],
+  "description": "Re 400 pinn GPU runs: mean test_a_relative_l2_v"
+ },
+ "re400_pinn_gpu_test_a_relative_l2_v_min": {
+  "value": 0.7693888416922796,
+  "runs": [
+   "pinn_re400_gpu_s1",
+   "pinn_re400_gpu_s2",
+   "pinn_re400_gpu_s3",
+   "pinn_re400_gpu_s4",
+   "pinn_re400_gpu_s5"
+  ],
+  "description": "Re 400 pinn GPU runs: min test_a_relative_l2_v"
+ },
+ "re400_pinn_gpu_test_a_relative_l2_v_max": {
+  "value": 0.9491427645273253,
+  "runs": [
+   "pinn_re400_gpu_s1",
+   "pinn_re400_gpu_s2",
+   "pinn_re400_gpu_s3",
+   "pinn_re400_gpu_s4",
+   "pinn_re400_gpu_s5"
+  ],
+  "description": "Re 400 pinn GPU runs: max test_a_relative_l2_v"
+ },
+ "re400_pinn_gpu_test_a_relative_l2_p_mean": {
+  "value": 0.8893216057723844,
+  "runs": [
+   "pinn_re400_gpu_s1",
+   "pinn_re400_gpu_s2",
+   "pinn_re400_gpu_s3",
+   "pinn_re400_gpu_s4",
+   "pinn_re400_gpu_s5"
+  ],
+  "description": "Re 400 pinn GPU runs: mean test_a_relative_l2_p"
+ },
+ "re400_pinn_gpu_test_a_relative_l2_p_min": {
+  "value": 0.7281601145369087,
+  "runs": [
+   "pinn_re400_gpu_s1",
+   "pinn_re400_gpu_s2",
+   "pinn_re400_gpu_s3",
+   "pinn_re400_gpu_s4",
+   "pinn_re400_gpu_s5"
+  ],
+  "description": "Re 400 pinn GPU runs: min test_a_relative_l2_p"
+ },
+ "re400_pinn_gpu_test_a_relative_l2_p_max": {
+  "value": 0.9347779665281806,
+  "runs": [
+   "pinn_re400_gpu_s1",
+   "pinn_re400_gpu_s2",
+   "pinn_re400_gpu_s3",
+   "pinn_re400_gpu_s4",
+   "pinn_re400_gpu_s5"
+  ],
+  "description": "Re 400 pinn GPU runs: max test_a_relative_l2_p"
+ },
+ "re400_pinn_gpu_continuity_residual_mean": {
+  "value": 0.02880396621741886,
+  "runs": [
+   "pinn_re400_gpu_s1",
+   "pinn_re400_gpu_s2",
+   "pinn_re400_gpu_s3",
+   "pinn_re400_gpu_s4",
+   "pinn_re400_gpu_s5"
+  ],
+  "description": "Re 400 pinn GPU runs: mean continuity_residual"
+ },
+ "re400_pinn_gpu_continuity_residual_min": {
+  "value": 0.01385031562955074,
+  "runs": [
+   "pinn_re400_gpu_s1",
+   "pinn_re400_gpu_s2",
+   "pinn_re400_gpu_s3",
+   "pinn_re400_gpu_s4",
+   "pinn_re400_gpu_s5"
+  ],
+  "description": "Re 400 pinn GPU runs: min continuity_residual"
+ },
+ "re400_pinn_gpu_continuity_residual_max": {
+  "value": 0.05981361060471682,
+  "runs": [
+   "pinn_re400_gpu_s1",
+   "pinn_re400_gpu_s2",
+   "pinn_re400_gpu_s3",
+   "pinn_re400_gpu_s4",
+   "pinn_re400_gpu_s5"
+  ],
+  "description": "Re 400 pinn GPU runs: max continuity_residual"
  }
 }

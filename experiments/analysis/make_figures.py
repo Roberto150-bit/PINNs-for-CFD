@@ -382,6 +382,161 @@ def fig_pipelines():
 
 # ---------------- data loading for the real figures ----------------
 
+# ---------------- poster v2 figures (one wider column, plain-language labels) ----------------
+
+WIDE = 9.6             # inches: one column of the three-column poster layout
+
+
+def value_labels(ax, bars, fmt, errs=None):
+    """Write each bar's value just above the bar (and above its error bar, if any)."""
+    for i, b in enumerate(bars):
+        h = b.get_height()
+        top = h + (errs[i] if errs is not None else 0)
+        ax.annotate(fmt(h), (b.get_x() + b.get_width() / 2, top), xytext=(0, 4),
+                    textcoords="offset points", ha="center", va="bottom", fontsize=22, color=INK)
+
+
+def fig_v2_accuracy(data):
+    """Test-A error of u, v, p in percent (mean ± std over seeds), one bar pair per variable."""
+    fig, ax = plt.subplots(figsize=(WIDE, 3.4), constrained_layout=True)
+    methods = [m for m in ("data_driven_nn", "pinn") if m in data]
+    width = 0.8 / len(methods)
+    plotted = {}
+    names = {"u": "u (horizontal\nvelocity)", "v": "v (vertical\nvelocity)", "p": "p (pressure)"}
+    for i, m in enumerate(methods):
+        means = [100 * data[m]["test_a"][k][0] for k in "uvp"]
+        stds = [100 * data[m]["test_a"][k][1] for k in "uvp"]
+        xs = np.arange(3) + (i - (len(methods) - 1) / 2) * width
+        bars = ax.bar(xs, means, width * 0.92, yerr=stds, color=COLORS[m], label=LABELS[m],
+                      capsize=6, error_kw={"elinewidth": 2, "ecolor": INK})
+        value_labels(ax, bars, lambda h: f"{h:.0f}%" if h >= 10 else f"{h:.1f}%", stds)
+        plotted[m] = [float(b.get_height()) / 100 for b in bars]
+    ax.set_xticks(range(3), [names[k] for k in "uvp"])
+    ax.set_ylabel("Error (%)")
+    ax.set_ylim(0, max(max(v) for v in plotted.values()) * 100 * 1.3)
+    ax.grid(axis="x", visible=False)
+    ax.legend(frameon=False, loc="upper left")
+    return fig, plotted
+
+
+def fig_v2_physics(data):
+    """How much each network's field violates the flow equations (RMS residual, log scale)."""
+    fig, ax = plt.subplots(figsize=(WIDE, 3.3), constrained_layout=True)
+    names = ["continuity", "x_momentum", "y_momentum"]
+    methods = [m for m in ("data_driven_nn", "pinn") if m in data]
+    width = 0.8 / len(methods)
+    plotted = {}
+    for i, m in enumerate(methods):
+        means = [data[m][n][0] for n in names]
+        stds = [data[m][n][1] for n in names]
+        xs = np.arange(3) + (i - (len(methods) - 1) / 2) * width
+        bars = ax.bar(xs, means, width * 0.92, yerr=stds, color=COLORS[m], label=LABELS[m], capsize=6,
+                      error_kw={"elinewidth": 2, "ecolor": INK})
+        value_labels(ax, bars, lambda h: f"{h:.2g}", stds)
+        plotted[m] = [float(b.get_height()) for b in bars]
+    ax.set_xticks(range(3), ["Mass\nconserved", "Momentum\n(x)", "Momentum\n(y)"])
+    ax.set_yscale("log")
+    ax.set_ylim(top=max(max(v) for v in plotted.values()) * 3)
+    plain_log_axis(ax.yaxis, subs=(1.0,))
+    ax.set_ylabel("Violation")
+    ax.grid(axis="x", visible=False)
+    fig.legend(*ax.get_legend_handles_labels(), frameon=False, loc="outside lower center", ncols=2)
+    return fig, plotted
+
+
+def fig_v2_cost(nums):
+    """Wall-clock time to a usable 64 x 64 x 51 flow field (seconds)."""
+    rows = [("Simulation (CPU)", "fd_n64_solve_seconds_median", "finite_difference"),
+            ("Data NN (GPU)", "dnn_gpu_total_cost_to_field_seconds", "data_driven_nn"),
+            ("PINN (GPU)", "pinn_gpu_total_cost_to_field_seconds", "pinn")]
+    rows = [r for r in rows if nums.get(r[1], {}).get("value") is not None]
+    fig, ax = plt.subplots(figsize=(WIDE, 2.6), constrained_layout=True)
+    vals = [nums[k]["value"] for _, k, _ in rows]
+    ys = np.arange(len(rows))[::-1]
+    bars = ax.barh(ys, vals, color=[COLORS[c] for _, _, c in rows], height=0.6)
+    for b, v in zip(bars, vals):
+        ax.annotate(f"{v:.1f} s" if v < 10 else f"{v:.0f} s", (v, b.get_y() + b.get_height() / 2),
+                    xytext=(8, 0), textcoords="offset points", va="center", fontsize=24, color=INK)
+    ax.set_yticks(ys, [r[0] for r in rows])
+    ax.set_xlim(0, max(vals) * 1.25)
+    ax.set_xlabel("Seconds")
+    ax.grid(axis="y", visible=False)
+    plotted = {k: float(b.get_width()) for (_, k, _), b in zip(rows, bars)}
+    runs = sorted({r for _, k, _ in rows for r in nums[k]["runs"]})
+    return fig, plotted, runs
+
+
+def vortex_center(u, x, y):
+    """Primary-vortex center = minimum of the stream function psi(y, x) = integral_0^y u dy'."""
+    psi = np.concatenate([np.zeros((1, u.shape[1])),
+                          np.cumsum(0.5 * (u[1:] + u[:-1]) * np.diff(y)[:, None], axis=0)])
+    j, i = np.unravel_index(np.argmin(psi), psi.shape)
+    return float(x[i]), float(y[j]), float(psi[j, i])
+
+
+def fig_v2_re400(fields, t_show=5.0):
+    """u at t = 5 for Re 400: simulation, data NN, PINN, with each field's vortex center."""
+    order = ["finite_difference", "data_driven_nn", "pinn"]
+    titles = {"finite_difference": "Simulation", "data_driven_nn": "Data NN", "pinn": "PINN"}
+    fig, axes = plt.subplots(1, 3, figsize=(WIDE, 3.75), constrained_layout=True)
+    ref = fields["finite_difference"]
+    k = int(np.argmin(np.abs(ref["t"] - t_show)))
+    vmax = max(abs(ref["u"][k]).max(), 1.0)
+    plotted = {}
+    for ax, m in zip(axes, order):
+        f = fields[m]
+        im = ax.imshow(f["u"][k], origin="lower", extent=[0, 1, 0, 1], cmap=DIVERGING, vmin=-vmax, vmax=vmax)
+        cx, cy, psi = vortex_center(f["u"][k], f["x"], f["y"])
+        ax.plot(cx, cy, marker="X", markersize=22, color=INK, markeredgecolor="white", markeredgewidth=2)
+        plotted[m] = {"vortex_x": cx, "vortex_y": cy, "psi_min": psi}
+        ax.set_title(titles[m], color=COLORS[m], fontweight="bold")
+        ax.set_xticks([])
+        ax.set_yticks([])
+        ax.grid(False)
+    fig.colorbar(im, ax=axes.tolist(), shrink=0.85, label="u (horizontal velocity)", pad=0.02)
+    return fig, plotted
+
+
+def fig_v2_training_length(curves):
+    """Test-A error of u vs optimizer steps for the 100,000-step runs (S5).
+
+    curves = {run_id: {"method", "re", "step": [...], "err": [...]}}; solid Re 100, dashed Re 400.
+    """
+    fig, ax = plt.subplots(figsize=(WIDE, 3.9), constrained_layout=True)
+    plotted, seen = {}, set()
+    for run_id, c in sorted(curves.items()):
+        style = "-" if c["re"] == 100 else "--"
+        label = f"{LABELS[c['method']]}, Re {c['re']:g}"
+        (line,) = ax.plot(np.array(c["step"]) / 1000, c["err"], style, color=COLORS[c["method"]],
+                          linewidth=2.5, alpha=0.9, label=None if label in seen else label)
+        seen.add(label)
+        plotted[run_id] = [float(v) for v in line.get_ydata()]
+    ax.axvline(20, color=INK2, linestyle=":", linewidth=2)
+    ax.annotate("main runs\nstop here", (20, 1), xytext=(6, -4), textcoords="offset points",
+                xycoords=("data", "axes fraction"), va="top", fontsize=20, color=INK2)
+    ax.set_yscale("log")
+    plain_log_axis(ax.yaxis, subs=(1.0, 3.0))
+    ax.set_xlabel("Training steps (thousands)")
+    ax.set_ylabel("Error in u (rel. L2)")
+    ax.legend(frameon=False, loc="upper right", fontsize=20)
+    return fig, plotted
+
+
+def training_length_data():
+    out = {}
+    for re, folder in ((100, "experiment_001_re100"), (400, "experiment_002_re400")):
+        for m in ("data_driven_nn", "pinn"):
+            for run in sorted(glob.glob(f"experiments/{folder}/extended/{m}/*_steps100k")):
+                if not os.path.exists(os.path.join(run, "performance.json")):
+                    continue
+                with open(os.path.join(run, "eval_history.csv")) as f:
+                    hist = list(csv.DictReader(f))
+                out[os.path.basename(run)] = {"method": m, "re": re,
+                                              "step": [int(h["step"]) for h in hist],
+                                              "err": [float(h["rel_l2_u"]) for h in hist]}
+    return out
+
+
 def gpu_runs(rows, method):
     return [r for r in rows if r["method"] == method and r["device"] == "gpu"
             and r["status"] == "evaluated" and r["timing_run"] == "False"]
@@ -555,6 +710,28 @@ def check_against_results(rows, agg):
                 for key, ys in plotted.items():
                     comp, n = key.split("|")
                     good &= np.allclose(ys, runs[n][f"{comp}_centerline"])
+        elif name == "v2_accuracy":
+            for m, heights in plotted.items():
+                runs = [r for r in v["runs"] if by_id[r]["method"] == m]
+                for k, h in zip("uvp", heights):
+                    col = [float(by_id[r][f"test_a_relative_l2_{k}"]) for r in runs]
+                    good &= np.isclose(h, np.mean(col), rtol=1e-9)
+        elif name == "v2_physics":
+            for m, heights in plotted.items():
+                runs = [r for r in v["runs"] if by_id[r]["method"] == m]
+                for n, h in zip(("continuity", "x_momentum", "y_momentum"), heights):
+                    col = [float(by_id[r][f"{n}_residual"]) for r in runs]
+                    good &= close(h, np.mean(col))
+        elif name == "v2_cost":
+            nums = json.load(open(os.path.join(RESULTS, "poster_numbers.json")))
+            for key, w in plotted.items():
+                good &= close(w, nums[key]["value"])
+        elif name == "v2_training_length":
+            for run_id, ys in plotted.items():
+                hits = glob.glob(f"experiments/*/extended/*/{run_id}/eval_history.csv")
+                with open(hits[0]) as f:
+                    exp = [float(h["rel_l2_u"]) for h in csv.DictReader(f)]
+                good &= np.allclose(ys, exp, rtol=1e-12)
         else:
             print(f"[INFO] {name}: no tabulated numbers to compare (field maps / diagrams)")
             continue
@@ -630,6 +807,36 @@ def main():
     if wanted("pipelines"):
         fig, p = fig_pipelines()
         made.append(save(fig, "pipelines", [], p))
+    # Poster v2 figures
+    nums_path = os.path.join(RESULTS, "poster_numbers.json")
+    nums = json.load(open(nums_path)) if os.path.exists(nums_path) else {}
+    if wanted("v2_accuracy"):
+        d = accuracy_data(agg)
+        fig, p = fig_v2_accuracy(d)
+        made.append(save(fig, "v2_accuracy", sum((d[m]["runs"] for m in d), []), p))
+    if wanted("v2_physics"):
+        d = residual_data(agg)
+        fig, p = fig_v2_physics(d)
+        made.append(save(fig, "v2_physics", sum((d[m]["runs"] for m in d), []), p))
+    if wanted("v2_cost") and nums:
+        fig, p, runs = fig_v2_cost(nums)
+        made.append(save(fig, "v2_cost", runs, p))
+    if wanted("v2_re400"):
+        exp4 = C.experiment_dir(400.0)
+        ref_id = C.fd_reference_run_id(400.0)
+        flds = {"finite_difference": dict(np.load(os.path.join(exp4, "finite_difference", ref_id, "solution.npz")))}
+        used = [ref_id]
+        for m, prefix in (("data_driven_nn", "dnn"), ("pinn", "pinn")):
+            rid = f"{prefix}_re400_gpu_s1"
+            flds[m] = dict(np.load(os.path.join(exp4, m, rid, "predictions.npz")))
+            used.append(rid)
+        fig, p = fig_v2_re400(flds)
+        made.append(save(fig, "v2_re400", used, p))
+    if wanted("v2_training_length"):
+        d = training_length_data()
+        if d:
+            fig, p = fig_v2_training_length(d)
+            made.append(save(fig, "v2_training_length", list(d), p))
     for m in made:
         print("wrote", m)
     raise SystemExit(0 if check_against_results(rows, agg) else 1)

@@ -255,7 +255,64 @@ def poster_numbers(summary, fd, det, cost, validation, transient):
         tc = transient["time_convergence"]
         put("fd_dt_halving_max_diff_t5", tc["summary_velocity"]["at_t_end"], tc["runs"],
             "FD 64: max |velocity difference| between dt and dt/2 at t = 5")
+    for key, e in re400_numbers().items():
+        nums[key] = e
+    for key, e in extended_numbers().items():
+        nums[key] = e
     return nums
+
+
+def re400_numbers():
+    """Re 400 GPU runs (Phase B): mean test-A relative L2 and continuity residual per method."""
+    path = os.path.join(RESULTS, "experiment_results_re400.csv")
+    if not os.path.exists(path):
+        return {}
+    with open(path) as f:
+        rows = [r for r in csv.DictReader(f) if r["device"] == "gpu" and r["timing_run"] in ("False", "")]
+    out = {}
+    for m, short in (("data_driven_nn", "dnn"), ("pinn", "pinn")):
+        sel = [r for r in rows if r["method"] == m and r["run_id"].endswith(tuple(f"_s{s}" for s in range(1, 6)))]
+        ids = sorted(r["run_id"] for r in sel)
+        for col in ["test_a_relative_l2_" + k for k in "uvp"] + ["continuity_residual"]:
+            vals = [float(r[col]) for r in sel if r[col] not in ("", "None")]
+            if vals:
+                out[f"re400_{short}_gpu_{col}_mean"] = {
+                    "value": statistics.mean(vals), "runs": ids,
+                    "description": f"Re 400 {m} GPU runs: mean {col}"}
+                out[f"re400_{short}_gpu_{col}_min"] = {
+                    "value": min(vals), "runs": ids, "description": f"Re 400 {m} GPU runs: min {col}"}
+                out[f"re400_{short}_gpu_{col}_max"] = {
+                    "value": max(vals), "runs": ids, "description": f"Re 400 {m} GPU runs: max {col}"}
+    return out
+
+
+def extended_numbers():
+    """S5 training length: test-A relative L2 of u at 20,000 steps and at the last step
+    of each completed 100,000-step run, averaged per (Re, method)."""
+    out = {}
+    for re, folder in ((100.0, "experiment_001_re100"), (400.0, "experiment_002_re400")):
+        for m, short in (("data_driven_nn", "dnn"), ("pinn", "pinn")):
+            at20, atend, ids = [], [], []
+            for run in sorted(glob.glob(f"experiments/{folder}/extended/{m}/*_steps100k")):
+                if not os.path.exists(os.path.join(run, "performance.json")):
+                    continue
+                with open(os.path.join(run, "eval_history.csv")) as f:
+                    hist = list(csv.DictReader(f))
+                by_step = {int(h["step"]): float(h["rel_l2_u"]) for h in hist}
+                if 20000 not in by_step:
+                    continue
+                at20.append(by_step[20000])
+                atend.append(by_step[max(by_step)])
+                ids.append(os.path.basename(run))
+            if ids:
+                tag = f"s5_re{re:g}_{short}"
+                out[f"{tag}_u_at_20k_mean"] = {"value": statistics.mean(at20), "runs": ids,
+                                               "description": f"S5 Re {re:g} {m}: test-A rel. L2 u at step 20,000"}
+                out[f"{tag}_u_at_100k_mean"] = {"value": statistics.mean(atend), "runs": ids,
+                                                "description": f"S5 Re {re:g} {m}: test-A rel. L2 u at step 100,000"}
+                out[f"{tag}_n_runs"] = {"value": len(ids), "runs": ids,
+                                        "description": f"S5 Re {re:g} {m}: completed 100k-step runs"}
+    return out
 
 
 def main():
