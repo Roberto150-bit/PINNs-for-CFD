@@ -1,0 +1,461 @@
+{
+ "fd_val_n32_u_max_dev": {
+  "value": 0.02010189541825047,
+  "description": "FD 32: max |u - Marchi| on x = 0.5",
+  "runs": [
+   "fd_re100_n32_steady"
+  ],
+  "printed_as": [
+   "0.0201"
+  ]
+ },
+ "fd_val_n64_u_max_dev": {
+  "value": 0.005591552473984351,
+  "description": "FD 64: max |u - Marchi| on x = 0.5",
+  "runs": [
+   "fd_re100_n64_steady"
+  ],
+  "printed_as": [
+   "0.0056"
+  ]
+ },
+ "fd_val_n128_u_max_dev": {
+  "value": 0.002450627173715886,
+  "description": "FD 128: max |u - Marchi| on x = 0.5",
+  "runs": [
+   "fd_re100_n128_steady"
+  ],
+  "printed_as": [
+   "0.0025"
+  ]
+ },
+ "fd_val_n64_vortex_dist_marchi": {
+  "value": 0.0038604460675223775,
+  "description": "FD 64: vortex center distance to Marchi",
+  "runs": [
+   "fd_re100_n64_steady"
+  ],
+  "printed_as": [
+   "0.0039"
+  ]
+ },
+ "fd_val_n64_vortex_dist_hou": {
+  "value": 0.002539001254352042,
+  "description": "FD 64: vortex center distance to Hou",
+  "runs": [
+   "fd_re100_n64_steady"
+  ],
+  "printed_as": [
+   "0.0025"
+  ]
+ },
+ "fd_dt_halving_max_diff_t5": {
+  "value": 4.3304271064026345e-06,
+  "description": "FD 64: max |velocity difference| between dt and dt/2 at t = 5",
+  "runs": [
+   "fd_re100_n64_transient",
+   "fd_re100_n64_transient_dthalf"
+  ],
+  "printed_as": [
+   "4.3e-06"
+  ]
+ },
+ "dnn_gpu_test_a_relative_l2_u_mean": {
+  "value": 0.016877733667527487,
+  "description": "data_driven_nn GPU runs: mean relative L2 of u on test_a",
+  "runs": [
+   "dnn_re100_gpu_s1",
+   "dnn_re100_gpu_s2",
+   "dnn_re100_gpu_s3",
+   "dnn_re100_gpu_s4",
+   "dnn_re100_gpu_s5"
+  ],
+  "printed_as": [
+   "0.017"
+  ]
+ },
+ "dnn_gpu_test_a_relative_l2_u_std": {
+  "value": 0.0010280192212841382,
+  "description": "data_driven_nn GPU runs: std over seeds",
+  "runs": [
+   "dnn_re100_gpu_s1",
+   "dnn_re100_gpu_s2",
+   "dnn_re100_gpu_s3",
+   "dnn_re100_gpu_s4",
+   "dnn_re100_gpu_s5"
+  ],
+  "printed_as": [
+   "0.001"
+  ]
+ },
+ "pinn_gpu_test_a_relative_l2_u_mean": {
+  "value": 0.08231617035423817,
+  "description": "pinn GPU runs: mean relative L2 of u on test_a",
+  "runs": [
+   "pinn_re100_gpu_s1",
+   "pinn_re100_gpu_s2",
+   "pinn_re100_gpu_s3",
+   "pinn_re100_gpu_s4",
+   "pinn_re100_gpu_s5"
+  ],
+  "printed_as": [
+   "0.082"
+  ]
+ },
+ "pinn_gpu_test_a_relative_l2_u_std": {
+  "value": 0.010820136736698778,
+  "description": "pinn GPU runs: std over seeds",
+  "runs": [
+   "pinn_re100_gpu_s1",
+   "pinn_re100_gpu_s2",
+   "pinn_re100_gpu_s3",
+   "pinn_re100_gpu_s4",
+   "pinn_re100_gpu_s5"
+  ],
+  "printed_as": [
+   "0.011"
+  ]
+ },
+ "dnn_gpu_test_b_relative_l2_u_mean": {
+  "value": 0.014368313550018353,
+  "description": "data_driven_nn GPU runs: mean relative L2 of u on test_b",
+  "runs": [
+   "dnn_re100_gpu_s1",
+   "dnn_re100_gpu_s2",
+   "dnn_re100_gpu_s3",
+   "dnn_re100_gpu_s4",
+   "dnn_re100_gpu_s5"
+  ],
+  "printed_as": [
+   "0.014"
+  ]
+ },
+ "pinn_gpu_test_b_relative_l2_u_mean": {
+  "value": 0.07745883001498746,
+  "description": "pinn GPU runs: mean relative L2 of u on test_b",
+  "runs": [
+   "pinn_re100_gpu_s1",
+   "pinn_re100_gpu_s2",
+   "pinn_re100_gpu_s3",
+   "pinn_re100_gpu_s4",
+   "pinn_re100_gpu_s5"
+  ],
+  "printed_as": [
+   "0.077"
+  ]
+ },
+ "pinn_gpu_continuity_residual_mean": {
+  "value": 0.07053461705108653,
+  "description": "pinn GPU: mean continuity_residual",
+  "runs": [
+   "pinn_re100_gpu_s1",
+   "pinn_re100_gpu_s2",
+   "pinn_re100_gpu_s3",
+   "pinn_re100_gpu_s4",
+   "pinn_re100_gpu_s5"
+  ],
+  "printed_as": [
+   "0.071"
+  ]
+ },
+ "dnn_gpu_continuity_residual_mean": {
+  "value": 0.54559165720832,
+  "description": "data_driven_nn GPU: mean continuity_residual",
+  "runs": [
+   "dnn_re100_gpu_s1",
+   "dnn_re100_gpu_s2",
+   "dnn_re100_gpu_s3",
+   "dnn_re100_gpu_s4",
+   "dnn_re100_gpu_s5"
+  ],
+  "printed_as": [
+   "0.55"
+  ]
+ },
+ "pinn_gpu_x_momentum_residual_mean": {
+  "value": 0.09637463455501205,
+  "description": "pinn GPU: mean x_momentum_residual",
+  "runs": [
+   "pinn_re100_gpu_s1",
+   "pinn_re100_gpu_s2",
+   "pinn_re100_gpu_s3",
+   "pinn_re100_gpu_s4",
+   "pinn_re100_gpu_s5"
+  ],
+  "printed_as": [
+   "0.096"
+  ]
+ },
+ "dnn_gpu_x_momentum_residual_mean": {
+  "value": 5.569002847914746,
+  "description": "data_driven_nn GPU: mean x_momentum_residual",
+  "runs": [
+   "dnn_re100_gpu_s1",
+   "dnn_re100_gpu_s2",
+   "dnn_re100_gpu_s3",
+   "dnn_re100_gpu_s4",
+   "dnn_re100_gpu_s5"
+  ],
+  "printed_as": [
+   "5.6"
+  ]
+ },
+ "pinn_gpu_training_time_seconds_mean": {
+  "value": 781.9692135369447,
+  "description": "pinn GPU: mean training_time_seconds",
+  "runs": [
+   "pinn_re100_gpu_s1",
+   "pinn_re100_gpu_s2",
+   "pinn_re100_gpu_s3",
+   "pinn_re100_gpu_s4",
+   "pinn_re100_gpu_s5"
+  ],
+  "printed_as": [
+   "782"
+  ]
+ },
+ "dnn_gpu_training_time_seconds_mean": {
+  "value": 137.00257639621015,
+  "description": "data_driven_nn GPU: mean training_time_seconds",
+  "runs": [
+   "dnn_re100_gpu_s1",
+   "dnn_re100_gpu_s2",
+   "dnn_re100_gpu_s3",
+   "dnn_re100_gpu_s4",
+   "dnn_re100_gpu_s5"
+  ],
+  "printed_as": [
+   "137"
+  ]
+ },
+ "fd_n64_solve_seconds_median": {
+  "value": 3.9274441010002192,
+  "description": "FD 64x64 transient (5,000 steps) solve time, median of repeats",
+  "runs": [
+   "fd_re100_n64_transient_timing_r1",
+   "fd_re100_n64_transient_timing_r2",
+   "fd_re100_n64_transient_timing_r3"
+  ],
+  "printed_as": [
+   "3.9"
+  ]
+ },
+ "dnn_gpu_break_even_evaluations": {
+  "value": 35.97744706741509,
+  "description": "data_driven_nn gpu: field evaluations before inference repays training vs rerunning FD",
+  "runs": [
+   "dnn_re100_gpu_s1",
+   "dnn_re100_gpu_s2",
+   "dnn_re100_gpu_s3",
+   "dnn_re100_gpu_s4",
+   "dnn_re100_gpu_s5"
+  ],
+  "printed_as": [
+   "36"
+  ]
+ },
+ "pinn_gpu_break_even_evaluations": {
+  "value": 199.62294787898793,
+  "description": "pinn gpu: field evaluations before inference repays training vs rerunning FD",
+  "runs": [
+   "pinn_re100_gpu_s1",
+   "pinn_re100_gpu_s2",
+   "pinn_re100_gpu_s3",
+   "pinn_re100_gpu_s4",
+   "pinn_re100_gpu_s5"
+  ],
+  "printed_as": [
+   "200"
+  ]
+ },
+ "fd_n64_peak_ram_bytes": {
+  "value": 76599296,
+  "description": "FD 64x64 transient: peak RSS, median of repeats",
+  "runs": [
+   "fd_re100_n64_transient_timing_r1",
+   "fd_re100_n64_transient_timing_r2",
+   "fd_re100_n64_transient_timing_r3"
+  ],
+  "printed_as": [
+   "0.08"
+  ]
+ },
+ "dnn_gpu_total_cost_to_field_seconds": {
+  "value": 140.93002049721036,
+  "description": "data_driven_nn gpu: total cost to a usable field",
+  "runs": [
+   "dnn_re100_gpu_s1",
+   "dnn_re100_gpu_s2",
+   "dnn_re100_gpu_s3",
+   "dnn_re100_gpu_s4",
+   "dnn_re100_gpu_s5"
+  ],
+  "printed_as": [
+   "141"
+  ]
+ },
+ "dnn_gpu_inference_time_seconds_mean": {
+  "value": 0.01026731430010841,
+  "description": "data_driven_nn GPU: mean inference_time_seconds",
+  "runs": [
+   "dnn_re100_gpu_s1",
+   "dnn_re100_gpu_s2",
+   "dnn_re100_gpu_s3",
+   "dnn_re100_gpu_s4",
+   "dnn_re100_gpu_s5"
+  ],
+  "printed_as": [
+   "10.3"
+  ]
+ },
+ "dnn_gpu_peak_ram_bytes_mean": {
+  "value": 1509280153.6,
+  "description": "data_driven_nn GPU: mean peak_ram_bytes",
+  "runs": [
+   "dnn_re100_gpu_s1",
+   "dnn_re100_gpu_s2",
+   "dnn_re100_gpu_s3",
+   "dnn_re100_gpu_s4",
+   "dnn_re100_gpu_s5"
+  ],
+  "printed_as": [
+   "1.51"
+  ]
+ },
+ "dnn_gpu_peak_vram_bytes_mean": {
+  "value": 127467008.0,
+  "description": "data_driven_nn GPU: mean peak_vram_bytes",
+  "runs": [
+   "dnn_re100_gpu_s1",
+   "dnn_re100_gpu_s2",
+   "dnn_re100_gpu_s3",
+   "dnn_re100_gpu_s4",
+   "dnn_re100_gpu_s5"
+  ],
+  "printed_as": [
+   "122"
+  ]
+ },
+ "pinn_gpu_total_cost_to_field_seconds": {
+  "value": 781.9692135369447,
+  "description": "pinn gpu: total cost to a usable field",
+  "runs": [
+   "pinn_re100_gpu_s1",
+   "pinn_re100_gpu_s2",
+   "pinn_re100_gpu_s3",
+   "pinn_re100_gpu_s4",
+   "pinn_re100_gpu_s5"
+  ],
+  "printed_as": [
+   "782"
+  ]
+ },
+ "pinn_gpu_inference_time_seconds_mean": {
+  "value": 0.010213031900002533,
+  "description": "pinn GPU: mean inference_time_seconds",
+  "runs": [
+   "pinn_re100_gpu_s1",
+   "pinn_re100_gpu_s2",
+   "pinn_re100_gpu_s3",
+   "pinn_re100_gpu_s4",
+   "pinn_re100_gpu_s5"
+  ],
+  "printed_as": [
+   "10.2"
+  ]
+ },
+ "pinn_gpu_peak_ram_bytes_mean": {
+  "value": 1592581324.8,
+  "description": "pinn GPU: mean peak_ram_bytes",
+  "runs": [
+   "pinn_re100_gpu_s1",
+   "pinn_re100_gpu_s2",
+   "pinn_re100_gpu_s3",
+   "pinn_re100_gpu_s4",
+   "pinn_re100_gpu_s5"
+  ],
+  "printed_as": [
+   "1.59"
+  ]
+ },
+ "pinn_gpu_peak_vram_bytes_mean": {
+  "value": 742203289.6,
+  "description": "pinn GPU: mean peak_vram_bytes",
+  "runs": [
+   "pinn_re100_gpu_s1",
+   "pinn_re100_gpu_s2",
+   "pinn_re100_gpu_s3",
+   "pinn_re100_gpu_s4",
+   "pinn_re100_gpu_s5"
+  ],
+  "printed_as": [
+   "708"
+  ]
+ },
+ "dnn_cpu_training_time_seconds_mean": {
+  "value": 268.5567339890804,
+  "description": "data NN CPU: mean training time",
+  "runs": [
+   "dnn_re100_cpu_s1",
+   "dnn_re100_cpu_s2"
+  ],
+  "printed_as": [
+   "269"
+  ]
+ },
+ "dnn_cpu_total_cost_to_field_seconds": {
+  "value": 272.4841780900806,
+  "description": "data_driven_nn cpu: total cost to a usable field",
+  "runs": [
+   "dnn_re100_cpu_s1",
+   "dnn_re100_cpu_s2"
+  ],
+  "printed_as": [
+   "272"
+  ]
+ },
+ "dnn_cpu_inference_time_seconds_mean": {
+  "value": 0.06572465374983949,
+  "description": "data NN CPU: mean full-field inference time",
+  "runs": [
+   "dnn_re100_cpu_s1",
+   "dnn_re100_cpu_s2"
+  ],
+  "printed_as": [
+   "66"
+  ]
+ },
+ "dnn_cpu_peak_ram_bytes_mean": {
+  "value": 1072541696.0,
+  "description": "data NN CPU: mean peak RSS",
+  "runs": [
+   "dnn_re100_cpu_s1",
+   "dnn_re100_cpu_s2"
+  ],
+  "printed_as": [
+   "1.07"
+  ]
+ },
+ "pinn_cpu_time_per_step_seconds_mean": {
+  "value": 0.2973159860435324,
+  "description": "PINN CPU timing runs (2,000 steps): mean time per step",
+  "runs": [
+   "pinn_re100_cpu_s1_timing",
+   "pinn_re100_cpu_s2_timing"
+  ],
+  "printed_as": [
+   "0.30"
+  ]
+ },
+ "pinn_cpu_peak_ram_bytes_mean": {
+  "value": 1851955200.0,
+  "description": "PINN CPU timing runs: mean peak RSS",
+  "runs": [
+   "pinn_re100_cpu_s1_timing",
+   "pinn_re100_cpu_s2_timing"
+  ],
+  "printed_as": [
+   "1.85"
+  ]
+ }
+}
