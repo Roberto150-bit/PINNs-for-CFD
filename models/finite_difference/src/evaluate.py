@@ -27,4 +27,5 @@ vortex_x = x[i]
 vortex_y = y[j]
 
 print(f"Estimated vortex center: ({vortex_x:.4f}, {vortex_y:.4f})")
-print(f"Velocity magnitude: {velocity_magnitude[i, j]:.6e}")
+# Arrays are stored as [row, column] = [y index, x index]
+print(f"Velocity magnitude: {velocity_magnitude[j, i]:.6e}")
