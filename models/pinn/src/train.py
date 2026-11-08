@@ -7,6 +7,7 @@ No FD data enters the loss. The FD reference is used only to log test-A
 relative L2 every 500 steps (monitoring) and in the final evaluation.
 """
 import argparse
+import hashlib
 import os
 import sys
 import time
@@ -32,6 +33,8 @@ def main():
     parser.add_argument("--neurons", type=int, default=config.NEURONS_PER_LAYER)
     parser.add_argument("--causal", action="store_true",
                         help="causal weighting of the PDE residual over time (study S4)")
+    parser.add_argument("--init-from", default=None,
+                        help="start from the weights of this model.keras (study S6, Re continuation)")
     parser.add_argument("--no-determinism", action="store_true")
     parser.add_argument("--tag", default=None, help="suffix added to the run id (e.g. timing)")
     parser.add_argument("--shared-gpu", action="store_true",
@@ -56,6 +59,14 @@ def main():
     samples_per_step = sum(len(a[0]) for a in (pts["col"], pts["ic"], pts["bc"]))
 
     model = build_network(args.hidden_layers, args.neurons, seed=args.seed)
+    init_from = None
+    if args.init_from:
+        # Same architecture required; only the weights are copied, the optimizer starts fresh
+        source = tf.keras.models.load_model(args.init_from, compile=False)
+        model.set_weights(source.get_weights())
+        init_from = {"model": os.path.relpath(os.path.abspath(args.init_from), REPO_ROOT).replace(os.sep, "/"),
+                     "sha256": hashlib.sha256(open(args.init_from, "rb").read()).hexdigest(),
+                     "optimizer_state": "fresh"}
     fields = network_fields(model)
     optimizer = tf.keras.optimizers.Adam(learning_rate=config.LEARNING_RATE)
     # Loss weights as variables so a one-time rebalance does not retrace
@@ -130,6 +141,7 @@ def main():
                                  if args.causal else {"enabled": False}),
             "data": {"fd_data_in_loss": False,
                      "monitoring": "test-A relative L2 against FD every 500 steps (not used in training)"},
+            "initial_weights": init_from or "random (Glorot uniform)",
             "reproducibility": {"random_seed": args.seed},
             "deterministic_ops": not args.no_determinism,
             "timing_valid": not args.shared_gpu,

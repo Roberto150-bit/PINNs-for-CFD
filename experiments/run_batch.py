@@ -12,6 +12,7 @@ already holds a performance.json, so the batch can be restarted safely.
     python experiments/run_batch.py --trend fd         (Reynolds trend: FD at Re 10 and 1000)
     python experiments/run_batch.py --trend nn         (Reynolds trend: networks at Re 10 and 1000)
     python experiments/run_batch.py --causal           (study S4: causal weighting, PINN Re 400)
+    python experiments/run_batch.py --continuation     (study S6: PINN Re 400 started from Re 100)
 """
 import argparse
 import os
@@ -191,6 +192,21 @@ def causal_jobs():
     return out
 
 
+def continuation_jobs():
+    """S6: PINN at Re 400 started from the final Re 100 PINN of the same seed,
+    seeds 1-3, everything else as in the main runs. Shares the GPU with
+    another job, so timings are flagged as not valid."""
+    EXP = f"{C.experiment_dir(400.0)}/continuation"
+    out = []
+    for s in (1, 2, 3):
+        rid = f"pinn_re400_gpu_s{s}_from_re100"
+        init = f"{C.experiment_dir(100.0)}/pinn/pinn_re100_gpu_s{s}/model.keras"
+        out.append((f"{EXP}/pinn/{rid}",
+                    [PY, "models/pinn/src/train.py", "--device", "gpu", "--seed", str(s), "--re", "400",
+                     "--init-from", init, "--shared-gpu", "--run-id", rid, "--exp-dir", EXP]))
+    return out
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--re", type=float, default=100.0)
@@ -199,11 +215,14 @@ def main():
     parser.add_argument("--extended", action="store_true")
     parser.add_argument("--trend", choices=["fd", "nn"], default=None)
     parser.add_argument("--causal", action="store_true")
+    parser.add_argument("--continuation", action="store_true")
     parser.add_argument("--trend-re", type=float, nargs="+", default=list(TREND_RE),
                         help="Reynolds numbers for --trend (default: 10 and 1000)")
     args = parser.parse_args()
     env = dict(os.environ, PYTHONDONTWRITEBYTECODE="1", TF_CPP_MIN_LOG_LEVEL="2")
-    if args.causal:
+    if args.continuation:
+        job_list = continuation_jobs()
+    elif args.causal:
         job_list = causal_jobs()
     elif args.trend:
         job_list = trend_jobs(args.trend, args.trend_re)
@@ -215,7 +234,7 @@ def main():
         job_list = jobs(args.re)
     for run_dir, cmd in job_list:
         name = os.path.basename(run_dir)
-        if args.extended or args.trend or args.causal:
+        if args.extended or args.trend or args.causal or args.continuation:
             LOG_DIR = os.path.join(os.path.dirname(os.path.dirname(run_dir)), "logs")
         else:
             LOG_DIR = os.path.join(C.experiment_dir(args.re), "sensitivity" if args.sensitivity else "", "logs")
