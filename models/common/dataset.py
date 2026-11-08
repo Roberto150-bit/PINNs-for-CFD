@@ -49,7 +49,7 @@ def sha256(path):
 
 
 def fd_solution_path(re, n=C.GRID_N):
-    return os.path.join(C.EXPERIMENT_DIR, "finite_difference",
+    return os.path.join(C.experiment_dir(re), "finite_difference",
                         C.fd_reference_run_id(re, n), "solution.npz")
 
 

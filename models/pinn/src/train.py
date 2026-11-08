@@ -31,8 +31,9 @@ def main():
     parser.add_argument("--no-determinism", action="store_true")
     parser.add_argument("--tag", default=None, help="suffix added to the run id (e.g. timing)")
     parser.add_argument("--run-id", default=None)
-    parser.add_argument("--exp-dir", default=C.EXPERIMENT_DIR)
+    parser.add_argument("--exp-dir", default=None, help="default: the experiment folder for --re")
     args = parser.parse_args()
+    args.exp_dir = args.exp_dir or C.experiment_dir(args.re)
 
     tf = configure_tensorflow(args.device, args.seed, deterministic=not args.no_determinism)
     from models.common import dataset, run_record

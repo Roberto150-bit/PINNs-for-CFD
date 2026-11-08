@@ -202,7 +202,7 @@ def flat_row(r, re):
     sto = perf.get("storage", {})
     inf = perf.get("inference", {})
     row = {
-        "experiment_id": os.path.basename(C.EXPERIMENT_DIR), "problem": "lid_driven_cavity",
+        "experiment_id": os.path.basename(C.experiment_dir(re)), "problem": "lid_driven_cavity",
         "reynolds_number": re, "grid_nx": C.GRID_N, "grid_ny": C.GRID_N, "time_dependent": True,
         "method": r["method"], "run_id": r["run_id"], "status": r["status"],
         "device": cfg.get("device"), "seed": cfg.get("seed"),
@@ -252,7 +252,7 @@ def flat_row(r, re):
 def load_reference(re):
     from models.common import dataset
     data = dataset.load(re)
-    ref_dir = os.path.join(C.EXPERIMENT_DIR, "finite_difference", C.fd_reference_run_id(re))
+    ref_dir = os.path.join(C.experiment_dir(re), "finite_difference", C.fd_reference_run_id(re))
     ref_raw = np.load(os.path.join(ref_dir, "solution.npz"))
     return prepare(ref_raw), data
 
@@ -263,8 +263,13 @@ def main():
     parser.add_argument("--only", nargs="*", default=None)
     parser.add_argument("--device", choices=["cpu", "gpu"], default="cpu",
                         help="device for the autodiff residuals")
-    parser.add_argument("--out", default="experiments/results/experiment_results.csv")
+    parser.add_argument("--out", default=None,
+                        help="default: experiments/results/experiment_results.csv (Re 100), "
+                             "experiment_results_re<Re>.csv otherwise")
     args = parser.parse_args()
+    if args.out is None:
+        args.out = ("experiments/results/experiment_results.csv" if args.re == 100.0
+                    else f"experiments/results/experiment_results_re{args.re:g}.csv")
 
     if args.device == "cpu":
         os.environ["CUDA_VISIBLE_DEVICES"] = ""
@@ -273,7 +278,7 @@ def main():
     ref, data = load_reference(args.re)
     nu = C.kinematic_viscosity(args.re)
     rows = []
-    for run_dir in find_runs(C.EXPERIMENT_DIR):
+    for run_dir in find_runs(C.experiment_dir(args.re)):
         run_id = os.path.basename(run_dir)
         if args.only and run_id not in args.only:
             continue

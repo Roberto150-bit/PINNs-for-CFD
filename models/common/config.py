@@ -39,6 +39,12 @@ HISTORY_EVERY = 10                 # loss components to history.csv
 # Paths
 EXPERIMENT_DIR = "experiments/experiment_001_re100"
 DATA_DIR = "experiments/data"
+# One experiment folder per Reynolds number
+EXPERIMENT_DIRS = {100.0: EXPERIMENT_DIR, 400.0: "experiments/experiment_002_re400"}
+
+
+def experiment_dir(reynolds_number):
+    return EXPERIMENT_DIRS[float(reynolds_number)]
 
 
 def fd_reference_run_id(reynolds_number, n=GRID_N):
