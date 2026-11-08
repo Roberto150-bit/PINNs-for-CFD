@@ -1,0 +1,16 @@
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1794123557.318900   21112 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1794123559.191644   21112 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+E0000 00:00:1794123561.814190   21112 cuda_platform.cc:57] failed call to cuInit: INTERNAL: CUDA error: Failed call to cuInit: CUDA_ERROR_NO_DEVICE: no CUDA-capable device is detected
+=== Source Location Trace: ===
+external/xla/xla/stream_executor/cuda/cuda_status.cc:50
+
+first step (trace + compile) 3.13s
+step      1 total 8.781e-01 ic 3.64e-02 bc 4.39e-01 c 1.15e-02 x 3.03e-01 y 8.84e-02 | relL2 u 1.202 v 1.349 p 1.016 | t 3.1s
+step    500 total 2.851e-02 ic 4.74e-03 bc 2.12e-02 c 5.00e-04 x 1.62e-03 y 4.60e-04 | relL2 u 0.461 v 1.006 p 0.941 | t 150.1s
+step   1000 total 2.263e-02 ic 2.52e-03 bc 1.84e-02 c 2.58e-04 x 1.06e-03 y 3.45e-04 | relL2 u 0.402 v 0.981 p 0.928 | t 297.0s
+step   1500 total 2.017e-02 ic 1.54e-03 bc 1.62e-02 c 6.69e-04 x 1.28e-03 y 5.19e-04 | relL2 u 0.378 v 0.988 p 0.913 | t 443.6s
+lambda check at step 2000: ratio 57.4 -> {'step': 2000, 'imbalance_ratio': 57.43906731085605, 'components': {'ic': 0.0009695734479464591, 'bc': 0.015170946717262268, 'c': 0.00026412244187667966, 'm': 0.0015619085170328617}, 'changed': False}
+step   2000 total 1.797e-02 ic 9.70e-04 bc 1.52e-02 c 2.64e-04 x 1.04e-03 y 5.21e-04 | relL2 u 0.366 v 0.956 p 0.911 | t 590.7s
+done pinn_re100_cpu_s2_timing: train 590.7s, per step 293.9 ms, peak RAM 1753 MiB, peak VRAM 0 MiB
