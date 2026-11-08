@@ -1,0 +1,57 @@
+{
+  "run_id": "dnn_re400_gpu_s1",
+  "method": "data_driven_nn",
+  "reynolds_number": 400.0,
+  "seed": 1,
+  "device": "gpu",
+  "tf_version": "2.22.0-rc0",
+  "python_version": "3.14.4",
+  "deterministic_ops": true,
+  "created": "2026-11-08T03:21:44",
+  "model": {
+    "hidden_layers": 5,
+    "neurons_per_layer": 64,
+    "activation": "tanh",
+    "initializer": "glorot_uniform",
+    "output_size": 3,
+    "trainable_parameters": 17091
+  },
+  "training": {
+    "steps": 20000,
+    "batch_size": 4096,
+    "learning_rate": 0.001,
+    "optimizer": "adam",
+    "loss_function": "mean of per-output MSE on standardized u, v, p",
+    "batches_per_epoch": 28
+  },
+  "data": {
+    "input_variables": [
+      "x",
+      "y",
+      "t"
+    ],
+    "target_variables": [
+      "u",
+      "v",
+      "p"
+    ],
+    "training_samples": 117555,
+    "validation_samples": 25190,
+    "dataset": "experiments/data/dataset_re400_n64.npz",
+    "input_scaling": "[-1, 1]",
+    "target_mean": [
+      0.009951254334552084,
+      0.0007486597173800619,
+      0.0010857849420635437
+    ],
+    "target_std": [
+      0.18119319201461934,
+      0.09021412754075922,
+      0.03807600970228528
+    ]
+  },
+  "reproducibility": {
+    "random_seed": 1,
+    "split_seed": 0
+  }
+}
