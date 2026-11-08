@@ -40,14 +40,24 @@ HISTORY_EVERY = 10                 # loss components to history.csv
 EXPERIMENT_DIR = "experiments/experiment_001_re100"
 DATA_DIR = "experiments/data"
 # One experiment folder per Reynolds number
-EXPERIMENT_DIRS = {100.0: EXPERIMENT_DIR, 400.0: "experiments/experiment_002_re400"}
+EXPERIMENT_DIRS = {10.0: "experiments/experiment_003_re10", 100.0: EXPERIMENT_DIR,
+                   400.0: "experiments/experiment_002_re400", 1000.0: "experiments/experiment_004_re1000"}
 
 
 def experiment_dir(reynolds_number):
     return EXPERIMENT_DIRS[float(reynolds_number)]
 
 
+# At Re 1000 the 64 x 64 FD solution is under-resolved (cell Re ~ 16), so the
+# reference is the 127 x 127 solution taken at every second point, which are
+# exactly the 64 x 64 grid points (models/finite_difference/src/subsample_reference.py)
+FD_REFERENCE_SOURCE_N = {1000.0: 127}
+
+
 def fd_reference_run_id(reynolds_number, n=GRID_N):
+    source_n = FD_REFERENCE_SOURCE_N.get(float(reynolds_number))
+    if source_n and n == GRID_N:
+        return f"fd_re{reynolds_number:g}_n{source_n}to{n}_transient"
     return f"fd_re{reynolds_number:g}_n{n}_transient"
 
 

@@ -116,7 +116,10 @@ def run_record(args):
         t = np.array([steps * dt])
         U, V, P = u[None], v[None], p[None]
 
-    finite = bool(np.isfinite(U).all() and np.isfinite(V).all() and np.isfinite(P).all())
+    # A run that diverged stops early; its last stored snapshot can still be finite
+    finite = bool(np.isfinite(U).all() and np.isfinite(V).all() and np.isfinite(P).all()
+                  and np.isfinite(velocity_change)
+                  and np.isfinite(u).all() and np.isfinite(v).all() and np.isfinite(p).all())
     dx = x[1] - x[0]
     final_div = divergence_rms(u, v, dx, dx)
 

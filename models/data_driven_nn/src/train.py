@@ -39,6 +39,8 @@ def main():
                         help="use this fraction of the train split (sensitivity study S1)")
     parser.add_argument("--hidden-layers", type=int, default=config.HIDDEN_LAYERS)
     parser.add_argument("--neurons", type=int, default=config.NEURONS_PER_LAYER)
+    parser.add_argument("--shared-gpu", action="store_true",
+                        help="another job uses the GPU at the same time: timings are flagged as not valid")
     parser.add_argument("--run-id", default=None)
     parser.add_argument("--exp-dir", default=None, help="default: the experiment folder for --re")
     args = parser.parse_args()
@@ -139,6 +141,8 @@ def main():
                      "target_mean": y_mean.tolist(), "target_std": y_std.tolist()},
             "reproducibility": {"random_seed": args.seed, "split_seed": C.SPLIT_SEED},
             "deterministic_ops": not args.no_determinism,
+            "timing_valid": not args.shared_gpu,
+            "timing_note": "GPU shared with another job: timing not valid" if args.shared_gpu else None,
         })
         recorder.start()
 
@@ -195,6 +199,7 @@ def main():
         "steps": args.steps,
         "samples_per_step": args.batch,
         "throughput_samples_per_second": args.batch * (args.steps - 1) / (train_time - first_step),
+        "timing_valid": not args.shared_gpu,
     }
     perf = recorder.finish(physical, timing, save_model=model)
     print(f"done {run_id}: train {train_time:.1f}s, per step {timing['time_per_step_seconds'] * 1e3:.2f} ms, "

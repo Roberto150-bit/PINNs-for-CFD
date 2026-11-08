@@ -46,6 +46,8 @@ def load_marchi(re):
 def load_hou(re):
     rows = [r for r in read_commented_csv(os.path.join(BENCH_DIR, "hou1995.csv"))
             if float(r["reynolds_number"]) == re]
+    if not rows:
+        return None             # Hou et al. tabulate no value at this Reynolds number
     return float(rows[0]["x"]), float(rows[0]["y"])
 
 
@@ -106,10 +108,10 @@ def validate(re, grids, exp_dir):
             "vortex_x": c["x"], "vortex_y": c["y"],
             "vortex_grid_x": c["grid_x"], "vortex_grid_y": c["grid_y"],
             "vortex_dist_marchi": float(np.hypot(c["x"] - marchi_center[0], c["y"] - marchi_center[1])),
-            "vortex_dist_hou": float(np.hypot(c["x"] - hou[0], c["y"] - hou[1])),
+            "vortex_dist_hou": float(np.hypot(c["x"] - hou[0], c["y"] - hou[1])) if hou else None,
             "vortex_dist_marchi_grid": float(np.hypot(c["grid_x"] - marchi_center[0],
                                                       c["grid_y"] - marchi_center[1])),
-            "vortex_dist_hou_grid": float(np.hypot(c["grid_x"] - hou[0], c["grid_y"] - hou[1])),
+            "vortex_dist_hou_grid": float(np.hypot(c["grid_x"] - hou[0], c["grid_y"] - hou[1])) if hou else None,
             "u_centerline": u_line.tolist(), "v_centerline": v_line.tolist(),
         }
         results.append(res)
@@ -147,7 +149,7 @@ def main():
         print(f"  n={r['n']:4d} dx={r['dx']:.4f}  max|du|={r['u_centerline_max_abs_dev']:.4e} "
               f"max|dv|={r['v_centerline_max_abs_dev']:.4e}  center=({r['vortex_x']:.4f},{r['vortex_y']:.4f}) "
               f"grid=({r['vortex_grid_x']:.4f},{r['vortex_grid_y']:.4f}) psi_min={r['psi_min']:.5f} "
-              f"dist M={r['vortex_dist_marchi']:.4f} H={r['vortex_dist_hou']:.4f}")
+              f"dist M={r['vortex_dist_marchi']:.4f} H={r['vortex_dist_hou'] if r['vortex_dist_hou'] is None else round(r['vortex_dist_hou'], 4)}")
 
 
 if __name__ == "__main__":

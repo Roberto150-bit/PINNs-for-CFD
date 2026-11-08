@@ -30,8 +30,12 @@ def main():
     parser.add_argument("--n-collocation", type=int, default=config.N_COLLOCATION)
     parser.add_argument("--hidden-layers", type=int, default=config.HIDDEN_LAYERS)
     parser.add_argument("--neurons", type=int, default=config.NEURONS_PER_LAYER)
+    parser.add_argument("--causal", action="store_true",
+                        help="causal weighting of the PDE residual over time (study S4)")
     parser.add_argument("--no-determinism", action="store_true")
     parser.add_argument("--tag", default=None, help="suffix added to the run id (e.g. timing)")
+    parser.add_argument("--shared-gpu", action="store_true",
+                        help="another job uses the GPU at the same time: timings are flagged as not valid")
     parser.add_argument("--run-id", default=None)
     parser.add_argument("--exp-dir", default=None, help="default: the experiment folder for --re")
     args = parser.parse_args()
@@ -71,6 +75,27 @@ def main():
         optimizer.apply_gradients(zip(grads, model.trainable_variables))
         return tf.stack([l_ic, l_bc, l_c, l_x, l_y, total])
 
+    # Causal weighting (option): same terms, but the PDE term is the causally
+    # weighted residual; the logged components stay unweighted
+    eps_index = 0
+    epsilon = tf.Variable(config.CAUSAL_EPSILONS[0], dtype=tf.float32, trainable=False)
+    chunk_ids = tf.constant(losses.time_chunk_ids(pts["col"][2], config.CAUSAL_CHUNKS))
+
+    @tf.function
+    def causal_train_step():
+        with tf.GradientTape() as tape:
+            l_ic = losses.initial_loss(fields, *ic)
+            l_bc = losses.boundary_loss(fields, *bc, bc_is_lid)
+            l_c, l_x, l_y, l_pde, w_min = losses.causal_residual_losses(
+                fields, *col, nu, chunk_ids, config.CAUSAL_CHUNKS, epsilon, lam["c"], lam["m"])
+            total = lam["ic"] * l_ic + lam["bc"] * l_bc + l_pde
+        grads = tape.gradient(total, model.trainable_variables)
+        optimizer.apply_gradients(zip(grads, model.trainable_variables))
+        return tf.stack([l_ic, l_bc, l_c, l_x, l_y, total, w_min])
+
+    if args.causal:
+        train_step = causal_train_step  # noqa: F811
+
     data = dataset.load(args.re)
     suffix = f"_{args.tag}" if args.tag else ""
     run_id = args.run_id or config.run_id(args.re, args.device, args.seed) + suffix
@@ -99,10 +124,16 @@ def main():
                      "continuity_weight_start": config.LAMBDA_CONTINUITY,
                      "momentum_weight_start": config.LAMBDA_MOMENTUM,
                      "adjustment": lambda_adjustment},
+            "causal_weighting": ({"enabled": True, "chunks": config.CAUSAL_CHUNKS,
+                                  "epsilons": config.CAUSAL_EPSILONS, "delta": config.CAUSAL_DELTA,
+                                  "reference": "Wang, Sankaran, Perdikaris 2022, Algorithm 1"}
+                                 if args.causal else {"enabled": False}),
             "data": {"fd_data_in_loss": False,
                      "monitoring": "test-A relative L2 against FD every 500 steps (not used in training)"},
             "reproducibility": {"random_seed": args.seed},
             "deterministic_ops": not args.no_determinism,
+            "timing_valid": not args.shared_gpu,
+            "timing_note": "GPU shared with another job: timing not valid" if args.shared_gpu else None,
         }
 
     recorder.write_config(cfg())
@@ -128,6 +159,13 @@ def main():
         if step % C.HISTORY_EVERY == 0 or step == 1:
             row = {"step": step, **{n: float(c) for n, c in zip(names, comps)},
                    "train_time_seconds": train_time}
+            if args.causal:
+                row["causal_epsilon"] = float(epsilon.numpy())
+                row["causal_min_weight"] = float(comps[6])
+                # Algorithm 1: move to the next epsilon once every chunk weight > delta
+                if comps[6] > config.CAUSAL_DELTA and eps_index < len(config.CAUSAL_EPSILONS) - 1:
+                    eps_index += 1
+                    epsilon.assign(config.CAUSAL_EPSILONS[eps_index])
             recorder.history.append(row)
 
         if step == config.LAMBDA_CHECK_STEP and adjustment is None:
@@ -170,6 +208,7 @@ def main():
         "samples_per_step": samples_per_step,
         "throughput_samples_per_second": samples_per_step * (args.steps - 1) / (train_time - first_step),
         "timing_run": args.tag == "timing",
+        "timing_valid": not args.shared_gpu,
     }
     perf = recorder.finish(model, timing)
     print(f"done {run_id}: train {train_time:.1f}s, per step {timing['time_per_step_seconds'] * 1e3:.1f} ms, "

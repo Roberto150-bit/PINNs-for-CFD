@@ -41,6 +41,15 @@ LAMBDA_MOMENTUM = 1.0
 LAMBDA_CHECK_STEP = 2000
 LAMBDA_IMBALANCE_FACTOR = 100.0
 
+## Causal weighting (off by default; sensitivity study S4, train.py --causal).
+## Wang, Sankaran and Perdikaris (2022), Algorithm 1: M time chunks; the
+## causality parameter eps steps through CAUSAL_EPSILONS, moving to the next
+## value once every chunk weight exceeds CAUSAL_DELTA (checked every
+## HISTORY_EVERY steps). The step count stays TRAINING_STEPS, as in the main runs.
+CAUSAL_CHUNKS = 32
+CAUSAL_EPSILONS = [1e-2, 1e-1, 1.0, 10.0, 100.0]
+CAUSAL_DELTA = 0.99
+
 # Reproducibility
 SEEDS = [1, 2, 3, 4, 5]
 
