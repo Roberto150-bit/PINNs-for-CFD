@@ -1,0 +1,46 @@
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1794117950.243923   12071 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1794117951.707659   12071 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+step      1 loss 9.102e-01 val 8.421e-01 relL2 u 9.478e-01 v 8.871e-01 p 9.714e-01 t 1.6s
+step    500 loss 4.151e-02 val 5.330e-02 relL2 u 1.754e-01 v 1.722e-01 p 3.109e-01 t 4.9s
+step   1000 loss 4.938e-02 val 3.180e-02 relL2 u 1.354e-01 v 1.063e-01 p 2.529e-01 t 7.8s
+step   1500 loss 1.987e-02 val 2.627e-02 relL2 u 1.154e-01 v 8.522e-02 p 2.386e-01 t 10.9s
+step   2000 loss 2.794e-02 val 2.615e-02 relL2 u 1.061e-01 v 8.347e-02 p 2.416e-01 t 14.7s
+step   2500 loss 1.826e-02 val 2.339e-02 relL2 u 9.671e-02 v 7.893e-02 p 2.295e-01 t 18.3s
+step   3000 loss 2.256e-02 val 2.343e-02 relL2 u 9.251e-02 v 7.823e-02 p 2.365e-01 t 21.7s
+step   3500 loss 1.860e-02 val 1.901e-02 relL2 u 7.616e-02 v 5.769e-02 p 2.146e-01 t 26.1s
+step   4000 loss 2.035e-02 val 1.687e-02 relL2 u 6.407e-02 v 5.608e-02 p 2.024e-01 t 30.1s
+step   4500 loss 2.331e-02 val 1.548e-02 relL2 u 6.345e-02 v 5.678e-02 p 1.948e-01 t 33.9s
+step   5000 loss 1.265e-02 val 1.499e-02 relL2 u 7.795e-02 v 5.313e-02 p 1.861e-01 t 37.6s
+step   5500 loss 1.343e-02 val 1.170e-02 relL2 u 5.377e-02 v 4.803e-02 p 1.652e-01 t 41.4s
+step   6000 loss 9.631e-03 val 1.070e-02 relL2 u 5.099e-02 v 5.070e-02 p 1.577e-01 t 44.4s
+step   6500 loss 1.104e-02 val 1.186e-02 relL2 u 7.001e-02 v 6.268e-02 p 1.565e-01 t 47.1s
+step   7000 loss 9.515e-03 val 1.081e-02 relL2 u 4.216e-02 v 4.460e-02 p 1.575e-01 t 51.4s
+step   7500 loss 8.059e-03 val 9.618e-03 relL2 u 4.494e-02 v 4.437e-02 p 1.444e-01 t 54.8s
+step   8000 loss 9.974e-03 val 9.056e-03 relL2 u 3.893e-02 v 4.055e-02 p 1.415e-01 t 57.3s
+step   8500 loss 8.740e-03 val 9.258e-03 relL2 u 3.975e-02 v 4.961e-02 p 1.421e-01 t 59.8s
+step   9000 loss 7.411e-03 val 7.846e-03 relL2 u 3.357e-02 v 3.363e-02 p 1.368e-01 t 63.6s
+step   9500 loss 6.155e-03 val 8.944e-03 relL2 u 2.946e-02 v 4.021e-02 p 1.453e-01 t 67.2s
+step  10000 loss 7.027e-03 val 7.594e-03 relL2 u 3.680e-02 v 3.895e-02 p 1.321e-01 t 71.0s
+step  10500 loss 6.719e-03 val 7.371e-03 relL2 u 3.491e-02 v 3.160e-02 p 1.330e-01 t 73.8s
+step  11000 loss 6.715e-03 val 6.925e-03 relL2 u 2.956e-02 v 3.422e-02 p 1.287e-01 t 76.7s
+step  11500 loss 6.215e-03 val 6.890e-03 relL2 u 3.151e-02 v 2.764e-02 p 1.308e-01 t 80.0s
+step  12000 loss 6.808e-03 val 6.763e-03 relL2 u 2.563e-02 v 3.393e-02 p 1.273e-01 t 84.0s
+step  12500 loss 5.970e-03 val 6.220e-03 relL2 u 2.490e-02 v 2.839e-02 p 1.244e-01 t 87.9s
+step  13000 loss 6.587e-03 val 6.872e-03 relL2 u 3.092e-02 v 3.708e-02 p 1.282e-01 t 91.8s
+step  13500 loss 5.115e-03 val 6.258e-03 relL2 u 2.493e-02 v 2.621e-02 p 1.225e-01 t 95.5s
+step  14000 loss 5.665e-03 val 5.980e-03 relL2 u 2.276e-02 v 2.493e-02 p 1.216e-01 t 99.2s
+step  14500 loss 5.716e-03 val 5.893e-03 relL2 u 2.085e-02 v 2.504e-02 p 1.207e-01 t 102.7s
+step  15000 loss 5.206e-03 val 5.828e-03 relL2 u 2.056e-02 v 2.205e-02 p 1.201e-01 t 105.9s
+step  15500 loss 6.186e-03 val 6.660e-03 relL2 u 3.612e-02 v 3.708e-02 p 1.225e-01 t 108.4s
+step  16000 loss 4.838e-03 val 5.810e-03 relL2 u 2.164e-02 v 2.205e-02 p 1.191e-01 t 110.9s
+step  16500 loss 5.332e-03 val 5.577e-03 relL2 u 1.937e-02 v 2.004e-02 p 1.180e-01 t 113.2s
+step  17000 loss 5.366e-03 val 5.661e-03 relL2 u 1.837e-02 v 2.460e-02 p 1.177e-01 t 116.3s
+step  17500 loss 4.680e-03 val 5.619e-03 relL2 u 2.222e-02 v 2.267e-02 p 1.171e-01 t 120.3s
+step  18000 loss 5.692e-03 val 5.691e-03 relL2 u 1.943e-02 v 2.980e-02 p 1.175e-01 t 124.0s
+step  18500 loss 4.494e-03 val 5.363e-03 relL2 u 1.822e-02 v 2.029e-02 p 1.151e-01 t 127.7s
+step  19000 loss 5.109e-03 val 5.338e-03 relL2 u 1.767e-02 v 2.077e-02 p 1.149e-01 t 130.6s
+step  19500 loss 4.971e-03 val 5.163e-03 relL2 u 1.588e-02 v 1.844e-02 p 1.141e-01 t 134.4s
+step  20000 loss 4.628e-03 val 5.449e-03 relL2 u 1.640e-02 v 2.407e-02 p 1.145e-01 t 138.3s
+done dnn_re100_gpu_s5: train 138.3s, per step 6.83 ms, peak RAM 1438 MiB, peak VRAM 122 MiB
