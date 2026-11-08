@@ -17,6 +17,7 @@ Figures
     error_map_re<Re>    where in space the error is (mean |u error| over t and seeds)
     s1_data, s2_collocation, s3_size   sensitivity studies (Re 100)
     reynolds_trend      test-A error and PDE residual vs Reynolds number
+    s4_causal           PINN with and without causal weighting at Re 400 (--only causal)
 Also writes experiments/results/reynolds_trend.csv.
 """
 import argparse
@@ -437,6 +438,54 @@ def fig_reynolds_trend(seeds=TREND_SEEDS):
     save(fig, "reynolds_trend", values)
 
 
+def causal_dirs(seeds=TREND_SEEDS):
+    base = os.path.join(C.experiment_dir(400.0), "causal", "pinn")
+    return [os.path.join(base, f"pinn_re400_gpu_s{s}_causal") for s in seeds
+            if os.path.isfile(os.path.join(base, f"pinn_re400_gpu_s{s}_causal", "metrics.json"))]
+
+
+def fig_causal(seeds=TREND_SEEDS):
+    """S4 at Re 400: error vs t and test-A error for the PINN with and without
+    causal weighting (same seeds), with the data NN for scale."""
+    groups = [("data_driven_nn", "Data NN", "-", existing_runs(400.0, "data_driven_nn", seeds)),
+              ("pinn", "PINN", "-", existing_runs(400.0, "pinn", seeds)),
+              ("pinn", "PINN, causal", "--", causal_dirs(seeds))]
+    if not groups[2][3]:
+        print("causal: skipped (no evaluated causal runs yet)")
+        return
+    fig, axes = plt.subplots(2, 1, figsize=(WIDTH, 8.4), layout="constrained",
+                             gridspec_kw={"height_ratios": [1.3, 1]})
+    values = {}
+    for i, (method, label, ls, dirs) in enumerate(groups):
+        ms = [json.load(open(os.path.join(d, "metrics.json"))) for d in dirs]
+        t = np.array(ms[0]["per_snapshot_relative_l2"]["t"])
+        keep = t > 0
+        mean, lo, hi = band([np.array(m["per_snapshot_relative_l2"]["u"], dtype=float)[keep] for m in ms])
+        axes[0].fill_between(t[keep], lo, hi, color=COLORS[method], alpha=0.2, lw=0)
+        axes[0].plot(t[keep], mean, color=COLORS[method], ls=ls, label=label)
+        test_a = [float(m["accuracy"]["test_a"]["relative_l2_u"]) for m in ms]
+        hollow = ls == "--"   # causal runs: open markers, so they differ without color
+        axes[1].scatter([i] * len(test_a), test_a, s=90, alpha=0.8, zorder=3,
+                        facecolors="white" if hollow else COLORS[method],
+                        edgecolors=COLORS[method] if hollow else "white", linewidths=2 if hollow else 1)
+        axes[1].plot([i - 0.25, i + 0.25], [np.mean(test_a)] * 2, color=COLORS[method], ls=ls, zorder=4)
+        values[label] = {"runs": [rid(d) for d in dirs], "t": tolist(t[keep]), "mean": tolist(mean),
+                         "min": tolist(lo), "max": tolist(hi), "test_a_relative_l2_u": test_a,
+                         "test_a_mean": float(np.mean(test_a))}
+    for ax in axes:
+        ax.set_yscale("log")
+        plain_log_axis(ax.yaxis, subs=(1.0, 2.0, 5.0))
+        ax.set_ylabel("Rel. L2, u")
+    axes[0].set_xlabel("Time t")
+    axes[1].set_xticks(range(len(groups)), ["Data NN", "PINN", "PINN,\ncausal"])
+    axes[1].set_xlim(-0.6, len(groups) - 0.4)
+    axes[1].grid(False, axis="x")
+    axes[1].set_title("Test A, every seed", loc="left")
+    fig.legend(*axes[0].get_legend_handles_labels(), loc="outside lower center", ncols=3, frameon=False,
+               handlelength=1.6, columnspacing=0.8)
+    save(fig, "s4_causal", values)
+
+
 FIGURES = {
     "loss_components": fig_loss_components,
     "generalization": fig_generalization,
@@ -445,6 +494,7 @@ FIGURES = {
     "error_map": lambda: [fig_error_map(re) for re in TREND_RE],
     "sensitivity": fig_sensitivity,
     "reynolds_trend": fig_reynolds_trend,
+    "causal": fig_causal,
 }
 
 

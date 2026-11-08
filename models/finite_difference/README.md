@@ -18,6 +18,29 @@ The complete parameter definitions and reasoning behind these values are documen
 
 Source code is located in: `src/`
 
+## Solver Used for the Comparison
+
+Sections 1-10 below describe the original solver. It is still available unchanged with `python run_solver.py --legacy` (5,681 steps, final velocity change $9.996184 \times 10^{-6}$). The comparison with the neural networks uses the same code with different options, which are now the defaults of `run_solver.py`:
+
+| Option | Original | Default now |
+|---|---|---|
+| `--advection` | `backward` (first order) | `central` (second order) |
+| `--pressure` | `jacobi`, 50 iterations per step | `direct` (sparse LU) |
+| `--pressure-bc` | `lid_dirichlet` ($p = 0$ on the lid) | `neumann` ($\partial p / \partial n = 0$ on all walls, zero mean) |
+| `--time-scheme` | `pressure_source` | `incremental_projection` |
+| `--ramp` | impulsive lid | $u_{lid}(t) = \tanh(10t)$ |
+
+Typical runs, from the repository root:
+
+```bash
+python models/finite_difference/src/run_solver.py --n 64 --re 100 --mode transient
+python models/finite_difference/src/run_solver.py --n 64 --re 100 --mode steady
+```
+
+A transient run stores 51 snapshots at $t = 0, 0.1, \dots, 5$; a steady run stops when the largest velocity change per step falls below `--tol`. Diffusion is explicit, so the time step must satisfy $\Delta t \le \Delta x^2 / (4\nu)$: at $Re = 10$ the runs use $\Delta t = 10^{-3}$, $2.5 \times 10^{-4}$ and $5 \times 10^{-5}$ on the 32, 64 and 128 grids. A run is marked finite only if the velocity change and the final $u$, $v$, $p$ contain no NaN or infinite values.
+
+`subsample_reference.py` builds the $64 \times 64$ reference at $Re = 1000$ from the $127 \times 127$ run by taking every second grid point (no interpolation), because the $64 \times 64$ grid is not converged at that Reynolds number.
+
 ### Solver Overview
 
 The numerical solver evolves three fields across the computational grid:
