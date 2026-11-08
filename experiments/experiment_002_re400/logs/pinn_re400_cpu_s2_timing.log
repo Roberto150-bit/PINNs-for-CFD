@@ -1,0 +1,16 @@
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1794132092.455840   36856 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1794132094.549321   36856 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+E0000 00:00:1794132095.904193   36856 cuda_platform.cc:57] failed call to cuInit: INTERNAL: CUDA error: Failed call to cuInit: CUDA_ERROR_NO_DEVICE: no CUDA-capable device is detected
+=== Source Location Trace: ===
+external/xla/xla/stream_executor/cuda/cuda_status.cc:50
+
+first step (trace + compile) 3.54s
+step      1 total 8.780e-01 ic 3.64e-02 bc 4.39e-01 c 1.15e-02 x 3.03e-01 y 8.84e-02 | relL2 u 1.224 v 1.430 p 1.035 | t 3.5s
+step    500 total 1.896e-02 ic 4.27e-03 bc 1.32e-02 c 2.71e-04 x 1.07e-03 y 2.02e-04 | relL2 u 0.496 v 0.966 p 0.999 | t 151.0s
+step   1000 total 1.408e-02 ic 2.73e-03 bc 1.02e-02 c 2.05e-04 x 6.82e-04 y 2.23e-04 | relL2 u 0.452 v 0.989 p 0.978 | t 297.5s
+step   1500 total 1.320e-02 ic 2.36e-03 bc 9.60e-03 c 1.88e-04 x 9.54e-04 y 9.91e-05 | relL2 u 0.458 v 1.007 p 0.972 | t 443.7s
+lambda check at step 2000: ratio 48.9 -> {'step': 2000, 'imbalance_ratio': 48.89882644009718, 'components': {'ic': 0.002042237436398864, 'bc': 0.00908388290554285, 'c': 0.00018576893489807844, 'm': 0.001998802414163947}, 'changed': False}
+step   2000 total 1.331e-02 ic 2.04e-03 bc 9.08e-03 c 1.86e-04 x 1.15e-03 y 8.50e-04 | relL2 u 0.458 v 1.015 p 0.972 | t 600.4s
+done pinn_re400_cpu_s2_timing: train 600.4s, per step 298.6 ms, peak RAM 1734 MiB, peak VRAM 0 MiB

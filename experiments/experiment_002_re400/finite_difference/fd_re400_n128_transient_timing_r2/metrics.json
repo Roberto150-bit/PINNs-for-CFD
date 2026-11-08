@@ -1,0 +1,5 @@
+{
+  "run_id": "fd_re400_n128_transient_timing_r2",
+  "method": "finite_difference",
+  "status": "not on the reference grid (51, 128, 128)"
+}

@@ -1,0 +1,2 @@
+fd_re400_n128_transient_timing_r1: steps=5000 t=5.000 solve=18.9s dV=7.971e-05 div_rms=5.077e-05 finite=True
+written to experiments/experiment_002_re400/finite_difference/fd_re400_n128_transient_timing_r1
