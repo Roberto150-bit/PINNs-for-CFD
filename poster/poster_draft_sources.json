@@ -162,6 +162,26 @@
    "0.55"
   ]
  },
+ "s5_re400_pinn_u_at_20k_mean": {
+  "value": 0.35654686475366454,
+  "description": "S5 Re 400 pinn: test-A rel. L2 u at step 20,000",
+  "runs": [
+   "pinn_re400_gpu_s1_steps100k"
+  ],
+  "printed_as": [
+   "36%"
+  ]
+ },
+ "s5_re400_pinn_u_at_100k_mean": {
+  "value": 0.1499099291936384,
+  "description": "S5 Re 400 pinn: test-A rel. L2 u at step 100,000",
+  "runs": [
+   "pinn_re400_gpu_s1_steps100k"
+  ],
+  "printed_as": [
+   "15%"
+  ]
+ },
  "pinn_gpu_total_cost_to_field_seconds": {
   "value": 781.9692135369447,
   "description": "pinn gpu: total cost to a usable field",

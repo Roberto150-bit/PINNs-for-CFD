@@ -264,7 +264,10 @@ def column_rq3(slide):
                           text=["Re = 400 at t = 5. The PINN conserves mass better than the data NN "
                                 f"({num('re400_pinn_gpu_continuity_residual_mean', '{:.2f}')} vs "
                                 f"{num('re400_dnn_gpu_continuity_residual_mean', '{:.2f}')}), yet its "
-                                "vortex (✕) sits against the lid."])
+                                "vortex (✕) sits against the lid.",
+                                "Trained 5× longer (100,000 steps), the same PINN's error in u falls from "
+                                f"{pct('s5_re400_pinn_u_at_20k_mean')} to {pct('s5_re400_pinn_u_at_100k_mean')} "
+                                "(one seed): it was under-trained, not unable."])
 
 
 def column_answer(slide):
@@ -281,7 +284,8 @@ def column_answer(slide):
     y = panel(slide, x, y,
               "Neither wins outright; their opposite strengths point to a hybrid.",
               text=["• Data NN: more accurate and cheaper, when simulation data already exists.",
-                    "• PINN: needs no data and obeys the physics, but costs more and can fail.",
+                    "• PINN: needs no data and obeys the physics, but costs more and needs far more "
+                    "training as the flow speeds up.",
                     "• Next: a hybrid trained on a little data plus the physics loss could cut both the "
                     "data and the computing needed (not tested here)."],
               size=BODY_PT)
