@@ -1,0 +1,13 @@
+# Hou, S., Zou, Q., Chen, S., Doolen, G., and Cogley, A. C. 1995. Simulation of cavity flow
+#   by the lattice Boltzmann method. J. Comput. Phys. 118, 329-347.
+#   Preprint: arXiv:comp-gas/9401003v1 (28 Jan 1994).
+# Source: preprint "Figure captions", Figure 1(b) (Re = 100, lid velocity U = 0.01) and
+#   Figure 1(c) (Re = 400, U = 0.1), preprint page 32. 256 x 256 lattice (Table 1 of the
+#   journal article; the arXiv preprint text does not include the tables).
+# Classical lid-driven cavity at steady state; primary-vortex center (x, y) in units of the
+#   cavity side.
+# Columns: quantity, reynolds_number, x, y.
+# Transcribed from the preprint text layer; to be verified against the PDF.
+quantity,reynolds_number,x,y
+primary_vortex_center,100,0.6196,0.7373
+primary_vortex_center,400,0.5608,0.6078

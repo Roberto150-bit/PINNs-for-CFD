@@ -1,0 +1,46 @@
+{
+  "run_id": "fd_re100_n128_transient",
+  "numerical_method": "finite_difference",
+  "mode": "transient",
+  "reynolds_number": 100.0,
+  "rho": 1.0,
+  "nu": 0.01,
+  "grid": {
+    "nx": 128,
+    "ny": 128,
+    "dx": 0.007874015748031496
+  },
+  "time_step": 0.001,
+  "max_steps": 5000,
+  "advection_scheme": "central",
+  "pressure_solver": {
+    "method": "direct",
+    "iterations": null,
+    "boundary_condition": "neumann"
+  },
+  "lid": {
+    "velocity": 1.0,
+    "ramp": true,
+    "ramp_profile": "tanh(k t)",
+    "ramp_rate": 10.0
+  },
+  "convergence": {
+    "enabled": false,
+    "tolerance": 0.0
+  },
+  "snapshots": {
+    "interval": 0.1,
+    "count": 51
+  },
+  "initial_conditions": {
+    "u": 0.0,
+    "v": 0.0,
+    "p": 0.0
+  },
+  "device": "cpu",
+  "seed": null,
+  "python_version": "3.14.4",
+  "tf_version": null,
+  "deterministic_ops": null,
+  "created": "2026-11-08T00:23:06"
+}
