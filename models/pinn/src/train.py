@@ -129,9 +129,10 @@ def main():
 
         if step == config.LAMBDA_CHECK_STEP and adjustment is None:
             # Weighted components (momentum counted as r_x + r_y)
-            comp = {"ic": comps[0], "bc": comps[1], "c": comps[2], "m": comps[3] + comps[4]}
+            comp = {"ic": float(comps[0]), "bc": float(comps[1]), "c": float(comps[2]),
+                    "m": float(comps[3] + comps[4])}
             weighted = {k: float(lam[k].numpy()) * v for k, v in comp.items()}
-            ratio = max(weighted.values()) / max(min(weighted.values()), 1e-30)
+            ratio = float(max(weighted.values()) / max(min(weighted.values()), 1e-30))
             if ratio > config.LAMBDA_IMBALANCE_FACTOR:
                 # One-time rebalance: every weighted component set to the median
                 med = float(np.median(list(weighted.values())))
