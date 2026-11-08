@@ -1,0 +1,60 @@
+{
+  "run_id": "dnn_re1000_gpu_s2",
+  "method": "data_driven_nn",
+  "reynolds_number": 1000.0,
+  "seed": 2,
+  "device": "gpu",
+  "tf_version": "2.22.0-rc0",
+  "python_version": "3.14.4",
+  "deterministic_ops": true,
+  "created": "2026-11-08T12:13:54",
+  "model": {
+    "hidden_layers": 5,
+    "neurons_per_layer": 64,
+    "activation": "tanh",
+    "initializer": "glorot_uniform",
+    "output_size": 3,
+    "trainable_parameters": 17091
+  },
+  "training": {
+    "steps": 20000,
+    "batch_size": 4096,
+    "learning_rate": 0.001,
+    "optimizer": "adam",
+    "loss_function": "mean of per-output MSE on standardized u, v, p",
+    "batches_per_epoch": 28
+  },
+  "data": {
+    "input_variables": [
+      "x",
+      "y",
+      "t"
+    ],
+    "target_variables": [
+      "u",
+      "v",
+      "p"
+    ],
+    "training_samples": 117555,
+    "train_fraction": 1.0,
+    "validation_samples": 25190,
+    "dataset": "experiments/data/dataset_re1000_n64.npz",
+    "input_scaling": "[-1, 1]",
+    "target_mean": [
+      0.00944900153007788,
+      0.000591233011423749,
+      -0.0017326046672915436
+    ],
+    "target_std": [
+      0.16214081069735092,
+      0.07825046228126102,
+      0.025480511608490214
+    ]
+  },
+  "reproducibility": {
+    "random_seed": 2,
+    "split_seed": 0
+  },
+  "timing_valid": false,
+  "timing_note": "GPU shared with another job: timing not valid"
+}
