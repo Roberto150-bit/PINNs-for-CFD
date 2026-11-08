@@ -24,7 +24,7 @@ def main():
 
     # Save numerical results
     np.savez(
-        "solver_results.npz",
+        "models/finite_difference/src/solver_results.npz",
         x=x,
         y=y,
         u=u,

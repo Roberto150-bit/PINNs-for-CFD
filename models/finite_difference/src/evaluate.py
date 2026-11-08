@@ -1,6 +1,6 @@
 import numpy as np
 
-data = np.load("solver_results.npz")
+data = np.load("models/finite_difference/src/solver_results.npz")
 
 x = data["x"]
 y = data["y"]

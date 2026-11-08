@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def load_results(filename="solver_results.npz"):
+def load_results(filename="models/finite_difference/src/solver_results.npz"):
     data = np.load(filename)
 
     x = data["x"]
@@ -27,7 +27,7 @@ def plot_velocity_field(x, y, u, v):
     plt.axis("equal")
     plt.tight_layout()
 
-    plt.savefig("velocity_field.png", dpi=300)
+    plt.savefig("models/finite_difference/src/velocity_field.png", dpi=300)
     plt.show() 
 
 
@@ -46,7 +46,7 @@ def plot_pressure_field(x, y, p):
     plt.axis("equal")
     plt.tight_layout()
 
-    plt.savefig("pressure_field.png", dpi=300)
+    plt.savefig("models/finite_difference/src/pressure_field.png", dpi=300)
     plt.show()
 
 
