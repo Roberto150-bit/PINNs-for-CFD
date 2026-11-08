@@ -236,10 +236,12 @@ def fig_snapshots(fields, times):
     return fig, plotted
 
 
-def fig_accuracy_vs_time(curves):
+def fig_accuracy_vs_time(curves, title=None, ylabel="Rel. L2, u"):
     """Test-A relative L2 of u vs training time; one line per run, color by method,
     solid = GPU, dashed = CPU. curves = {run_id: {"method", "device", "time": [], "err": []}}"""
-    fig, ax = plt.subplots(figsize=(WIDTH, 3.7), constrained_layout=True)
+    fig, ax = plt.subplots(figsize=(WIDTH, 3.7 if title is None else 4.1), constrained_layout=True)
+    if title:
+        rq_title(ax, title)
     plotted = {}
     seen = set()
     for run_id, c in sorted(curves.items()):
@@ -254,7 +256,7 @@ def fig_accuracy_vs_time(curves):
     plain_log_axis(ax.xaxis, subs=(1.0,))
     plain_log_axis(ax.yaxis, subs=(1.0, 3.0))
     ax.set_xlabel("Training time (s)")
-    ax.set_ylabel("Rel. L2, u")
+    ax.set_ylabel(ylabel)
     fig.legend(frameon=False, loc="outside lower center", ncols=2)
     return fig, plotted
 
@@ -366,7 +368,7 @@ def fig_pipelines():
     box(0.2, 6.0, 3.0, 2.0, "FD\nsolver", COLORS["finite_difference"])
     box(4.6, 6.0, 3.0, 2.0, "FD\ndata", COLORS["finite_difference"])
     box(9.0, 6.0, 2.6, 2.0, "Data\nNN", COLORS["data_driven_nn"])
-    box(0.2, 0.4, 3.0, 2.0, "NS + IC\n+ BC", INK2)
+    box(0.2, 0.4, 3.0, 2.0, "Flow\nequations", INK2)
     box(9.0, 0.4, 2.6, 2.0, "PINN", COLORS["pinn"])
     box(12.4, 3.2, 2.4, 2.0, "Eval.", INK)
     arrow(3.4, 7.0, 4.6, 7.0)
@@ -474,11 +476,13 @@ def vortex_center(u, x, y):
     return float(x[i]), float(y[j]), float(psi[j, i])
 
 
-def fig_v2_re400(fields, t_show=5.0):
+def fig_v2_re400(fields, t_show=5.0, width=WIDE, title=None):
     """u at t = 5 for Re 400: simulation, data NN, PINN, with each field's vortex center."""
     order = ["finite_difference", "data_driven_nn", "pinn"]
     titles = {"finite_difference": "Simulation", "data_driven_nn": "Data NN", "pinn": "PINN"}
-    fig, axes = plt.subplots(1, 3, figsize=(WIDE, 3.75), constrained_layout=True)
+    fig, axes = plt.subplots(1, 3, figsize=(width, 3.75 if title is None else 3.9), constrained_layout=True)
+    if title:
+        fig.suptitle(title, x=0.02, ha="left", fontsize=24, color=INK)
     ref = fields["finite_difference"]
     k = int(np.argmin(np.abs(ref["t"] - t_show)))
     vmax = max(abs(ref["u"][k]).max(), 1.0)
@@ -493,7 +497,8 @@ def fig_v2_re400(fields, t_show=5.0):
         ax.set_xticks([])
         ax.set_yticks([])
         ax.grid(False)
-    fig.colorbar(im, ax=axes.tolist(), shrink=0.85, label="u (horizontal velocity)", pad=0.02)
+    fig.colorbar(im, ax=axes.tolist(), shrink=0.85, label="u" if title else "u (horizontal velocity)",
+                 pad=0.02)
     return fig, plotted
 
 
@@ -535,6 +540,135 @@ def training_length_data():
                                               "step": [int(h["step"]) for h in hist],
                                               "err": [float(h["rel_l2_u"]) for h in hist]}
     return out
+
+
+# ---------------- poster v3 figures (one per research question, template column width) ----------------
+
+def rq_title(ax, text):
+    ax.set_title(text, loc="left", color=INK, fontsize=24, pad=10)
+
+
+def fig_v3_rq1(data):
+    """RQ1: test-A error of u, v, p in percent, mean ± std over 5 seeds."""
+    fig, ax = plt.subplots(figsize=(WIDTH, 3.9), constrained_layout=True)
+    methods = [m for m in ("data_driven_nn", "pinn") if m in data]
+    width = 0.8 / len(methods)
+    plotted = {}
+    for i, m in enumerate(methods):
+        means = [100 * data[m]["test_a"][k][0] for k in "uvp"]
+        stds = [100 * data[m]["test_a"][k][1] for k in "uvp"]
+        xs = np.arange(3) + (i - (len(methods) - 1) / 2) * width
+        bars = ax.bar(xs, means, width * 0.92, yerr=stds, color=COLORS[m], label=LABELS[m],
+                      capsize=5, error_kw={"elinewidth": 2, "ecolor": INK})
+        value_labels(ax, bars, lambda h: f"{h:.0f}%" if h >= 10 else f"{h:.1f}%", stds)
+        plotted[m] = [float(b.get_height()) / 100 for b in bars]
+    ax.set_xticks(range(3), ["u", "v", "p"])
+    ax.set_ylabel("Error (%)")
+    ax.set_ylim(0, max(max(v) for v in plotted.values()) * 100 * 1.3)
+    ax.grid(axis="x", visible=False)
+    ax.legend(frameon=False, loc="upper left")
+    rq_title(ax, "RQ1  Accuracy against the simulation")
+    return fig, plotted
+
+
+def fig_v3_rq2(data):
+    """RQ2: RMS violation of continuity and momentum (autodiff, 50,000 points), log scale."""
+    fig, ax = plt.subplots(figsize=(WIDTH, 3.9), constrained_layout=True)
+    names = ["continuity", "x_momentum", "y_momentum"]
+    methods = [m for m in ("data_driven_nn", "pinn") if m in data]
+    width = 0.8 / len(methods)
+    plotted = {}
+    for i, m in enumerate(methods):
+        means = [data[m][n][0] for n in names]
+        stds = [data[m][n][1] for n in names]
+        xs = np.arange(3) + (i - (len(methods) - 1) / 2) * width
+        bars = ax.bar(xs, means, width * 0.92, yerr=stds, color=COLORS[m], label=LABELS[m], capsize=5,
+                      error_kw={"elinewidth": 2, "ecolor": INK})
+        value_labels(ax, bars, lambda h: f"{h:.2g}", stds)
+        plotted[m] = [float(b.get_height()) for b in bars]
+    ax.set_xticks(range(3), ["Mass", "Mom. x", "Mom. y"])
+    ax.set_yscale("log")
+    ax.set_ylim(top=max(max(v) for v in plotted.values()) * 12)
+    plain_log_axis(ax.yaxis, subs=(1.0,))
+    ax.set_ylabel("Violation")
+    ax.grid(axis="x", visible=False)
+    ax.legend(frameon=False, loc="upper right", ncols=2)
+    rq_title(ax, "RQ2  Obeying the flow equations")
+    return fig, plotted
+
+
+def rq3_data():
+    """Per-seed test-A error of u for every Reynolds number with a results table."""
+    tables = {100.0: os.path.join(RESULTS, "experiment_results.csv")}
+    for path in glob.glob(os.path.join(RESULTS, "experiment_results_re*.csv")):
+        tables[float(os.path.basename(path)[len("experiment_results_re"):-4])] = path
+    out = {}
+    for re, path in sorted(tables.items()):
+        with open(path) as f:
+            rows = [r for r in csv.DictReader(f) if r["device"] == "gpu" and r["timing_run"] == "False"
+                    and r["status"] == "evaluated" and r["method"] in ("data_driven_nn", "pinn")]
+        for m in ("data_driven_nn", "pinn"):
+            sel = sorted(rows, key=lambda r: r["run_id"])
+            sel = [r for r in sel if r["method"] == m and r["test_a_relative_l2_u"] not in ("", "None")]
+            if sel:
+                out.setdefault(re, {})[m] = {"runs": [r["run_id"] for r in sel],
+                                             "err": [float(r["test_a_relative_l2_u"]) for r in sel]}
+    return out
+
+
+def fig_v3_rq3(data):
+    """RQ3: error of u for every seed, per Reynolds number (spread = repeatability)."""
+    fig, ax = plt.subplots(figsize=(WIDTH, 3.9), constrained_layout=True)
+    res = sorted(data)
+    plotted = {}
+    offset = {"data_driven_nn": -0.14, "pinn": 0.14}
+    for i, re in enumerate(res):
+        for m, d in data[re].items():
+            ys = 100 * np.array(d["err"])
+            xs = i + offset[m] + np.linspace(-0.06, 0.06, len(ys))
+            sc = ax.scatter(xs, ys, s=110, color=COLORS[m], edgecolor="white", linewidth=1.2, zorder=3,
+                            label=LABELS[m] if i == 0 else None)
+            plotted[f"{re:g}|{m}"] = [float(v) / 100 for v in sc.get_offsets()[:, 1]]
+    ax.set_xticks(range(len(res)), [f"Re {re:g}" for re in res])
+    ax.set_xlim(-0.6, len(res) - 0.4)
+    ax.set_yscale("log")
+    plain_log_axis(ax.yaxis, subs=(1.0, 3.0))
+    ax.set_ylabel("Error in u (%)")
+    ax.grid(axis="x", visible=False)
+    ax.legend(frameon=False, loc="upper left")
+    rq_title(ax, "RQ3  Repeatability: every seed shown")
+    return fig, plotted
+
+
+def fig_v3_rq4(nums):
+    """RQ4: time to a usable field split into data generation and training, and peak memory."""
+    fig, (ax, ax2) = plt.subplots(1, 2, figsize=(WIDTH, 3.9), constrained_layout=True,
+                                  gridspec_kw={"width_ratios": [1.7, 1]})
+    fd = nums["fd_n64_solve_seconds_median"]["value"]
+    dnn_train = nums["dnn_gpu_training_time_seconds_mean"]["value"]
+    pinn_train = nums["pinn_gpu_training_time_seconds_mean"]["value"]
+    ys = [1, 0]
+    b1 = ax.barh(ys, [fd, 0], color=COLORS["finite_difference"], height=0.6, label="Simulation data")
+    b2 = ax.barh(ys, [dnn_train, pinn_train], left=[fd, 0], color=[COLORS["data_driven_nn"], COLORS["pinn"]],
+                 height=0.6, label="Training")
+    for y, tot in zip(ys, (fd + dnn_train, pinn_train)):
+        ax.annotate(f"{tot:.0f} s", (tot, y), xytext=(6, 0), textcoords="offset points", va="center",
+                    fontsize=22, color=INK)
+    ax.set_yticks(ys, ["Data NN", "PINN"])
+    ax.set_xlim(0, max(fd + dnn_train, pinn_train) * 1.35)
+    ax.set_xlabel("GPU seconds")
+    ax.grid(axis="y", visible=False)
+    vram = [nums["dnn_gpu_peak_vram_bytes_mean"]["value"] / 2**20, nums["pinn_gpu_peak_vram_bytes_mean"]["value"] / 2**20]
+    b3 = ax2.bar([0, 1], vram, color=[COLORS["data_driven_nn"], COLORS["pinn"]], width=0.7)
+    value_labels(ax2, b3, lambda h: f"{h:.0f}")
+    ax2.set_xticks([0, 1], ["Data", "PINN"])
+    ax2.set_ylim(0, max(vram) * 1.3)
+    ax2.set_ylabel("GPU MB")
+    ax2.grid(axis="x", visible=False)
+    rq_title(ax, "RQ4  Cost to train")
+    plotted = {"time_fd_data": float(b1[0].get_width()), "time_dnn_train": float(b2[0].get_width()),
+               "time_pinn_train": float(b2[1].get_width()), "vram_mb": [float(b.get_height()) for b in b3]}
+    return fig, plotted
 
 
 def gpu_runs(rows, method):
@@ -672,6 +806,8 @@ def check_against_results(rows, agg):
 
     for path in sorted(glob.glob(os.path.join(OUT, "*.values.json"))):
         v = json.load(open(path))
+        if "figure" not in v:      # figures from training_analysis.py are checked by that script
+            continue
         name, plotted = v["figure"], v["plotted"]
         good = True
         if name == "accuracy":
@@ -687,7 +823,7 @@ def check_against_results(rows, agg):
                 for n, h in zip(("continuity", "x_momentum", "y_momentum"), heights):
                     col = [float(by_id[r][f"{n}_residual"]) for r in runs]
                     good &= close(h, np.mean(col))
-        elif name == "accuracy_vs_time":
+        elif name in ("accuracy_vs_time", "v3_rq4_time"):
             for run_id, ys in plotted.items():
                 good &= np.allclose(ys, agg["accuracy_vs_time"][run_id]["rel_l2_u"], rtol=1e-12)
         elif name == "error_vs_time":
@@ -726,6 +862,29 @@ def check_against_results(rows, agg):
             nums = json.load(open(os.path.join(RESULTS, "poster_numbers.json")))
             for key, w in plotted.items():
                 good &= close(w, nums[key]["value"])
+        elif name == "v3_rq1":
+            for m, heights in plotted.items():
+                runs = [r for r in v["runs"] if by_id[r]["method"] == m]
+                for k, h in zip("uvp", heights):
+                    good &= np.isclose(h, np.mean([float(by_id[r][f"test_a_relative_l2_{k}"]) for r in runs]),
+                                       rtol=1e-9)
+        elif name == "v3_rq2":
+            for m, heights in plotted.items():
+                runs = [r for r in v["runs"] if by_id[r]["method"] == m]
+                for n, h in zip(("continuity", "x_momentum", "y_momentum"), heights):
+                    good &= close(h, np.mean([float(by_id[r][f"{n}_residual"]) for r in runs]))
+        elif name == "v3_rq3":
+            src = rq3_data()
+            for key, ys in plotted.items():
+                re, m = key.split("|")
+                good &= np.allclose(ys, src[float(re)][m]["err"], rtol=1e-9)
+        elif name == "v3_rq4":
+            nums = json.load(open(os.path.join(RESULTS, "poster_numbers.json")))
+            good &= close(plotted["time_fd_data"], nums["fd_n64_solve_seconds_median"]["value"])
+            good &= close(plotted["time_dnn_train"], nums["dnn_gpu_training_time_seconds_mean"]["value"])
+            good &= close(plotted["time_pinn_train"], nums["pinn_gpu_training_time_seconds_mean"]["value"])
+            good &= np.allclose(plotted["vram_mb"], [nums[f"{s}_gpu_peak_vram_bytes_mean"]["value"] / 2**20
+                                                     for s in ("dnn", "pinn")])
         elif name == "v2_training_length":
             for run_id, ys in plotted.items():
                 hits = glob.glob(f"experiments/*/extended/*/{run_id}/eval_history.csv")
@@ -782,6 +941,10 @@ def main():
         d = curve_data(agg, rows)
         fig, p = fig_accuracy_vs_time(d)
         made.append(save(fig, "accuracy_vs_time", list(d), p))
+    if wanted("v3_rq4_time"):
+        d = curve_data(agg, rows)
+        fig, p = fig_accuracy_vs_time(d, title="RQ4  Accuracy per second of training", ylabel="Error in u")
+        made.append(save(fig, "v3_rq4_time", list(d), p))
     if wanted("snapshots"):
         ref_id = C.fd_reference_run_id(100.0)
         flds = {"finite_difference": dict(np.load(os.path.join(EXP, "finite_difference", ref_id, "solution.npz")))}
@@ -832,6 +995,34 @@ def main():
             used.append(rid)
         fig, p = fig_v2_re400(flds)
         made.append(save(fig, "v2_re400", used, p))
+    if wanted("v3_re400"):
+        exp4 = C.experiment_dir(400.0)
+        ref_id = C.fd_reference_run_id(400.0)
+        flds = {"finite_difference": dict(np.load(os.path.join(exp4, "finite_difference", ref_id, "solution.npz")))}
+        used = [ref_id]
+        for m, prefix in (("data_driven_nn", "dnn"), ("pinn", "pinn")):
+            rid = f"{prefix}_re400_gpu_s1"
+            flds[m] = dict(np.load(os.path.join(exp4, m, rid, "predictions.npz")))
+            used.append(rid)
+        fig, p = fig_v2_re400(flds, width=WIDTH, title="RQ3  Re 400 flow at t = 5 (✕ = vortex)")
+        made.append(save(fig, "v3_re400", used, p))
+    if wanted("v3_rq1"):
+        d = accuracy_data(agg)
+        fig, p = fig_v3_rq1(d)
+        made.append(save(fig, "v3_rq1", sum((d[m]["runs"] for m in d), []), p))
+    if wanted("v3_rq2"):
+        d = residual_data(agg)
+        fig, p = fig_v3_rq2(d)
+        made.append(save(fig, "v3_rq2", sum((d[m]["runs"] for m in d), []), p))
+    if wanted("v3_rq3"):
+        d = rq3_data()
+        fig, p = fig_v3_rq3(d)
+        made.append(save(fig, "v3_rq3", [r for re in d for m in d[re] for r in d[re][m]["runs"]], p))
+    if wanted("v3_rq4") and nums:
+        fig, p = fig_v3_rq4(nums)
+        keys = ("fd_n64_solve_seconds_median", "dnn_gpu_training_time_seconds_mean",
+                "pinn_gpu_training_time_seconds_mean")
+        made.append(save(fig, "v3_rq4", sorted({r for k in keys for r in nums[k]["runs"]}), p))
     if wanted("v2_training_length"):
         d = training_length_data()
         if d:
