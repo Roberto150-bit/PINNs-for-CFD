@@ -228,7 +228,9 @@ def column_rq12(slide):
               text=[f"Error in u at Re = 100: data NN {pct('dnn_gpu_test_a_relative_l2_u_mean')}, hybrid "
                     f"{pct('hybrid_gpu_test_a_relative_l2_u_mean')}, PINN {pct('pinn_gpu_test_a_relative_l2_u_mean')} "
                     f"(mean of {num('dnn_gpu_n_runs', '{:.0f}')}, {num('hybrid_gpu_n_runs', '{:.0f}')} and "
-                    f"{num('pinn_gpu_n_runs', '{:.0f}')} seeds)."])
+                    f"{num('pinn_gpu_n_runs', '{:.0f}')} seeds). One hybrid seed ends on a spike "
+                    f"({pct('spike_re100_hybrid_worst_best')} → {pct('spike_re100_hybrid_worst_final')} in its last "
+                    "500 steps); like every run, it is scored at its final step."])
     COLUMN_END[2] = panel(slide, x, y,
                           "RQ2: The PINN obeys the flow equations "
                           f"{ratio('dnn_gpu_continuity_residual_mean', 'pinn_gpu_continuity_residual_mean')}× "

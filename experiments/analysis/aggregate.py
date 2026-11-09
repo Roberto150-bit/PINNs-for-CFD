@@ -265,6 +265,8 @@ def poster_numbers(summary, fd, det, cost, validation, transient):
         nums[key] = e
     for key, e in extended_numbers().items():
         nums[key] = e
+    for key, e in spike_numbers().items():
+        nums[key] = e
     for key, e in continuation_numbers().items():
         nums[key] = e
     return nums
@@ -325,6 +327,37 @@ def re400_numbers():
                         "value": min(vals), "runs": ids, "description": f"Re {re} {m} GPU runs: min {col}"}
                     out[f"re{re}_{short}_gpu_{col}_max"] = {
                         "value": max(vals), "runs": ids, "description": f"Re {re} {m} GPU runs: max {col}"}
+    return out
+
+
+def spike_numbers():
+    """Final-step spikes at Re 100 (main GPU runs): a run 'ends on a spike' when its final
+    test-A error in u is more than 2x the best value it reached during training (the spike
+    rule fixed before any hybrid result). Keys: spike_re100_<short>_final_n and, for the
+    worst such run per method, spike_re100_<short>_worst_best / _worst_final / _worst_run."""
+    out = {}
+    with open(os.path.join(RESULTS, "experiment_results.csv")) as f:
+        rows = [r for r in csv.DictReader(f) if r["device"] == "gpu" and r["timing_run"] == "False"
+                and r["status"] == "evaluated" and r["method"] != "finite_difference"]
+    for m, short in METHODS:
+        runs = sorted(r["run_id"] for r in rows if r["method"] == m)
+        if not runs:
+            continue
+        hits = []
+        for rid in runs:
+            with open(os.path.join(EXP, m, rid, "eval_history.csv")) as f:
+                h = [float(x["rel_l2_u"]) for x in csv.DictReader(f)]
+            best, final = min(h), h[-1]
+            if final > 2 * best:
+                hits.append((final / best, rid, best, final))
+        out[f"spike_re100_{short}_final_n"] = {"value": len(hits), "runs": runs,
+                                               "description": f"{m} Re 100: runs whose final u error > 2x their best"}
+        if hits:
+            _, rid, best, final = max(hits)
+            out[f"spike_re100_{short}_worst_best"] = {"value": best, "runs": [rid],
+                                                      "description": f"{rid}: best test-A u error during training"}
+            out[f"spike_re100_{short}_worst_final"] = {"value": final, "runs": [rid],
+                                                       "description": f"{rid}: test-A u error at the final step"}
     return out
 
 
