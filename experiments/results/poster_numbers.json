@@ -3108,86 +3108,107 @@
   "description": "Re 100, seeds of the control runs: dnn mean continuity_residual"
  },
  "ctrl_re400_n_runs": {
-  "value": 2,
+  "value": 3,
   "runs": [
    "dnn_re400_gpu_s1",
    "dnn_re400_gpu_s2",
+   "dnn_re400_gpu_s3",
    "hybrid_re400_gpu_s1",
    "hybrid_re400_gpu_s1_dataonly",
    "hybrid_re400_gpu_s2",
-   "hybrid_re400_gpu_s2_dataonly"
+   "hybrid_re400_gpu_s2_dataonly",
+   "hybrid_re400_gpu_s3",
+   "hybrid_re400_gpu_s3_dataonly"
   ],
   "description": "hybrid data-only control at Re 400: runs with same-seed hybrid and data NN"
  },
  "ctrl_re400_dataonly_u_mean": {
-  "value": 0.052287073166359034,
+  "value": 0.052539534705101476,
   "runs": [
    "dnn_re400_gpu_s1",
    "dnn_re400_gpu_s2",
+   "dnn_re400_gpu_s3",
    "hybrid_re400_gpu_s1",
    "hybrid_re400_gpu_s1_dataonly",
    "hybrid_re400_gpu_s2",
-   "hybrid_re400_gpu_s2_dataonly"
+   "hybrid_re400_gpu_s2_dataonly",
+   "hybrid_re400_gpu_s3",
+   "hybrid_re400_gpu_s3_dataonly"
   ],
   "description": "Re 400, seeds of the control runs: dataonly mean test_a_relative_l2_u"
  },
  "ctrl_re400_dataonly_cont_mean": {
-  "value": 0.296928245837243,
+  "value": 0.3256343785432159,
   "runs": [
    "dnn_re400_gpu_s1",
    "dnn_re400_gpu_s2",
+   "dnn_re400_gpu_s3",
    "hybrid_re400_gpu_s1",
    "hybrid_re400_gpu_s1_dataonly",
    "hybrid_re400_gpu_s2",
-   "hybrid_re400_gpu_s2_dataonly"
+   "hybrid_re400_gpu_s2_dataonly",
+   "hybrid_re400_gpu_s3",
+   "hybrid_re400_gpu_s3_dataonly"
   ],
   "description": "Re 400, seeds of the control runs: dataonly mean continuity_residual"
  },
  "ctrl_re400_hybrid_u_mean": {
-  "value": 0.06538213436921655,
+  "value": 0.06546351420972317,
   "runs": [
    "dnn_re400_gpu_s1",
    "dnn_re400_gpu_s2",
+   "dnn_re400_gpu_s3",
    "hybrid_re400_gpu_s1",
    "hybrid_re400_gpu_s1_dataonly",
    "hybrid_re400_gpu_s2",
-   "hybrid_re400_gpu_s2_dataonly"
+   "hybrid_re400_gpu_s2_dataonly",
+   "hybrid_re400_gpu_s3",
+   "hybrid_re400_gpu_s3_dataonly"
   ],
   "description": "Re 400, seeds of the control runs: hybrid mean test_a_relative_l2_u"
  },
  "ctrl_re400_hybrid_cont_mean": {
-  "value": 0.041703939425018696,
+  "value": 0.04092768505780911,
   "runs": [
    "dnn_re400_gpu_s1",
    "dnn_re400_gpu_s2",
+   "dnn_re400_gpu_s3",
    "hybrid_re400_gpu_s1",
    "hybrid_re400_gpu_s1_dataonly",
    "hybrid_re400_gpu_s2",
-   "hybrid_re400_gpu_s2_dataonly"
+   "hybrid_re400_gpu_s2_dataonly",
+   "hybrid_re400_gpu_s3",
+   "hybrid_re400_gpu_s3_dataonly"
   ],
   "description": "Re 400, seeds of the control runs: hybrid mean continuity_residual"
  },
  "ctrl_re400_dnn_u_mean": {
-  "value": 0.022085453297737433,
+  "value": 0.023046314915998612,
   "runs": [
    "dnn_re400_gpu_s1",
    "dnn_re400_gpu_s2",
+   "dnn_re400_gpu_s3",
    "hybrid_re400_gpu_s1",
    "hybrid_re400_gpu_s1_dataonly",
    "hybrid_re400_gpu_s2",
-   "hybrid_re400_gpu_s2_dataonly"
+   "hybrid_re400_gpu_s2_dataonly",
+   "hybrid_re400_gpu_s3",
+   "hybrid_re400_gpu_s3_dataonly"
   ],
   "description": "Re 400, seeds of the control runs: dnn mean test_a_relative_l2_u"
  },
  "ctrl_re400_dnn_cont_mean": {
-  "value": 0.5475640366687353,
+  "value": 0.548871379443898,
   "runs": [
    "dnn_re400_gpu_s1",
    "dnn_re400_gpu_s2",
+   "dnn_re400_gpu_s3",
    "hybrid_re400_gpu_s1",
    "hybrid_re400_gpu_s1_dataonly",
    "hybrid_re400_gpu_s2",
-   "hybrid_re400_gpu_s2_dataonly"
+   "hybrid_re400_gpu_s2_dataonly",
+   "hybrid_re400_gpu_s3",
+   "hybrid_re400_gpu_s3_dataonly"
   ],
   "description": "Re 400, seeds of the control runs: dnn mean continuity_residual"
  }

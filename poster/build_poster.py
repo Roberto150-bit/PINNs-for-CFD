@@ -244,7 +244,7 @@ def column_rq12(slide):
                           text=["Violation of mass conservation: PINN "
                                 f"{num('pinn_gpu_continuity_residual_mean', '{:.2g}')}, hybrid "
                                 f"{num('hybrid_gpu_continuity_residual_mean', '{:.2g}')}, data NN "
-                                f"{num('dnn_gpu_continuity_residual_mean', '{:.2g}')}. Without its physics loss the hybrid has "
+                                f"{num('dnn_gpu_continuity_residual_mean', '{:.2g}')}. Without its physics loss the hybrid's mass violation is "
                                 f"{num('ctrl_re100_dataonly_cont_mean', '{:.2f}')} (error in u "
                                 f"{pct('ctrl_re100_dataonly_u_mean')} vs {pct('ctrl_re100_hybrid_u_mean')}, same seeds)."])
 
