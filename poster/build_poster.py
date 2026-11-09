@@ -268,25 +268,26 @@ def column_rq12(slide):
         "speeds u (left-right) and v (up-down) and the pressure p. Lower is better."])
     y = picture(slide, x, y, "v4_accuracy")
     y = caption(slide, x, y, [
-        "The data NN is the most accurate: "
-        f"{pct('dnn_gpu_test_a_relative_l2_u_mean')} error in u, "
+        f"The data NN is the most accurate ({pct('dnn_gpu_test_a_relative_l2_u_mean')} error in u, "
         f"{ratio('pinn_gpu_test_a_relative_l2_u_mean', 'dnn_gpu_test_a_relative_l2_u_mean')}× better than the "
-        f"PINN ({pct('pinn_gpu_test_a_relative_l2_u_mean')}); the hybrid is in between "
-        f"({pct('hybrid_gpu_test_a_relative_l2_u_mean')}; {seed_counts()}). One hybrid run jumped from "
-        f"{pct('spike_re100_hybrid_worst_best')} to {pct('spike_re100_hybrid_worst_final')} in its last "
-        "training steps; every run is reported as it ended."])
+        f"PINN's {pct('pinn_gpu_test_a_relative_l2_u_mean')}); the hybrid is in between "
+        f"({pct('hybrid_gpu_test_a_relative_l2_u_mean')}). One hybrid run jumped from "
+        f"{pct('spike_re100_hybrid_worst_best')} to {pct('spike_re100_hybrid_worst_final')} at the very end "
+        "and is reported as it ended."])
     y = lead(slide, x, y, [
         "RQ2 physics. Real fluid cannot appear or vanish (mass) and obeys Newton's laws "
-        "(momentum). Bars: how much each prediction breaks these rules. Lower is better."])
+        "(momentum). Bars: how much each prediction breaks these rules."])
     y = picture(slide, x, y, "v4_physics")
     COLUMN_END[2] = caption(slide, x, y, [
         "The PINN, which is taught the rules, breaks them "
         f"{ratio('dnn_gpu_continuity_residual_mean', 'pinn_gpu_continuity_residual_mean')}× less than the "
         f"data NN ({num('pinn_gpu_continuity_residual_mean', '{:.2g}')} vs "
         f"{num('dnn_gpu_continuity_residual_mean', '{:.2g}')}); the hybrid keeps most of that benefit "
-        f"({num('hybrid_gpu_continuity_residual_mean', '{:.2g}')}). Without its physics lessons the hybrid "
-        f"breaks the rules more ({num('ctrl_re100_dataonly_cont_mean', '{:.2f}')}) but is more accurate "
-        f"({pct('ctrl_re100_dataonly_u_mean')} vs {pct('ctrl_re100_hybrid_u_mean')})."])
+        f"({num('hybrid_gpu_continuity_residual_mean', '{:.2g}')}). Without its physics lessons (same "
+        f"runs) the hybrid breaks the rules more ({num('ctrl_re100_dataonly_cont_mean', '{:.2f}')}); it is "
+        f"then more accurate at Re = 100 ({pct('ctrl_re100_dataonly_u_mean')} vs "
+        f"{pct('ctrl_re100_hybrid_u_mean')}) but less accurate at Re = 1000 "
+        f"({pct('ctrl_re1000_dataonly_u_mean')} vs {pct('ctrl_re1000_hybrid_u_mean')})."])
 
 
 def column_rq3(slide):
