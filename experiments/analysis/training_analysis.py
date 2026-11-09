@@ -20,6 +20,9 @@ Figures
     s4_causal           PINN with and without causal weighting at Re 400 (--only causal)
     s6_continuation     PINN at Re 400 started from random weights or from the Re 100 PINN
     s6_continuation_re1000   the same at Re 1000, started from the S6 Re 400 PINN
+    three_methods       test-A error vs step for data NN, PINN and hybrid (Re 100 and 400)
+    spikes              spike count per run (table: analysis_spikes.csv, no figure)
+The hybrid (data + physics loss) is drawn wherever its runs exist.
 Also writes experiments/results/reynolds_trend.csv.
 """
 import argparse
@@ -45,9 +48,11 @@ DPI = 300
 WIDTH = 7.5            # inches: one poster column
 
 # Same method colors as the other figures
-COLORS = {"finite_difference": "#2a78d6", "data_driven_nn": "#eb6834", "pinn": "#1baf7a"}
-LABELS = {"finite_difference": "FD", "data_driven_nn": "Data NN", "pinn": "PINN"}
-SHORT = {"data_driven_nn": "dnn", "pinn": "pinn"}
+COLORS = {"finite_difference": "#2a78d6", "data_driven_nn": "#eb6834", "pinn": "#1baf7a",
+          "hybrid": "#7b52c7"}
+LABELS = {"finite_difference": "FD", "data_driven_nn": "Data NN", "pinn": "PINN", "hybrid": "Hybrid"}
+SHORT = {"data_driven_nn": "dnn", "pinn": "pinn", "hybrid": "hybrid"}
+NETWORKS = ("data_driven_nn", "pinn", "hybrid")    # the hybrid is drawn only where its runs exist
 INK, INK2, GRIDLINE = "#0b0b0b", "#52514e", "#d9d8d4"
 SEQUENTIAL = LinearSegmentedColormap.from_list("blue_seq", ["#f7f9fc", "#9ec5f4", "#2a78d6", "#104281"])
 # PINN loss terms: categorical slots 4-8 plus a distinct line style each, so the
@@ -133,6 +138,16 @@ def rid(d):
     return os.path.basename(d.rstrip("/"))
 
 
+def legend_entries(axes):
+    """Legend handles from every panel, each label once (a method may be
+    missing from the first panel, e.g. the hybrid before its runs exist)."""
+    out = {}
+    for ax in np.atleast_1d(axes).flat:
+        for h, lab in zip(*ax.get_legend_handles_labels()):
+            out.setdefault(lab, h)
+    return list(out.values()), list(out.keys())
+
+
 # ---------------- figures ----------------
 
 def fig_loss_components(res=(100.0, 400.0), seeds=(1, 2, 3, 4, 5), every=100):
@@ -213,7 +228,7 @@ def fig_repeatability(res=(100.0, 400.0), seeds=(1, 2, 3, 4, 5)):
     values = {}
     for ax, re in zip(np.atleast_1d(axes), res):
         values[f"re{re:g}"] = {}
-        for method in ("data_driven_nn", "pinn"):
+        for method in NETWORKS:
             for k, d in enumerate(existing_runs(re, method, seeds)):
                 e = read_csv(os.path.join(d, "eval_history.csv"))
                 ax.plot(e["step"], e["rel_l2_u"], color=COLORS[method], lw=1.6, alpha=0.85,
@@ -226,8 +241,8 @@ def fig_repeatability(res=(100.0, 400.0), seeds=(1, 2, 3, 4, 5)):
     np.atleast_1d(axes)[-1].set_xlabel("Training step")
     np.atleast_1d(axes)[-1].xaxis.set_major_formatter(
         matplotlib.ticker.FuncFormatter(lambda v, _: f"{v / 1000:g}k"))
-    handles, labels = np.atleast_1d(axes)[0].get_legend_handles_labels()
-    fig.legend(handles, labels, loc="outside lower center", ncols=2, frameon=False)
+    handles, labels = legend_entries(axes)
+    fig.legend(handles, labels, loc="outside lower center", ncols=len(handles), frameon=False)
     save(fig, "repeatability", values)
 
 
@@ -242,7 +257,7 @@ def fig_error_vs_t(seeds=TREND_SEEDS):
     values = {}
     for ax, re in zip(axes.flat, res):
         values[f"re{re:g}"] = {}
-        for method in ("data_driven_nn", "pinn"):
+        for method in NETWORKS:
             dirs = [d for d in existing_runs(re, method, seeds) if os.path.isfile(os.path.join(d, "metrics.json"))]
             if not dirs:
                 continue
@@ -266,20 +281,21 @@ def fig_error_vs_t(seeds=TREND_SEEDS):
         ax.set_xlabel("Time t")
     for ax in axes[:, 0]:
         ax.set_ylabel("Rel. L2, u")
-    handles, labels = axes.flat[0].get_legend_handles_labels()
-    fig.legend(handles, labels, loc="outside lower center", ncols=2, frameon=False)
+    handles, labels = legend_entries(axes)
+    fig.legend(handles, labels, loc="outside lower center", ncols=len(handles), frameon=False)
     save(fig, "error_vs_t", values)
 
 
 def fig_error_map(re, seeds=TREND_SEEDS):
     """Mean |u_network - u_FD| over all snapshots and seeds, on the 64 x 64 grid."""
     ref_path = os.path.join(C.experiment_dir(re), "finite_difference", C.fd_reference_run_id(re), "solution.npz")
-    if not (os.path.isfile(ref_path) and all(existing_runs(re, m, seeds) for m in SHORT)):
+    if not (os.path.isfile(ref_path) and all(existing_runs(re, m, seeds) for m in ("data_driven_nn", "pinn"))):
         print(f"error_map_re{re:g}: skipped (reference or runs not available yet)")
         return
     ref = np.load(ref_path)
     maps, values = {}, {"re": re}
-    for method in ("data_driven_nn", "pinn"):
+    methods = [m for m in NETWORKS if m != "hybrid" or len(existing_runs(re, m, seeds)) == len(seeds)]
+    for method in methods:
         dirs = existing_runs(re, method, seeds)
         if not dirs:
             return
@@ -293,8 +309,9 @@ def fig_error_map(re, seeds=TREND_SEEDS):
                           "top_rows_mean": float(m[-8:].mean()), "rest_mean": float(m[:-8].mean())}
     vmax = max(float(np.percentile(m, 99)) for m in maps.values())
     values["color_max_99th_percentile"] = vmax
-    fig, axes = plt.subplots(1, 2, figsize=(WIDTH, 4.6), layout="constrained", sharey=True)
-    for ax, method in zip(axes, ("data_driven_nn", "pinn")):
+    fig, axes = plt.subplots(1, len(methods), figsize=(WIDTH, 4.6 if len(methods) == 2 else 3.9),
+                             layout="constrained", sharey=True)
+    for ax, method in zip(axes, methods):
         im = ax.pcolormesh(ref["x"], ref["y"], maps[method], cmap=SEQUENTIAL, vmin=0, vmax=vmax,
                            shading="nearest", rasterized=True)
         ax.set_aspect("equal")
@@ -418,7 +435,7 @@ def fig_reynolds_trend(seeds=TREND_SEEDS):
     for ax, col, ylabel in ((axes[0], "test_a_relative_l2_u", "Rel. L2, u"),
                             (axes[1], "continuity_residual", "Continuity\nresidual")):
         values[col] = {}
-        for method in ("data_driven_nn", "pinn"):
+        for method in NETWORKS:
             res = [re for re in TREND_RE if any(float(r["reynolds_number"]) == re and r["method"] == method
                                                 for r in rows)]
             ys = [[float(r[col]) for r in rows if float(r["reynolds_number"]) == re and r["method"] == method]
@@ -436,7 +453,7 @@ def fig_reynolds_trend(seeds=TREND_SEEDS):
     axes[1].set_xticks(list(TREND_RE), [f"{re:g}" for re in TREND_RE])
     axes[1].xaxis.set_minor_locator(matplotlib.ticker.NullLocator())
     axes[1].set_xlabel("Reynolds number")
-    fig.legend(loc="outside lower center", ncols=2, frameon=False)
+    fig.legend(loc="outside lower center", ncols=len(values["test_a_relative_l2_u"]), frameon=False)
     save(fig, "reynolds_trend", values)
 
 
@@ -452,7 +469,10 @@ def fig_causal(seeds=TREND_SEEDS):
     groups = [("data_driven_nn", "Data NN", "-", existing_runs(400.0, "data_driven_nn", seeds)),
               ("pinn", "PINN", "-", existing_runs(400.0, "pinn", seeds)),
               ("pinn", "PINN, causal", "--", causal_dirs(seeds))]
-    if not groups[2][3]:
+    hybrid = [d for d in existing_runs(400.0, "hybrid", seeds) if os.path.isfile(os.path.join(d, "metrics.json"))]
+    if hybrid:
+        groups.insert(1, ("hybrid", "Hybrid", "-", hybrid))
+    if not groups[-1][3]:
         print("causal: skipped (no evaluated causal runs yet)")
         return
     fig, axes = plt.subplots(2, 1, figsize=(WIDTH, 8.4), layout="constrained",
@@ -479,12 +499,12 @@ def fig_causal(seeds=TREND_SEEDS):
         plain_log_axis(ax.yaxis, subs=(1.0, 2.0, 5.0))
         ax.set_ylabel("Rel. L2, u")
     axes[0].set_xlabel("Time t")
-    axes[1].set_xticks(range(len(groups)), ["Data NN", "PINN", "PINN,\ncausal"])
+    axes[1].set_xticks(range(len(groups)), [g[1].replace(", ", ",\n") for g in groups])
     axes[1].set_xlim(-0.6, len(groups) - 0.4)
     axes[1].grid(False, axis="x")
     axes[1].set_title("Test A, every seed", loc="left")
-    fig.legend(*axes[0].get_legend_handles_labels(), loc="outside lower center", ncols=3, frameon=False,
-               handlelength=1.6, columnspacing=0.8)
+    fig.legend(*axes[0].get_legend_handles_labels(), loc="outside lower center", ncols=min(3, len(groups)),
+               frameon=False, handlelength=1.6, columnspacing=0.8)
     save(fig, "s4_causal", values)
 
 
@@ -548,6 +568,101 @@ def fig_continuation(re=400.0, seeds=TREND_SEEDS):
     save(fig, "s6_continuation" if re == 400.0 else f"s6_continuation_re{re:g}", values)
 
 
+def fig_three_methods(res=(100.0, 400.0), seeds=(1, 2, 3, 4, 5)):
+    """Test-A relative L2 of u vs step for the three networks: mean over all
+    seeds that exist (line) and min-max over seeds (band)."""
+    fig, axes = plt.subplots(len(res), 1, figsize=(WIDTH, 4.2 * len(res)), sharex=True, sharey=True,
+                             layout="constrained")
+    values = {"note": "mean and min-max over the seeds listed; logged every 500 steps"}
+    for ax, re in zip(np.atleast_1d(axes), res):
+        values[f"re{re:g}"] = {}
+        for method in NETWORKS:
+            dirs = existing_runs(re, method, seeds)
+            if not dirs:
+                continue
+            evs = [read_csv(os.path.join(d, "eval_history.csv")) for d in dirs]
+            steps = evs[0]["step"]
+            mean, lo, hi = band([e["rel_l2_u"] for e in evs])
+            ax.fill_between(steps, lo, hi, color=COLORS[method], alpha=0.2, lw=0)
+            ax.plot(steps, mean, color=COLORS[method], label=f"{LABELS[method]}")
+            values[f"re{re:g}"][method] = {"runs": [rid(d) for d in dirs], "step": tolist(steps),
+                                          "mean": tolist(mean), "min": tolist(lo), "max": tolist(hi)}
+        ax.set_yscale("log")
+        plain_log_axis(ax.yaxis, subs=(1.0, 3.0))
+        n = {m: len(v["runs"]) for m, v in values[f"re{re:g}"].items()}
+        ax.set_title(f"Re = {re:g}\nseeds: {', '.join(f'{LABELS[m]} {k}' for m, k in n.items())}",
+                     loc="left", fontsize=20)
+        ax.set_ylabel("Rel. L2, u")
+    np.atleast_1d(axes)[-1].set_xlabel("Training step")
+    np.atleast_1d(axes)[-1].xaxis.set_major_formatter(
+        matplotlib.ticker.FuncFormatter(lambda v, _: f"{v / 1000:g}k"))
+    handles, labels = legend_entries(axes)
+    fig.legend(handles, labels, loc="outside lower center", ncols=len(handles), frameon=False)
+    save(fig, "three_methods", values)
+
+
+SPIKE_FACTOR = 2.0   # fixed 2026-11-09 00:36, before any hybrid result
+
+
+def spike_stats(e):
+    """Spikes in test-A error of u: evaluation steps >= 1,000 whose value is
+    more than SPIKE_FACTOR times the best value at earlier steps (step 1, the
+    untrained network, excluded)."""
+    keep = e["step"] >= C.EVAL_EVERY
+    step, u = e["step"][keep], e["rel_l2_u"][keep]
+    best_before = np.minimum.accumulate(u)[:-1]            # best of u[0..k-1] for k = 1..n-1
+    ratio = u[1:] / best_before
+    spike = ratio > SPIKE_FACTOR
+    return {"n_evals": int(len(u)), "spikes": int(spike.sum()),
+            "spike_steps": [int(s) for s in step[1:][spike]],
+            "worst_ratio": float(ratio.max()), "worst_ratio_step": int(step[1:][np.argmax(ratio)]),
+            "final_is_spike": bool(spike[-1]), "final_over_best": float(u[-1] / u.min()),
+            "best": float(u.min()), "best_step": int(step[np.argmin(u)]), "final": float(u[-1])}
+
+
+SPIKE_COLS = ["reynolds_number", "method", "run_id", "seed", "n_evals", "spikes", "spike_steps", "worst_ratio",
+              "worst_ratio_step", "final_is_spike", "final_over_best", "best", "best_step", "final"]
+
+
+def table_spikes(seeds=(1, 2, 3, 4, 5)):
+    """Spike table for the main runs (20,000 steps) of the three networks at every Re."""
+    rows, summary = [], {"definition": f"eval step k >= 1000 with test-A rel. L2 of u > {SPIKE_FACTOR:g} x "
+                                       "the best value at steps 500..k-500; step 1 excluded",
+                         "fixed": "2026-11-09 00:36, before any hybrid result"}
+    for re in TREND_RE:
+        for method in NETWORKS:
+            dirs = existing_runs(re, method, seeds)
+            if not dirs:
+                continue
+            per = []
+            for d in dirs:
+                st = spike_stats(read_csv(os.path.join(d, "eval_history.csv")))
+                cfg = json.load(open(os.path.join(d, "config.json")))
+                rows.append({"reynolds_number": re, "method": method, "run_id": rid(d),
+                             "seed": cfg["reproducibility"]["random_seed"], **st,
+                             "spike_steps": " ".join(str(k) for k in st["spike_steps"])})
+                per.append(st)
+            summary[f"re{re:g}_{method}"] = {"runs": len(per), "spikes_total": sum(p["spikes"] for p in per),
+                                             "runs_with_spike": sum(p["spikes"] > 0 for p in per),
+                                             "runs_ending_on_spike": sum(p["final_is_spike"] for p in per),
+                                             "worst_ratio": max(p["worst_ratio"] for p in per),
+                                             "final_over_best_mean": float(np.mean([p["final_over_best"]
+                                                                                    for p in per]))}
+    os.makedirs(OUT, exist_ok=True)
+    with open(os.path.join(OUT, "analysis_spikes.csv"), "w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=SPIKE_COLS)
+        w.writeheader()
+        w.writerows(rows)
+    with open(os.path.join(OUT, "analysis_spikes.values.json"), "w") as f:
+        json.dump(summary, f, indent=1)
+    print(f"wrote {OUT}/analysis_spikes.csv ({len(rows)} runs)")
+    for k, v in summary.items():
+        if isinstance(v, dict):
+            print(f"  {k:28s} runs {v['runs']}  spikes {v['spikes_total']:2d}  runs with spike "
+                  f"{v['runs_with_spike']}  ending on spike {v['runs_ending_on_spike']}  "
+                  f"worst ratio {v['worst_ratio']:.2f}  final/best {v['final_over_best_mean']:.2f}")
+
+
 FIGURES = {
     "loss_components": fig_loss_components,
     "generalization": fig_generalization,
@@ -558,6 +673,8 @@ FIGURES = {
     "reynolds_trend": fig_reynolds_trend,
     "causal": fig_causal,
     "continuation": lambda: [fig_continuation(re) for re in CONTINUATION_FROM],
+    "three_methods": fig_three_methods,
+    "spikes": table_spikes,
 }
 
 
