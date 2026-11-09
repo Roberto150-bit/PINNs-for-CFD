@@ -279,7 +279,7 @@ def control_numbers():
     with the hybrid and the data NN runs of the same seeds at the same Re.
     Keys: ctrl_re<Re>_<dataonly|hybrid|dnn>_<u|cont>_mean, ctrl_re<Re>_n_runs."""
     out = {}
-    for re in ("100", "400"):
+    for re in ("10", "100", "400", "1000"):
         path = os.path.join(RESULTS, f"control_re{re}.csv")
         main = os.path.join(RESULTS, "experiment_results.csv" if re == "100" else f"experiment_results_re{re}.csv")
         if not (os.path.exists(path) and os.path.exists(main)):

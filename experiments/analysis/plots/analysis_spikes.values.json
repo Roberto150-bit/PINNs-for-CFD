@@ -82,19 +82,19 @@
   "final_over_best_mean": 1.0395964714047676
  },
  "re1000_pinn": {
-  "runs": 4,
+  "runs": 5,
   "spikes_total": 0,
   "runs_with_spike": 0,
   "runs_ending_on_spike": 0,
-  "worst_ratio": 1.1231106978428844,
-  "final_over_best_mean": 1.0003027751849773
+  "worst_ratio": 1.1415042640128539,
+  "final_over_best_mean": 1.0050479353363122
  },
  "re1000_hybrid": {
-  "runs": 3,
+  "runs": 5,
   "spikes_total": 0,
   "runs_with_spike": 0,
   "runs_ending_on_spike": 0,
-  "worst_ratio": 1.250286740599873,
-  "final_over_best_mean": 1.0406050565002223
+  "worst_ratio": 1.619613259102145,
+  "final_over_best_mean": 1.1482856857205623
  }
 }
