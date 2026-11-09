@@ -3,12 +3,17 @@
     python models/hybrid/src/train.py --device gpu --seed 1
     python models/hybrid/src/train.py --device gpu --seed 1 --re 400
 
-Every setting is shared with the other two methods (see config.py), so the
-only difference from the data NN is the added physics loss, and the only
-difference from the PINN is the added data loss. The network outputs u, v, p
-in physical units (as the PINN), so the physics residuals are taken directly;
-the data loss divides each output error by its train-split standard
-deviation, which is the data NN's loss on standardized targets.
+Every setting is shared with the other two methods (see config.py). The only
+difference from the PINN is the added data loss. Against the data NN there are
+two differences: the added physics loss, and the output units. The network
+outputs u, v, p in physical units (as the PINN), so the physics residuals are
+taken directly, whereas the data NN outputs standardized values; the data loss
+divides each output error by its train-split standard deviation, which gives
+the data NN's loss value for the same prediction.
+
+    --data-only   control run: data loss only (physics weights 0, physics terms
+                  not computed), physical outputs. It separates the effect of the
+                  physics loss from the effect of the output units.
 """
 import argparse
 import os
@@ -39,6 +44,8 @@ def main():
     parser.add_argument("--tag", default=None, help="suffix added to the run id (e.g. timing)")
     parser.add_argument("--shared-gpu", action="store_true",
                         help="another job uses the GPU at the same time: timings are flagged as not valid")
+    parser.add_argument("--data-only", action="store_true",
+                        help="control: data loss only, physical outputs (no physics terms)")
     parser.add_argument("--run-id", default=None)
     parser.add_argument("--exp-dir", default=None, help="default: the experiment folder for --re")
     args = parser.parse_args()
@@ -107,6 +114,22 @@ def main():
         optimizer.apply_gradients(zip(grads, model.trainable_variables))
         return tf.stack([l_d, l_ic, l_bc, l_c, l_x, l_y, total])
 
+    @tf.function
+    def data_only_step(idx):
+        xb = tf.gather(X_train, idx)
+        yb = tf.gather(Y_train, idx)
+        with tf.GradientTape() as tape:
+            l_d = data_loss(xb, yb)
+        grads = tape.gradient(l_d, model.trainable_variables)
+        optimizer.apply_gradients(zip(grads, model.trainable_variables))
+        z = tf.zeros(())
+        return tf.stack([l_d, z, z, z, z, z, l_d])
+
+    if args.data_only:
+        train_step = data_only_step  # noqa: F811
+        for k in ("ic", "bc", "c", "m"):
+            lam[k].assign(0.0)
+
     perm = None
 
     def batch_indices(step):
@@ -149,6 +172,7 @@ def main():
                                        "bc": pinn_config.LAMBDA_BC, "c": pinn_config.LAMBDA_CONTINUITY,
                                        "m": pinn_config.LAMBDA_MOMENTUM},
                      "adjustment": lambda_adjustment},
+            "control_data_only": bool(args.data_only),
             "initial_weights": "random (Glorot uniform)",
             "reproducibility": {"random_seed": args.seed, "split_seed": C.SPLIT_SEED},
             "deterministic_ops": not args.no_determinism,
@@ -181,7 +205,7 @@ def main():
             recorder.history.append({"step": step, **{n: float(c) for n, c in zip(names, comps)},
                                      "train_time_seconds": train_time})
 
-        if step == pinn_config.LAMBDA_CHECK_STEP and adjustment is None:
+        if step == pinn_config.LAMBDA_CHECK_STEP and adjustment is None and not args.data_only:
             # Same rule as the PINN, over all five weighted components
             comp = {"data": float(comps[0]), "ic": float(comps[1]), "bc": float(comps[2]),
                     "c": float(comps[3]), "m": float(comps[4] + comps[5])}

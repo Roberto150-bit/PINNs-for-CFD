@@ -10,6 +10,7 @@ already holds a performance.json, so the batch can be restarted safely.
     python experiments/run_batch.py --sensitivity      (studies S1-S3, Re 100)
     python experiments/run_batch.py --extended         (study S5, 100,000 steps)
     python experiments/run_batch.py --hybrid           (hybrid network: data + physics loss, Re 10-1000)
+    python experiments/run_batch.py --hybrid-control   (hybrid with data loss only: control, Re 100 and 400)
     python experiments/run_batch.py --extended-trend   (S5 extension: PINN Re 1000 and Re 10, 100,000 steps)
     python experiments/run_batch.py --trend fd         (Reynolds trend: FD at Re 10 and 1000)
     python experiments/run_batch.py --trend nn         (Reynolds trend: networks at Re 10 and 1000)
@@ -125,6 +126,21 @@ def hybrid_jobs():
     out.append((f"{EXP}/hybrid/{rid}",
                 [PY, "models/hybrid/src/train.py", "--device", "gpu", "--seed", "1", "--re", "400",
                  "--steps", str(EXTENDED_STEPS), "--run-id", rid, "--exp-dir", EXP]))
+    return out
+
+
+def hybrid_control_jobs():
+    """Control for the hybrid (D23): hybrid code with the data loss only (no physics terms),
+    physical outputs, seeds 1-3 at Re 100 and 400. Hybrid vs this control isolates the physics
+    loss; this control vs the data NN isolates the output units. GPU not shared."""
+    out = []
+    for re in (100.0, 400.0):
+        EXP = f"{C.experiment_dir(re)}/control"
+        for s in (1, 2, 3):
+            rid = f"hybrid_re{re:g}_gpu_s{s}_dataonly"
+            out.append((f"{EXP}/hybrid/{rid}",
+                        [PY, "models/hybrid/src/train.py", "--device", "gpu", "--seed", str(s), "--re", f"{re:g}",
+                         "--data-only", "--run-id", rid, "--exp-dir", EXP]))
     return out
 
 
@@ -287,6 +303,7 @@ def main():
     parser.add_argument("--extended", action="store_true")
     parser.add_argument("--extended-trend", action="store_true")
     parser.add_argument("--hybrid", action="store_true")
+    parser.add_argument("--hybrid-control", action="store_true")
     parser.add_argument("--trend",choices=["fd", "nn"], default=None)
     parser.add_argument("--causal", action="store_true")
     parser.add_argument("--continuation", type=float, nargs="?", const=400.0, default=None,
@@ -311,6 +328,8 @@ def main():
         job_list = causal_jobs()
     elif args.trend:
         job_list = trend_jobs(args.trend, args.trend_re)
+    elif args.hybrid_control:
+        job_list = hybrid_control_jobs()
     elif args.hybrid:
         job_list = hybrid_jobs()
     elif args.extended_trend:
@@ -325,7 +344,7 @@ def main():
         name = os.path.basename(run_dir)
         if args.hybrid and "/extended/" not in run_dir:
             LOG_DIR = os.path.join(os.path.dirname(os.path.dirname(run_dir)), "logs")
-        elif args.extended or args.extended_trend or args.hybrid or args.trend or args.causal or args.continuation is not None:
+        elif args.extended or args.extended_trend or args.hybrid or args.hybrid_control or args.trend or args.causal or args.continuation is not None:
             LOG_DIR = os.path.join(os.path.dirname(os.path.dirname(run_dir)), "logs")
         else:
             LOG_DIR = os.path.join(C.experiment_dir(args.re), "sensitivity" if args.sensitivity else "", "logs")
