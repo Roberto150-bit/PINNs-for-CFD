@@ -9,6 +9,7 @@ already holds a performance.json, so the batch can be restarted safely.
     python experiments/run_batch.py [--re 400] [--dry-run]
     python experiments/run_batch.py --sensitivity      (studies S1-S3, Re 100)
     python experiments/run_batch.py --extended         (study S5, 100,000 steps)
+    python experiments/run_batch.py --hybrid           (hybrid network: data + physics loss, Re 10-1000)
     python experiments/run_batch.py --extended-trend   (S5 extension: PINN Re 1000 and Re 10, 100,000 steps)
     python experiments/run_batch.py --trend fd         (Reynolds trend: FD at Re 10 and 1000)
     python experiments/run_batch.py --trend nn         (Reynolds trend: networks at Re 10 and 1000)
@@ -102,6 +103,29 @@ def sensitivity_jobs():
 
 
 EXTENDED_STEPS = 100_000
+
+
+def hybrid_jobs():
+    """Hybrid network (FD data loss + physics loss), same conditions as the data NN and
+    the PINN: same architecture, optimizer, 20,000 steps, data split, batch and physics
+    points. Order: seeds 1-3 at every Re first (Re 100, 400, 10, 1000), then seeds 4-5 at
+    Re 100 and 400 (5 seeds, as the main runs), then one 100,000-step run at Re 400 (as S5).
+    GPU not shared.
+    """
+    order = ([(re, s) for re in (100.0, 400.0, 10.0, 1000.0) for s in (1, 2, 3)]
+             + [(re, s) for re in (100.0, 400.0) for s in (4, 5)])
+    out = []
+    for re, s in order:
+        EXP = C.experiment_dir(re)
+        rid = f"hybrid_re{re:g}_gpu_s{s}"
+        out.append((f"{EXP}/hybrid/{rid}",
+                    [PY, "models/hybrid/src/train.py", "--device", "gpu", "--seed", str(s), "--re", f"{re:g}"]))
+    EXP = f"{C.experiment_dir(400.0)}/extended"
+    rid = f"hybrid_re400_gpu_s1_steps{EXTENDED_STEPS // 1000}k"
+    out.append((f"{EXP}/hybrid/{rid}",
+                [PY, "models/hybrid/src/train.py", "--device", "gpu", "--seed", "1", "--re", "400",
+                 "--steps", str(EXTENDED_STEPS), "--run-id", rid, "--exp-dir", EXP]))
+    return out
 
 
 def extended_trend_jobs():
@@ -262,6 +286,7 @@ def main():
     parser.add_argument("--sensitivity", action="store_true")
     parser.add_argument("--extended", action="store_true")
     parser.add_argument("--extended-trend", action="store_true")
+    parser.add_argument("--hybrid", action="store_true")
     parser.add_argument("--trend",choices=["fd", "nn"], default=None)
     parser.add_argument("--causal", action="store_true")
     parser.add_argument("--continuation", type=float, nargs="?", const=400.0, default=None,
@@ -286,6 +311,8 @@ def main():
         job_list = causal_jobs()
     elif args.trend:
         job_list = trend_jobs(args.trend, args.trend_re)
+    elif args.hybrid:
+        job_list = hybrid_jobs()
     elif args.extended_trend:
         job_list = extended_trend_jobs()
     elif args.extended:
@@ -296,7 +323,9 @@ def main():
         job_list = jobs(args.re)
     for run_dir, cmd in job_list:
         name = os.path.basename(run_dir)
-        if args.extended or args.extended_trend or args.trend or args.causal or args.continuation is not None:
+        if args.hybrid and "/extended/" not in run_dir:
+            LOG_DIR = os.path.join(os.path.dirname(os.path.dirname(run_dir)), "logs")
+        elif args.extended or args.extended_trend or args.hybrid or args.trend or args.causal or args.continuation is not None:
             LOG_DIR = os.path.join(os.path.dirname(os.path.dirname(run_dir)), "logs")
         else:
             LOG_DIR = os.path.join(C.experiment_dir(args.re), "sensitivity" if args.sensitivity else "", "logs")

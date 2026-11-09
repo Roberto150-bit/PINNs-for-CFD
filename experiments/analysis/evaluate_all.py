@@ -149,7 +149,7 @@ def autodiff_physics(run_dir, nu, batch=10000):
 
 def find_runs(exp_dir):
     runs = []
-    for method in ("finite_difference", "data_driven_nn", "pinn"):
+    for method in ("finite_difference", "data_driven_nn", "pinn", "hybrid"):
         for d in sorted(glob.glob(os.path.join(exp_dir, method, "*"))):
             if os.path.isfile(os.path.join(d, "config.json")):
                 runs.append(d)
