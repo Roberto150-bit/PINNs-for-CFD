@@ -31,7 +31,7 @@ Run ids follow `<method>_re<Re>_<device>_s<seed>[_<tag>]`, e.g. `pinn_re400_gpu_
 | S4 | causal weighting of the PDE residual, PINN | seeds 1-3, $Re = 400$ | `experiment_002_re400/causal/` |
 | S5 | longer training (100,000 steps) | data NN and PINN at $Re = 100$, PINN at $Re = 400$ and $1000$, hybrid at $Re = 400$ and $1000$ | `experiment_00X/extended/` |
 | S6 | $Re$ continuation: PINN started from the trained PINN at a neighbouring $Re$ | $Re = 400$ from $100$ (seeds 1-5), $Re = 1000$ from S6 $Re = 400$ and $Re = 10$ from $100$ (seeds 1-3) | `experiment_00X/continuation/` |
-| control | hybrid with the data loss only, to separate the physics loss from the output units | seeds 1-3 at $Re = 100$ and $400$ (`--hybrid-control`) and at $Re = 10$ and $1000$ (`--day`) | `experiment_00X/control/` |
+| control | hybrid with the data loss only, to separate the physics loss from the output units | seeds 1-3 at $Re = 100$ and $400$ (`--hybrid-control`) and at $Re = 10$ and $1000$ (`--day`); seeds 4-5 at all four $Re$ (train.py directly, command in `models/hybrid/README.md`) | `experiment_00X/control/` |
 
 
 ## Running

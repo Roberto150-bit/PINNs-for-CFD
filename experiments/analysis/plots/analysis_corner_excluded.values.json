@@ -61,12 +61,14 @@
   "runs": [
    "hybrid_re10_gpu_s1_dataonly",
    "hybrid_re10_gpu_s2_dataonly",
-   "hybrid_re10_gpu_s3_dataonly"
+   "hybrid_re10_gpu_s3_dataonly",
+   "hybrid_re10_gpu_s4_dataonly",
+   "hybrid_re10_gpu_s5_dataonly"
   ],
-  "continuity_r0_mean": 0.6881418426831564,
-  "continuity_r0.02_mean": 0.6361429293950399,
-  "continuity_r0.05_mean": 0.31042904655138653,
-  "continuity_r0.1_mean": 0.1620156541466713
+  "continuity_r0_mean": 0.6969371557235717,
+  "continuity_r0.02_mean": 0.6511518716812134,
+  "continuity_r0.05_mean": 0.31969242095947265,
+  "continuity_r0.1_mean": 0.15320155322551726
  },
  "re100_main_data_driven_nn": {
   "runs": [
@@ -111,12 +113,14 @@
   "runs": [
    "hybrid_re100_gpu_s1_dataonly",
    "hybrid_re100_gpu_s2_dataonly",
-   "hybrid_re100_gpu_s3_dataonly"
+   "hybrid_re100_gpu_s3_dataonly",
+   "hybrid_re100_gpu_s4_dataonly",
+   "hybrid_re100_gpu_s5_dataonly"
   ],
-  "continuity_r0_mean": 0.4484790861606598,
-  "continuity_r0.02_mean": 0.39209869503974915,
-  "continuity_r0.05_mean": 0.21418931086858115,
-  "continuity_r0.1_mean": 0.1384317303697268
+  "continuity_r0_mean": 0.4771308720111847,
+  "continuity_r0.02_mean": 0.430642706155777,
+  "continuity_r0.05_mean": 0.23843276500701904,
+  "continuity_r0.1_mean": 0.142718805372715
  },
  "re100_sensitivity_data_driven_nn": {
   "runs": [
@@ -236,12 +240,14 @@
   "runs": [
    "hybrid_re400_gpu_s1_dataonly",
    "hybrid_re400_gpu_s2_dataonly",
-   "hybrid_re400_gpu_s3_dataonly"
+   "hybrid_re400_gpu_s3_dataonly",
+   "hybrid_re400_gpu_s4_dataonly",
+   "hybrid_re400_gpu_s5_dataonly"
   ],
-  "continuity_r0_mean": 0.3256344000498454,
-  "continuity_r0.02_mean": 0.285935511191686,
-  "continuity_r0.05_mean": 0.20681644479433695,
-  "continuity_r0.1_mean": 0.1492870698372523
+  "continuity_r0_mean": 0.3571501672267914,
+  "continuity_r0.02_mean": 0.3189501345157623,
+  "continuity_r0.05_mean": 0.22064245939254762,
+  "continuity_r0.1_mean": 0.1548789620399475
  },
  "re1000_main_data_driven_nn": {
   "runs": [
@@ -284,12 +290,23 @@
  },
  "re1000_extended_pinn": {
   "runs": [
-   "pinn_re1000_gpu_s1_steps100k"
+   "pinn_re1000_gpu_s1_steps100k",
+   "pinn_re1000_gpu_s2_steps100k",
+   "pinn_re1000_gpu_s3_steps100k"
   ],
-  "continuity_r0_mean": 0.8210884928703308,
-  "continuity_r0.02_mean": 0.22898441553115845,
-  "continuity_r0.05_mean": 0.009148672223091125,
-  "continuity_r0.1_mean": 0.006328449584543705
+  "continuity_r0_mean": 1.025363713502884,
+  "continuity_r0.02_mean": 0.284982414295276,
+  "continuity_r0.05_mean": 0.014905492154260477,
+  "continuity_r0.1_mean": 0.006358103671421607
+ },
+ "re1000_extended_hybrid": {
+  "runs": [
+   "hybrid_re1000_gpu_s1_steps100k"
+  ],
+  "continuity_r0_mean": 0.338578999042511,
+  "continuity_r0.02_mean": 0.056963346898555756,
+  "continuity_r0.05_mean": 0.022721905261278152,
+  "continuity_r0.1_mean": 0.01757296361029148
  },
  "re1000_continuation_pinn": {
   "runs": [
@@ -306,11 +323,13 @@
   "runs": [
    "hybrid_re1000_gpu_s1_dataonly",
    "hybrid_re1000_gpu_s2_dataonly",
-   "hybrid_re1000_gpu_s3_dataonly"
+   "hybrid_re1000_gpu_s3_dataonly",
+   "hybrid_re1000_gpu_s4_dataonly",
+   "hybrid_re1000_gpu_s5_dataonly"
   ],
-  "continuity_r0_mean": 0.26749316851298016,
-  "continuity_r0.02_mean": 0.23009123901526132,
-  "continuity_r0.05_mean": 0.19462443888187408,
-  "continuity_r0.1_mean": 0.15374508003393808
+  "continuity_r0_mean": 0.2565467208623886,
+  "continuity_r0.02_mean": 0.22359494864940643,
+  "continuity_r0.05_mean": 0.1899243950843811,
+  "continuity_r0.1_mean": 0.15130100548267364
  }
 }

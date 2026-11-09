@@ -48,6 +48,12 @@ python experiments/run_batch.py --hybrid-control   # data-only control, seeds 1-
 python experiments/run_batch.py --day              # seeds 4-5 at Re 10 and 1000, controls at Re 10 and 1000, more 100k runs
 ```
 
+Control seeds 4 and 5 (at each $Re$ of 10, 100, 400, 1000, with its experiment folder) were run with `train.py` directly, then scored with `evaluate_all.py --exp-dir <experiment folder>/control`:
+
+```
+python models/hybrid/src/train.py --device gpu --seed 4 --re 400 --data-only --run-id hybrid_re400_gpu_s4_dataonly --exp-dir experiments/experiment_002_re400/control
+```
+
 Run folders:
 
 - main runs: `experiments/experiment_00X_re<Re>/hybrid/hybrid_re<Re>_gpu_s<seed>/`

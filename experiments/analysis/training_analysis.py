@@ -688,7 +688,7 @@ def control_dir(re, seed):
     return os.path.join(C.experiment_dir(re), "control", "hybrid", f"hybrid_re{re:g}_gpu_s{seed}_dataonly")
 
 
-def fig_hybrid_control(res=(100.0, 400.0), seeds=TREND_SEEDS, name="hybrid_control"):
+def fig_hybrid_control(res=(100.0, 400.0), seeds=(1, 2, 3, 4, 5), name="hybrid_control"):
     """Data NN -> data-only control (only the output units change) -> hybrid
     (only the physics loss is added): test-A error of u and continuity residual
     per seed, from each run's metrics.json. Drawn once every control run exists."""
