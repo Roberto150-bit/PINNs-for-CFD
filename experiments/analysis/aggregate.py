@@ -402,7 +402,8 @@ def extended_numbers():
     """S5 training length: test-A relative L2 of u at 20,000 steps and at the last step
     of each completed 100,000-step run, averaged per (Re, method)."""
     out = {}
-    for re, folder in ((100.0, "experiment_001_re100"), (400.0, "experiment_002_re400")):
+    for re, folder in ((100.0, "experiment_001_re100"), (400.0, "experiment_002_re400"),
+                       (10.0, "experiment_003_re10"), (1000.0, "experiment_004_re1000")):
         for m, short in METHODS:
             at20, at40, atend, ids = [], [], [], []
             for run in sorted(glob.glob(f"experiments/{folder}/extended/{m}/*_steps100k")):

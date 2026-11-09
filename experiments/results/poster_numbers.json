@@ -2843,6 +2843,34 @@
   ],
   "description": "S5 Re 400 hybrid: completed 100k-step runs"
  },
+ "s5_re1000_pinn_u_at_40k_mean": {
+  "value": 0.3863106057232089,
+  "runs": [
+   "pinn_re1000_gpu_s1_steps100k"
+  ],
+  "description": "S5 Re 1000 pinn: test-A rel. L2 u at step 40,000"
+ },
+ "s5_re1000_pinn_u_at_20k_mean": {
+  "value": 0.41255446655370787,
+  "runs": [
+   "pinn_re1000_gpu_s1_steps100k"
+  ],
+  "description": "S5 Re 1000 pinn: test-A rel. L2 u at step 20,000"
+ },
+ "s5_re1000_pinn_u_at_100k_mean": {
+  "value": 0.3895893005718105,
+  "runs": [
+   "pinn_re1000_gpu_s1_steps100k"
+  ],
+  "description": "S5 Re 1000 pinn: test-A rel. L2 u at step 100,000"
+ },
+ "s5_re1000_pinn_n_runs": {
+  "value": 1,
+  "runs": [
+   "pinn_re1000_gpu_s1_steps100k"
+  ],
+  "description": "S5 Re 1000 pinn: completed 100k-step runs"
+ },
  "spike_re100_dnn_final_n": {
   "value": 0,
   "runs": [
