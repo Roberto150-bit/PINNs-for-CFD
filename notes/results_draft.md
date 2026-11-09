@@ -4,7 +4,7 @@ Draft of the Results chapter. The method is described in `notes/methodology_draf
 
 **Conventions.** Errors are relative $L_2$ errors against the $64 \times 64$ finite-difference (FD) reference at the final training step. Test A is the held-out 15% of the space-time points, test B the ten held-out snapshots. Tables show the mean over seeds with the sample standard deviation in brackets and list the seeds used; every number comes from the file named under the table. Tables are generated from those files, not typed.
 
-**Still changing.** Further 100,000-step runs (hybrid at $Re = 400$, seeds 2–3; PINN at $Re = 1000$, seeds 2–3; hybrid at $Re = 1000$, seed 1) are being trained. Every number marked **[3 seeds; 5 pending]** or **[pending]** will change when they are scored; the others are final.
+**Still changing.** Further 100,000-step runs (PINN at $Re = 1000$, seeds 2–3; hybrid at $Re = 1000$, seed 1) are being trained. Every number marked **[3 seeds; 5 pending]** or **[pending]** will change when they are scored; the others are final.
 
 ## 4.1 Reference solution
 
@@ -98,7 +98,7 @@ The residuals by automatic differentiation are averages over random points, and 
 | 400 | Hybrid | 20,000 steps | 1,2,3,4,5 | 0.075 (0.070) | 0.033 (0.0065) | 0.027 (0.0067) | 0.025 (0.006) |
 | 400 | Control | control | 1,2,3 | 0.326 (0.054) | 0.286 (0.048) | 0.207 (0.031) | 0.149 (0.020) |
 | 400 | PINN | 100,000 steps (S5) | 1,2,3 | 1.55 (0.311) | 0.105 (0.086) | 0.0083 (5.2e-04) | 0.0056 (6.0e-04) |
-| 400 | Hybrid | 100,000 steps (S5) | 1 | 0.613 | 0.100 | 0.020 | 0.015 |
+| 400 | Hybrid | 100,000 steps (S5) | 1,2,3 | 0.703 (0.279) | 0.080 (0.032) | 0.019 (8.6e-04) | 0.015 (0.0012) |
 | 400 | PINN | warm start (S6) | 1,2,3,4,5 | 1.32 (0.178) | 0.042 (0.018) | 0.010 (0.0017) | 0.0086 (0.0015) |
 | 1000 | Data NN | 20,000 steps | 1,2,3,4,5 | 0.338 (0.024) | 0.244 (0.017) | 0.161 (0.013) | 0.115 (0.019) |
 | 1000 | PINN | 20,000 steps | 1,2,3,4,5 | 0.012 (0.0016) | 0.011 (0.0018) | 0.010 (0.0019) | 0.0097 (0.002) |
@@ -266,15 +266,15 @@ Sources: `experiments/results/causal_re400.csv`, `experiment_results_re400.csv`.
 
 **Figure.** `analysis_s4_causal.png`.
 
-**S5: training five times longer.** At $Re = 400$ the PINN's error falls in every seed but stays far above the data NN's; at $Re = 100$ the PINN barely changes and at $Re = 1000$ (one seed) it does not recover. Measured over all evaluation points, the long-trained networks violate continuity much more than after 20,000 steps. Nearly all of that comes from the two lid corners, where the wall velocity is discontinuous and the exact solution is singular: without the points within 0.05 of a lid corner, the long-trained PINNs satisfy continuity better than the 20,000-step PINNs at $Re = 400$ and as well at $Re = 1000$ (table in Section 4.3).
+**S5: training five times longer.** At $Re = 400$ the PINN's error falls in every seed but stays far above the data NN's; at $Re = 100$ the PINN barely changes and at $Re = 1000$ (one seed) it does not recover. Measured over all evaluation points, the long-trained networks violate continuity much more than after 20,000 steps. Nearly all of that comes from the two lid corners, where the wall velocity is discontinuous and the exact solution is singular: without the points within 0.05 of a lid corner, the long-trained PINNs satisfy continuity better than the 20,000-step PINNs at $Re = 400$ and as well at $Re = 1000$ (table in Section 4.3). The hybrid at $Re = 400$ (three seeds) gains less: $u$ falls from 0.065 to 0.046, by a factor 0.57 and 0.61 in seeds 1 and 3 and not at all in seed 2 (1.01); away from the lid corners ($r \ge 0.05$) its continuity residual falls from 0.026 to 0.019, still about twice the long-trained PINN's (0.0083).
 
 <!-- table:s5 -->
 | $Re$ | Network | Runs | Seeds | Test A $u$ | Test A $v$ | Test A $p$ | Continuity | $u$ ratio per seed (new / old) |
 |---|---|---|---|---|---|---|---|---|
 | 400 | PINN | 20,000 steps, same seeds | 1,2,3 | 0.349 (0.022) | 0.883 (0.098) | 0.859 (0.114) | 0.038 (0.023) |  |
 | 400 | PINN | 100,000 steps | 1,2,3 | 0.141 (0.013) | 0.242 (0.034) | 0.797 (0.444) | 1.55 (0.311) | 0.42, 0.34, 0.45 |
-| 400 | Hybrid | 20,000 steps, same seeds | 1 | 0.076 | 0.082 | 0.250 | 0.038 |  |
-| 400 | Hybrid | 100,000 steps | 1 | 0.044 | 0.049 | 0.203 | 0.613 | 0.57 |
+| 400 | Hybrid | 20,000 steps, same seeds | 1,2,3 | 0.065 (0.011) | 0.074 (0.0071) | 0.231 (0.017) | 0.041 (0.0043) |  |
+| 400 | Hybrid | 100,000 steps | 1,2,3 | 0.046 (0.008) | 0.045 (0.0044) | 0.203 (0.0027) | 0.703 (0.279) | 0.57, 1.01, 0.61 |
 | 1000 | PINN | 20,000 steps, same seeds | 1 | 0.413 | 0.993 | 1.05 | 0.010 |  |
 | 1000 | PINN | 100,000 steps | 1 | 0.390 | 0.942 | 1.03 | 0.821 | 0.94 |
 
@@ -285,13 +285,13 @@ Scored at the final step (100,000) at 50,000 fresh points. Sources: `experiments
 | 100, Data NN | 3 | 0.017 | 0.014 | 0.011 |
 | 100, PINN | 3 | 0.084 | 0.064 | 0.082 |
 | 400, PINN | 3 | 0.349 | 0.212 | 0.141 |
-| 400, Hybrid | 1 | 0.076 | 0.053 | 0.044 |
+| 400, Hybrid | 3 | 0.065 | 0.047 | 0.046 |
 | 1000, PINN | 1 | 0.413 | 0.386 | 0.390 |
 
 Test-A $u$ from the runs' evaluation log (mean over runs). Source: `experiments/results/poster_numbers.json`.
 <!-- /table:s5 -->
 
-$Re = 400$ hybrid and $Re = 1000$ PINN: **[1 seed; 3 pending]**; $Re = 1000$ hybrid: **[pending]**. The 100,000-step runs at $Re = 100$ have no physics evaluation yet.
+$Re = 1000$ PINN: **[1 seed; 3 pending]**; $Re = 1000$ hybrid: **[pending]**. The 100,000-step runs at $Re = 100$ have no physics evaluation yet.
 
 **S6: starting from a trained PINN at a neighbouring Reynolds number.** At $Re = 400$ every seed started from the $Re = 100$ PINN ends at less than half the error of the random start. At $Re = 1000$, started from those $Re = 400$ runs, two of three seeds improve and one does not change. At $Re = 10$ there is no clear effect. The warm-start runs show the same lid-corner rise in the all-points residual as S5.
 
