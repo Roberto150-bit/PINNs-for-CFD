@@ -21,13 +21,17 @@ Figures
     s6_continuation     PINN at Re 400 started from random weights or from the Re 100 PINN
     s6_continuation_re1000   the same at Re 1000, started from the S6 Re 400 PINN
     three_methods       test-A error vs step for data NN, PINN and hybrid (Re 100 and 400)
+    three_methods_re10_re1000   the same at Re 10 and 1000
     spikes              spike count per run (table: analysis_spikes.csv, no figure)
     hybrid_control      data NN vs data-only control vs hybrid, same seeds (Re 100 and 400)
+    corner_excluded     PDE residual RMS without the lid-corner neighbourhoods (table:
+                        analysis_corner_excluded.csv, no figure; CPU, about 2 minutes)
 The hybrid (data + physics loss) is drawn wherever its runs exist.
 Also writes experiments/results/reynolds_trend.csv.
 """
 import argparse
 import csv
+import glob
 import json
 import os
 import sys
@@ -579,7 +583,7 @@ def fig_continuation(re=400.0, seeds=TREND_SEEDS):
     save(fig, "s6_continuation" if re == 400.0 else f"s6_continuation_re{re:g}", values)
 
 
-def fig_three_methods(res=(100.0, 400.0), seeds=(1, 2, 3, 4, 5)):
+def fig_three_methods(res=(100.0, 400.0), seeds=(1, 2, 3, 4, 5), name="three_methods"):
     """Test-A relative L2 of u vs step for the three networks: mean over all
     seeds that exist (line) and min-max over seeds (band)."""
     fig, axes = plt.subplots(len(res), 1, figsize=(WIDTH, 4.2 * len(res)), sharex=True, sharey=True,
@@ -609,7 +613,7 @@ def fig_three_methods(res=(100.0, 400.0), seeds=(1, 2, 3, 4, 5)):
         matplotlib.ticker.FuncFormatter(lambda v, _: f"{v / 1000:g}k"))
     handles, labels = legend_entries(axes)
     fig.legend(handles, labels, loc="outside lower center", ncols=len(handles), frameon=False)
-    save(fig, "three_methods", values)
+    save(fig, name, values)
 
 
 SPIKE_FACTOR = 2.0   # fixed 2026-11-09 00:36, before any hybrid result
@@ -723,6 +727,80 @@ def fig_hybrid_control(res=(100.0, 400.0), seeds=TREND_SEEDS):
     save(fig, "hybrid_control", values)
 
 
+CORNER_RADII = (0.0, 0.02, 0.05, 0.1)   # fixed 2026-11-09 10:16, after the S5/S6 residuals were seen
+CORNER_GROUPS = ("", "extended", "continuation", "control", "sensitivity")
+
+
+def table_corner_excluded():
+    """PDE residual RMS of every scored network run at the evaluator's 50,000
+    points (same points, same seed as evaluate_all.py), also with the points
+    within r of either lid corner (0, 1), (1, 1) left out.
+
+    Added after seeing that long-trained runs (S5, S6) have large residuals at
+    the evaluation points: the rise is concentrated at the two lid corners,
+    where the wall velocity jumps from 1 to 0 and the exact solution is
+    singular. Post-hoc; the evaluator's value (r = 0, all points) stays the
+    primary result and is reproduced here as a check."""
+    from models.common.network import configure_tensorflow
+    tf = configure_tensorflow("cpu", 0, deterministic=False)
+    tf.config.threading.set_intra_op_parallelism_threads(4)    # light: GPU runs may be training
+    tf.config.threading.set_inter_op_parallelism_threads(1)
+    sys.path.insert(0, os.path.join(REPO_ROOT, "experiments", "analysis"))
+    import evaluate_all as E
+    from models.common.residuals import navier_stokes_residuals
+    rng = np.random.default_rng(E.PHYSICS_SEED)
+    pts = rng.uniform([C.X_MIN, C.Y_MIN, C.T_MIN], [C.X_MAX, C.Y_MAX, C.T_MAX],
+                      size=(E.PHYSICS_POINTS, 3)).astype("float32")
+    r_corner = np.minimum(np.hypot(pts[:, 0], 1 - pts[:, 1]), np.hypot(1 - pts[:, 0], 1 - pts[:, 1]))
+    keep = {r: r_corner >= r for r in CORNER_RADII}
+    rows = []
+    for re in TREND_RE:
+        for group in CORNER_GROUPS:
+            for method in NETWORKS:
+                base = os.path.join(C.experiment_dir(re), group, method)
+                for d in sorted(glob.glob(os.path.join(base, f"{SHORT[method]}_re{re:g}_gpu_s*"))):
+                    if not (scored(d) and os.path.isfile(os.path.join(d, "model.keras"))):
+                        continue
+                    fields = E.load_network_fields(d)
+                    nu = C.kinematic_viscosity(re)
+                    res = []
+                    for i in range(0, len(pts), 10000):
+                        x, y, t = (tf.constant(pts[i:i + 10000, k:k + 1]) for k in range(3))
+                        res.append(np.concatenate([q.numpy() for q in navier_stokes_residuals(fields, x, y, t, nu)],
+                                                  axis=1))
+                    R = np.concatenate(res)
+                    with open(os.path.join(d, "metrics.json")) as f:
+                        primary = json.load(f)["physical_consistency"]["continuity_residual"]
+                    row = {"reynolds_number": re, "group": group or "main", "method": method, "run_id": rid(d),
+                           "continuity_residual_metrics_json": primary}
+                    for r in CORNER_RADII:
+                        for j, name in enumerate(("continuity", "x_momentum", "y_momentum")):
+                            row[f"{name}_r{r:g}"] = float(np.sqrt(np.mean(R[keep[r], j] ** 2)))
+                    if abs(row["continuity_r0"] - primary) > 1e-3 * primary:
+                        raise RuntimeError(f"{rid(d)}: all-points value {row['continuity_r0']} != metrics.json {primary}")
+                    rows.append(row)
+    summary = {"definition": "RMS of the autodiff residuals at the evaluate_all points (seed "
+                             f"{E.PHYSICS_SEED}, {E.PHYSICS_POINTS} points) with r = distance to the nearer lid "
+                             "corner; r0 = all points (equals metrics.json)",
+               "added": "2026-11-09, post-hoc, after the S5/S6 residuals were seen",
+               "points_kept": {f"r{r:g}": int(keep[r].sum()) for r in CORNER_RADII}}
+    groups = {}
+    for row in rows:
+        groups.setdefault(f"re{row['reynolds_number']:g}_{row['group']}_{row['method']}", []).append(row)
+    for k, rs in groups.items():
+        summary[k] = {"runs": [r["run_id"] for r in rs],
+                      **{f"continuity_r{r:g}_mean": float(np.mean([x[f"continuity_r{r:g}"] for x in rs]))
+                         for r in CORNER_RADII}}
+    os.makedirs(OUT, exist_ok=True)
+    with open(os.path.join(OUT, "analysis_corner_excluded.csv"), "w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=list(rows[0]))
+        w.writeheader()
+        w.writerows(rows)
+    with open(os.path.join(OUT, "analysis_corner_excluded.values.json"), "w") as f:
+        json.dump(summary, f, indent=1)
+    print(f"wrote {OUT}/analysis_corner_excluded.csv ({len(rows)} runs)")
+
+
 FIGURES = {
     "loss_components": fig_loss_components,
     "generalization": fig_generalization,
@@ -733,9 +811,10 @@ FIGURES = {
     "reynolds_trend": fig_reynolds_trend,
     "causal": fig_causal,
     "continuation": lambda: [fig_continuation(re) for re in CONTINUATION_FROM],
-    "three_methods": fig_three_methods,
+    "three_methods": lambda: [fig_three_methods(), fig_three_methods((10.0, 1000.0), name="three_methods_re10_re1000")],
     "spikes": table_spikes,
     "hybrid_control": fig_hybrid_control,
+    "corner_excluded": table_corner_excluded,
 }
 
 
