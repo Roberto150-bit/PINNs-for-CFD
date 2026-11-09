@@ -1,0 +1,98 @@
+{
+  "run_id": "hybrid_re1000_gpu_s3_dataonly",
+  "method": "hybrid",
+  "reynolds_number": 1000.0,
+  "seed": 3,
+  "device": "gpu",
+  "tf_version": "2.22.0-rc0",
+  "python_version": "3.14.4",
+  "deterministic_ops": true,
+  "created": "2026-11-09T11:54:28",
+  "model": {
+    "hidden_layers": 5,
+    "neurons_per_layer": 64,
+    "activation": "tanh",
+    "initializer": "glorot_uniform",
+    "output_size": 3,
+    "trainable_parameters": 17091
+  },
+  "training": {
+    "steps": 20000,
+    "learning_rate": 0.001,
+    "optimizer": "adam",
+    "batch": "data: 4096 FD points per step (shuffled per epoch); physics: full point set",
+    "batches_per_epoch": 28,
+    "timing_run": false
+  },
+  "data": {
+    "fd_data_in_loss": true,
+    "input_variables": [
+      "x",
+      "y",
+      "t"
+    ],
+    "target_variables": [
+      "u",
+      "v",
+      "p"
+    ],
+    "training_samples": 117555,
+    "validation_samples": 25190,
+    "dataset": "experiments/data/dataset_re1000_n64.npz",
+    "input_scaling": "[-1, 1]",
+    "target_mean": [
+      0.00944900153007788,
+      0.000591233011423749,
+      -0.0017326046672915436
+    ],
+    "target_std": [
+      0.16214081069735092,
+      0.07825046228126102,
+      0.025480511608490214
+    ],
+    "data_loss": "mean of per-output MSE, each output divided by its train-split std",
+    "network_output": "physical u, v, p (no output standardization)"
+  },
+  "physics": {
+    "equations": [
+      "continuity",
+      "x_momentum",
+      "y_momentum"
+    ],
+    "nu": 0.001,
+    "rho": 1.0,
+    "collocation_points": 20000,
+    "initial_points": 4096,
+    "boundary_points_per_wall": 1000,
+    "lid_velocity": "tanh(10 t)",
+    "corners_excluded": true,
+    "time_window": [
+      0.0,
+      5.0
+    ],
+    "sampling_seed": 0
+  },
+  "loss": {
+    "data_weight": 1.0,
+    "ic_weight": 0.0,
+    "bc_weight": 0.0,
+    "c_weight": 0.0,
+    "m_weight": 0.0,
+    "weights_start": {
+      "data": 1.0,
+      "ic": 1.0,
+      "bc": 1.0,
+      "c": 1.0,
+      "m": 1.0
+    },
+    "adjustment": null
+  },
+  "control_data_only": true,
+  "initial_weights": "random (Glorot uniform)",
+  "reproducibility": {
+    "random_seed": 3,
+    "split_seed": 0
+  },
+  "timing_valid": true,
+  "timing_note": null
+}
