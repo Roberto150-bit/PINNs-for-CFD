@@ -1,0 +1,12 @@
+# Store text files with LF line endings in the repository, whatever the OS that
+# commits them; Windows and Linux checkouts then agree on what changed.
+* text=auto
+# Binary outputs: never convert
+*.npz binary
+*.npy binary
+*.keras binary
+*.h5 binary
+*.png binary
+*.pdf binary
+*.pptx binary
+*.potx binary
