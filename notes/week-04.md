@@ -177,14 +177,27 @@ so that later times count only once earlier times are fitted. $\varepsilon$ is r
 
 It made no difference. The error-vs-time curves of the two versions lie on top of each other (`analysis_s4_causal.png`), and the causal runs end at the same wrong flow, with the vortex 12 to 14 grid spacings from the FD center. The logged weights show why: $\varepsilon$ reached 1 within 50 steps and never went further, because from step 100 on the smallest weight stayed between 0.82 and 0.987, never above 0.99. So the 32 chunks were weighted almost equally for the whole run, and the method reduced to the ordinary loss. Our PDE losses are small (about $10^{-3}$ per chunk), so the published schedule gives weights close to 1. Its schedule was used as published, without tuning.
 
-### Decisions this week:
-36. The G8 overfitting check was relaxed after it failed: the loss must fall at least 100 times in 5,000 steps with $u$ and $v$ MSE below $10^{-3}$, instead of reaching $10^{-4}$. The pressure field's lid-corner spikes keep the pressure term from going lower.
+### Starting the $Re = 400$ PINN from the $Re = 100$ PINN (S6, 3 seeds):
+36. Instead of random weights, each $Re = 400$ PINN starts from the trained $Re = 100$ PINN of the same seed (option `--init-from`; the optimizer starts fresh). Everything else is as in the main runs: 20,000 steps, the same points, loss weights and rebalancing rule (no rebalancing was triggered: ratios 30.7, 48.0 and 72.1). Scoring was fixed before the runs: final step, test A, compared with the standard run of the same seed (`experiments/results/continuation_re400.csv`):
 
-37. Results are always taken at the final step of the fixed protocol, also when a run ends on a spike. Numbers are not changed after seeing results; if a run looks under-trained, the remedy is a separate study with more training (S5, 100,000 steps), not a change to the existing runs.
+| Seed | $u$ standard / S6 | $v$ standard / S6 | $p$ standard / S6 | Vortex distance from FD standard / S6 |
+|---|---|---|---|---|
+| 1 | 0.357 / 0.163 | 0.945 / 0.306 | 0.917 / 0.405 | 12.9 / 4.8 $\Delta x$ |
+| 2 | 0.366 / 0.148 | 0.933 / 0.261 | 0.933 / 0.457 | 11.4 / 4.3 $\Delta x$ |
+| 3 | 0.324 / 0.148 | 0.769 / 0.316 | 0.728 / 0.412 | 11.1 / 4.6 $\Delta x$ |
+
+Every seed improves, by much more than the spread between seeds: the mean error drops from 0.349 to 0.153 for $u$, 0.883 to 0.294 for $v$ and 0.859 to 0.425 for $p$, and the vortex strength goes from $\psi_{min} = -0.027$ to $-0.067$ (FD $-0.085$). The started-from-$Re = 100$ runs are below the standard runs at every checkpoint (`analysis_s6_continuation.png`); at the first checkpoint, after one step at $Re = 400$, they score 0.54 against 1.19. In total they were trained for 40,000 steps (20,000 at each $Re$); one PINN trained for 100,000 steps from random weights at $Re = 400$ (S5, seed 1) reaches a similar $u$ and $v$ (0.150, 0.267) but a higher $p$ error (0.759). The flow is still not the FD flow: the vortex is 4.6 grid spacings off and about 20% too weak, and the data NN is at 0.023.
+
+The same step was then taken once more, from $Re = 400$ to $Re = 1000$: two PINNs (seeds 1 and 2; a third did not fit in the time available) started from the $Re = 400$ runs above and trained 20,000 steps at $Re = 1000$ (`experiments/results/continuation_re1000.csv`, `analysis_s6_continuation_re1000.png`). The result is mixed. Seed 2 ends at $u$ 0.277 and $v$ 0.548 against 0.413 and 0.981 from random weights, with a vortex inside the cavity 6.8 grid spacings from FD instead of on the wall 25 spacings away, but its $p$ error is higher (1.08 against 0.99). Seed 1 held a $u$ error of about 0.27 for 11,500 steps, then a jump in the boundary loss threw it back to the same wrong flow as the random start ($u$ 0.412). Under the fixed protocol (final step) this does not show a reliable improvement at $Re = 1000$. Both runs did reach a $u$ error near 0.27 during training, so the network can get closer to the flow there; one of the two did not stay there.
+
+### Decisions this week:
+37. The G8 overfitting check was relaxed after it failed: the loss must fall at least 100 times in 5,000 steps with $u$ and $v$ MSE below $10^{-3}$, instead of reaching $10^{-4}$. The pressure field's lid-corner spikes keep the pressure term from going lower.
+
+38. Results are always taken at the final step of the fixed protocol, also when a run ends on a spike. Numbers are not changed after seeing results; if a run looks under-trained, the remedy is a separate study with more training (S5, 100,000 steps), not a change to the existing runs.
 
 ### Open problems and next steps:
-38. The PINN failure at $Re \ge 400$ is the main open problem, and causal weighting as published did not fix it. The next things to try are, each as a separate study with the main runs left unchanged: starting from the $Re = 100$ solution and raising $Re$ step by step, placing more collocation points near the lid, where the error is largest, and a causal schedule with larger $\varepsilon$ suited to our loss scale.
+39. The PINN failure at $Re \ge 400$ is the main open problem, and causal weighting as published did not fix it. Starting from the $Re = 100$ PINN (S6, 3 seeds) and training five times longer (S5, one seed at $Re = 400$) both bring the $u$ error down to about 0.15. This points to an optimization problem rather than a limit of the method: from random weights, 20,000 steps end in a wrong flow. Next, each as a separate study with the main runs left unchanged: raising $Re$ in several steps (100, 200, 400, then 1000), placing more collocation points near the lid, where the error is largest, and a causal schedule with larger $\varepsilon$ suited to our loss scale.
 
-39. The PINN at $Re = 10$ is limited by the boundary loss. A study with a larger $\lambda_{bc}$ would show whether that is the cause, without touching the existing runs.
+40. The PINN at $Re = 10$ is limited by the boundary loss. A study with a larger $\lambda_{bc}$ would show whether that is the cause, without touching the existing runs.
 
-40. At $Re = 1000$ the data NN learns from a $127 \times 127$ solve, so a cost comparison there has to count that solve, not the $64 \times 64$ one. The trend runs shared the GPU, so their times are not valid. To compare cost across $Re$, the trend runs need to be timed again on a free GPU.
+41. At $Re = 1000$ the data NN learns from a $127 \times 127$ solve, so a cost comparison there has to count that solve, not the $64 \times 64$ one. The trend runs shared the GPU, so their times are not valid. To compare cost across $Re$, the trend runs need to be timed again on a free GPU.
