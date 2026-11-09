@@ -14,6 +14,7 @@ already holds a performance.json, so the batch can be restarted safely.
     python experiments/run_batch.py --causal           (study S4: causal weighting, PINN Re 400)
     python experiments/run_batch.py --continuation     (study S6: PINN Re 400 started from Re 100)
     python experiments/run_batch.py --continuation 1000  (S6 extension: Re 1000 started from S6 Re 400)
+    python experiments/run_batch.py --continuation 10    (S6 extension: Re 10 started from Re 100)
 """
 import argparse
 import os
@@ -200,14 +201,27 @@ def continuation_jobs(target=400.0):
     seeds 1-2. Everything else as in the main runs. Shares the GPU with
     another job, so timings are flagged as not valid."""
     if target == 1000.0:
+        # Seeds 1-2 ran on a shared GPU; seed 3 was added later (GPU not shared).
         EXP = f"{C.experiment_dir(1000.0)}/continuation"
         out = []
-        for s in (1, 2):
+        for s in (1, 2, 3):
             rid = f"pinn_re1000_gpu_s{s}_from_re400"
             init = f"{C.experiment_dir(400.0)}/continuation/pinn/pinn_re400_gpu_s{s}_from_re100/model.keras"
             out.append((f"{EXP}/pinn/{rid}",
                         [PY, "models/pinn/src/train.py", "--device", "gpu", "--seed", str(s), "--re", "1000",
-                         "--init-from", init, "--shared-gpu", "--run-id", rid, "--exp-dir", EXP]))
+                         "--init-from", init, "--run-id", rid, "--exp-dir", EXP]
+                        + (["--shared-gpu"] if s < 3 else [])))
+        return out
+    if target == 10.0:
+        # S6 at a slower flow: PINN at Re 10 started from the final Re 100 PINN of the same seed.
+        EXP = f"{C.experiment_dir(10.0)}/continuation"
+        out = []
+        for s in (1, 2, 3):
+            rid = f"pinn_re10_gpu_s{s}_from_re100"
+            init = f"{C.experiment_dir(100.0)}/pinn/pinn_re100_gpu_s{s}/model.keras"
+            out.append((f"{EXP}/pinn/{rid}",
+                        [PY, "models/pinn/src/train.py", "--device", "gpu", "--seed", str(s), "--re", "10",
+                         "--init-from", init, "--run-id", rid, "--exp-dir", EXP]))
         return out
     EXP = f"{C.experiment_dir(400.0)}/continuation"
     out = []

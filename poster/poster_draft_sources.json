@@ -240,6 +240,17 @@
    "3"
   ]
  },
+ "s5_re400_pinn_u_at_40k_mean": {
+  "value": 0.22357999478557247,
+  "description": "S5 Re 400 pinn: test-A rel. L2 u at step 40,000",
+  "runs": [
+   "pinn_re400_gpu_s1_steps100k",
+   "pinn_re400_gpu_s2_steps100k"
+  ],
+  "printed_as": [
+   "22%"
+  ]
+ },
  "pinn_gpu_total_cost_to_field_seconds": {
   "value": 781.9692135369447,
   "description": "pinn gpu: total cost to a usable field",

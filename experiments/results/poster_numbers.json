@@ -1886,6 +1886,15 @@
   ],
   "description": "Re 400 pinn GPU runs: max continuity_residual"
  },
+ "s5_re100_dnn_u_at_40k_mean": {
+  "value": 0.014464156822246645,
+  "runs": [
+   "dnn_re100_gpu_s1_steps100k",
+   "dnn_re100_gpu_s2_steps100k",
+   "dnn_re100_gpu_s3_steps100k"
+  ],
+  "description": "S5 Re 100 data_driven_nn: test-A rel. L2 u at step 40,000"
+ },
  "s5_re100_dnn_u_at_20k_mean": {
   "value": 0.016989216802286503,
   "runs": [
@@ -1913,6 +1922,15 @@
   ],
   "description": "S5 Re 100 data_driven_nn: completed 100k-step runs"
  },
+ "s5_re100_pinn_u_at_40k_mean": {
+  "value": 0.06425585240143071,
+  "runs": [
+   "pinn_re100_gpu_s1_steps100k",
+   "pinn_re100_gpu_s2_steps100k",
+   "pinn_re100_gpu_s3_steps100k"
+  ],
+  "description": "S5 Re 100 pinn: test-A rel. L2 u at step 40,000"
+ },
  "s5_re100_pinn_u_at_20k_mean": {
   "value": 0.08405453355615582,
   "runs": [
@@ -1939,6 +1957,14 @@
    "pinn_re100_gpu_s3_steps100k"
   ],
   "description": "S5 Re 100 pinn: completed 100k-step runs"
+ },
+ "s5_re400_pinn_u_at_40k_mean": {
+  "value": 0.22357999478557247,
+  "runs": [
+   "pinn_re400_gpu_s1_steps100k",
+   "pinn_re400_gpu_s2_steps100k"
+  ],
+  "description": "S5 Re 400 pinn: test-A rel. L2 u at step 40,000"
  },
  "s5_re400_pinn_u_at_20k_mean": {
   "value": 0.3612308447849198,

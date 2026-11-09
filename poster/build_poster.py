@@ -271,7 +271,8 @@ def column_rq3(slide):
                                 f"with 100,000 steps ({num('s5_re400_pinn_n_runs', '{:.0f}')} seeds), and from "
                                 f"{pct('s6_re400_base_u_mean')} to {pct('s6_re400_warm_u_mean')} in 20,000 steps "
                                 "when it starts from the trained Re = 100 PINN "
-                                f"({num('s6_re400_n_runs', '{:.0f}')} seeds)."])
+                                f"({num('s6_re400_n_runs', '{:.0f}')} seeds); after the same 40,000 steps "
+                                f"a random start is at {pct('s5_re400_pinn_u_at_40k_mean')}."])
 
 
 def column_answer(slide):

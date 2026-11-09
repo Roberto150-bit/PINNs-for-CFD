@@ -328,7 +328,7 @@ def extended_numbers():
     out = {}
     for re, folder in ((100.0, "experiment_001_re100"), (400.0, "experiment_002_re400")):
         for m, short in (("data_driven_nn", "dnn"), ("pinn", "pinn")):
-            at20, atend, ids = [], [], []
+            at20, at40, atend, ids = [], [], [], []
             for run in sorted(glob.glob(f"experiments/{folder}/extended/{m}/*_steps100k")):
                 if not os.path.exists(os.path.join(run, "performance.json")):
                     continue
@@ -339,9 +339,14 @@ def extended_numbers():
                     continue
                 at20.append(by_step[20000])
                 atend.append(by_step[max(by_step)])
+                at40.append(by_step.get(40000))
                 ids.append(os.path.basename(run))
             if ids:
                 tag = f"s5_re{re:g}_{short}"
+                if all(v is not None for v in at40):
+                    # equal-cost reference for the S6 warm start (20k + 20k = 40,000 steps in total)
+                    out[f"{tag}_u_at_40k_mean"] = {"value": statistics.mean(at40), "runs": ids,
+                                                   "description": f"S5 Re {re:g} {m}: test-A rel. L2 u at step 40,000"}
                 out[f"{tag}_u_at_20k_mean"] = {"value": statistics.mean(at20), "runs": ids,
                                                "description": f"S5 Re {re:g} {m}: test-A rel. L2 u at step 20,000"}
                 out[f"{tag}_u_at_100k_mean"] = {"value": statistics.mean(atend), "runs": ids,
