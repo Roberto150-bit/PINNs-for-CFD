@@ -38,8 +38,9 @@ DPI = 300
 WIDTH = 7.5            # inches: one poster column
 
 # One fixed color per method on every figure
-COLORS = {"finite_difference": "#2a78d6", "data_driven_nn": "#eb6834", "pinn": "#1baf7a"}
-LABELS = {"finite_difference": "FD", "data_driven_nn": "Data NN", "pinn": "PINN"}
+COLORS = {"finite_difference": "#2a78d6", "data_driven_nn": "#eb6834", "pinn": "#1baf7a", "hybrid": "#7b52c7"}
+NETS = ("data_driven_nn", "pinn", "hybrid")   # network methods, in plotting order
+LABELS = {"finite_difference": "FD", "data_driven_nn": "Data NN", "pinn": "PINN", "hybrid": "Hybrid"}
 GRID_SHADES = {32: "#86b6ef", 64: "#2a78d6", 128: "#104281"}   # one-hue ramp for grid levels
 INK, INK2, GRIDLINE = "#0b0b0b", "#52514e", "#d9d8d4"
 DIVERGING = LinearSegmentedColormap.from_list("blue_gray_red", ["#184f95", "#f0efec", "#b42b2a"])
@@ -447,7 +448,7 @@ def fig_v2_physics(data):
     plain_log_axis(ax.yaxis, subs=(1.0,))
     ax.set_ylabel("Violation")
     ax.grid(axis="x", visible=False)
-    fig.legend(*ax.get_legend_handles_labels(), frameon=False, loc="outside lower center", ncols=2)
+    fig.legend(*ax.get_legend_handles_labels(), frameon=False, loc="outside lower center", ncols=len(methods))
     return fig, plotted
 
 
@@ -611,8 +612,8 @@ def rq3_data():
     for re, path in sorted(tables.items()):
         with open(path) as f:
             rows = [r for r in csv.DictReader(f) if r["device"] == "gpu" and r["timing_run"] == "False"
-                    and r["status"] == "evaluated" and r["method"] in ("data_driven_nn", "pinn")]
-        for m in ("data_driven_nn", "pinn"):
+                    and r["status"] == "evaluated" and r["method"] in NETS]
+        for m in NETS:
             sel = sorted(rows, key=lambda r: r["run_id"])
             sel = [r for r in sel if r["method"] == m and r["test_a_relative_l2_u"] not in ("", "None")]
             if sel:
@@ -689,24 +690,25 @@ def callout(ax, text, xy, xytext, color=INK):
 def fig_v4_accuracy(data):
     """Finding 1: test-A error of u, v, p (%); callout = ratio of the u errors."""
     fig, ax = plt.subplots(figsize=(WIDTH, 5.6), constrained_layout=True)
-    width = 0.38
+    methods = [m for m in NETS if m in data]
+    width = 0.76 / len(methods)
     plotted = {}
-    for i, m in enumerate(("data_driven_nn", "pinn")):
+    for i, m in enumerate(methods):
         means = [100 * data[m]["test_a"][k][0] for k in "uvp"]
         stds = [100 * data[m]["test_a"][k][1] for k in "uvp"]
-        xs = np.arange(3) + (i - 0.5) * width
+        xs = np.arange(3) + (i - (len(methods) - 1) / 2) * width
         bars = ax.bar(xs, means, width * 0.92, yerr=stds, color=COLORS[m], label=LABELS[m],
                       capsize=5, error_kw={"elinewidth": 2, "ecolor": INK})
         value_labels(ax, bars, lambda h: f"{h:.0f}%" if h >= 10 else f"{h:.1f}%", stds)
         plotted[m] = [float(b.get_height()) / 100 for b in bars]
     ratio = plotted["pinn"][0] / plotted["data_driven_nn"][0]
-    callout(ax, f"{ratio:.0f}× lower error in u\nfor the data NN", xy=(-0.5 * width, 100 * plotted["data_driven_nn"][0] * 0.5),
+    callout(ax, f"{ratio:.0f}× lower error in u\nfor the data NN", xy=(-(len(methods) - 1) / 2 * width, 100 * plotted["data_driven_nn"][0] * 0.5),
             xytext=(0.35, 0.80), color=COLORS["data_driven_nn"])
     ax.set_xticks(range(3), ["u", "v", "p"])
     ax.set_ylabel("Error (%)")
     ax.set_ylim(0, max(max(v) for v in plotted.values()) * 100 * 1.35)
     ax.grid(axis="x", visible=False)
-    fig.legend(*ax.get_legend_handles_labels(), frameon=False, loc="outside lower center", ncols=2)
+    fig.legend(*ax.get_legend_handles_labels(), frameon=False, loc="outside lower center", ncols=len(methods))
     plotted["ratio_u"] = ratio
     return fig, plotted
 
@@ -715,18 +717,19 @@ def fig_v4_physics(data):
     """Finding 2: RMS violation of mass and momentum conservation; callout = mass ratio."""
     fig, ax = plt.subplots(figsize=(WIDTH, 5.6), constrained_layout=True)
     names = ["continuity", "x_momentum", "y_momentum"]
-    width = 0.38
+    methods = [m for m in NETS if m in data]
+    width = 0.76 / len(methods)
     plotted = {}
-    for i, m in enumerate(("data_driven_nn", "pinn")):
+    for i, m in enumerate(methods):
         means = [data[m][n][0] for n in names]
         stds = [data[m][n][1] for n in names]
-        xs = np.arange(3) + (i - 0.5) * width
+        xs = np.arange(3) + (i - (len(methods) - 1) / 2) * width
         bars = ax.bar(xs, means, width * 0.92, yerr=stds, color=COLORS[m], label=LABELS[m], capsize=5,
                       error_kw={"elinewidth": 2, "ecolor": INK})
         value_labels(ax, bars, lambda h: f"{h:.2g}", stds)
         plotted[m] = [float(b.get_height()) for b in bars]
     ratio = plotted["data_driven_nn"][0] / plotted["pinn"][0]
-    callout(ax, f"{ratio:.0f}× less mass\nviolation for the PINN", xy=(0.5 * width, plotted["pinn"][0] * 1.6),
+    callout(ax, f"{ratio:.0f}× less mass\nviolation for the PINN", xy=((methods.index("pinn") - (len(methods) - 1) / 2) * width, plotted["pinn"][0] * 1.6),
             xytext=(0.30, 0.86), color=COLORS["pinn"])
     ax.set_xticks(range(3), ["Mass", "Momentum\n(x)", "Momentum\n(y)"])
     ax.set_yscale("log")
@@ -734,7 +737,7 @@ def fig_v4_physics(data):
     plain_log_axis(ax.yaxis, subs=(1.0,))
     ax.set_ylabel("Equation violation")
     ax.grid(axis="x", visible=False)
-    ax.legend(frameon=False, loc="upper right")
+    ax.legend(frameon=False, loc="upper right", ncols=1 if len(methods) < 3 else 3, fontsize=20)
     plotted["ratio_mass"] = ratio
     return fig, plotted
 
@@ -744,8 +747,10 @@ def fig_v4_trend(data):
     fig, ax = plt.subplots(figsize=(WIDTH, 5.4), constrained_layout=True)
     res = sorted(data)
     plotted = {}
-    offset = {"data_driven_nn": -0.08, "pinn": 0.08}
-    for m in ("data_driven_nn", "pinn"):
+    offset = {"data_driven_nn": -0.12, "pinn": 0.0, "hybrid": 0.12}
+    for m in NETS:
+        if not any(m in data[re] for re in res):
+            continue
         xs_mean, ys_mean = [], []
         for i, re in enumerate(res):
             if m not in data[re]:
@@ -759,7 +764,7 @@ def fig_v4_trend(data):
         ax.plot(xs_mean, ys_mean, "-", color=COLORS[m], linewidth=3, label=LABELS[m], zorder=2)
     if 400.0 in res and "pinn" in data[400.0]:
         i = res.index(400.0)
-        callout(ax, "PINN stuck: equations\nsatisfied, flow wrong", xy=(i + 0.08, 100 * min(data[400.0]["pinn"]["err"]) * 0.85),
+        callout(ax, "PINN stuck: equations\nsatisfied, flow wrong", xy=(i, 100 * min(data[400.0]["pinn"]["err"]) * 0.85),
                 xytext=(0.30, 0.86), color=COLORS["pinn"])
     ax.set_xticks(range(len(res)), [f"Re {re:g}" for re in res])
     ax.set_xlim(-0.5, len(res) - 0.5)
@@ -806,23 +811,38 @@ def fig_v4_cost(nums):
     fd = nums["fd_n64_solve_seconds_median"]["value"]
     dnn = nums["dnn_gpu_training_time_seconds_mean"]["value"]
     pinn = nums["pinn_gpu_training_time_seconds_mean"]["value"]
-    b_data = ax.barh([1], [fd], color=COLORS["finite_difference"], height=0.5, label="Making simulation data")
-    b_tr = ax.barh([1, 0], [dnn, pinn], left=[fd, 0], color=[COLORS["data_driven_nn"], COLORS["pinn"]],
-                   height=0.5)
-    for y, tot in ((1, fd + dnn), (0, pinn)):
+    hyb_entry = nums.get("hybrid_gpu_training_time_seconds_mean")
+    hyb = hyb_entry["value"] if hyb_entry and hyb_entry["value"] is not None else None
+    if hyb is not None:
+        # Hybrid row in the middle; like the data NN it also needs the simulation data
+        ys_data, labels = [2, 1], ["Data NN", "Hybrid", "PINN"]
+        b_data = ax.barh(ys_data, [fd, fd], color=COLORS["finite_difference"], height=0.5,
+                         label="Making simulation data")
+        b_tr = ax.barh([2, 1, 0], [dnn, hyb, pinn], left=[fd, fd, 0],
+                       color=[COLORS["data_driven_nn"], COLORS["hybrid"], COLORS["pinn"]], height=0.5)
+        totals = ((2, fd + dnn), (1, fd + hyb), (0, pinn))
+    else:
+        labels = ["Data NN", "PINN"]
+        b_data = ax.barh([1], [fd], color=COLORS["finite_difference"], height=0.5, label="Making simulation data")
+        b_tr = ax.barh([1, 0], [dnn, pinn], left=[fd, 0], color=[COLORS["data_driven_nn"], COLORS["pinn"]],
+                       height=0.5)
+        totals = ((1, fd + dnn), (0, pinn))
+    for y, tot in totals:
         ax.annotate(f"{tot:.0f} s", (tot, y), xytext=(8, 0), textcoords="offset points", va="center",
                     fontsize=24, color=INK)
     ratio = pinn / (fd + dnn)
     ax.annotate(f"PINN needs {ratio:.1f}× more GPU time", xy=(pinn * 0.6, 0.5), xycoords="data",
                 fontsize=22, color=COLORS["pinn"], ha="center", va="center",
                 bbox={"boxstyle": "round,pad=0.35", "fc": "white", "ec": COLORS["pinn"], "lw": 2})
-    ax.set_yticks([1, 0], ["Data NN", "PINN"])
-    ax.set_xlim(0, max(fd + dnn, pinn) * 1.22)
-    ax.set_ylim(-0.6, 1.6)
+    ax.set_yticks(list(range(len(labels)))[::-1], labels)
+    ax.set_xlim(0, max(t for _, t in totals) * 1.22)
+    ax.set_ylim(-0.6, len(labels) - 0.4)
     ax.set_xlabel("Seconds (making data + training)")
     ax.grid(axis="y", visible=False)
     plotted = {"time_fd_data": float(b_data[0].get_width()), "time_dnn_train": float(b_tr[0].get_width()),
-               "time_pinn_train": float(b_tr[1].get_width()), "ratio": ratio}
+               "time_pinn_train": float(b_tr[-1].get_width()), "ratio": ratio}
+    if hyb is not None:
+        plotted["time_hybrid_train"] = float(b_tr[1].get_width())
     return fig, plotted
 
 
@@ -833,7 +853,7 @@ def gpu_runs(rows, method):
 
 def accuracy_data(agg):
     out = {}
-    for m in ("data_driven_nn", "pinn"):
+    for m in NETS:
         g = group(agg, m)
         if g is None:
             continue
@@ -845,7 +865,7 @@ def accuracy_data(agg):
 
 def residual_data(agg):
     out = {}
-    for m in ("data_driven_nn", "pinn"):
+    for m in NETS:
         g = group(agg, m)
         if g is None:
             continue
@@ -1018,14 +1038,14 @@ def check_against_results(rows, agg):
             for key, w in plotted.items():
                 good &= close(w, nums[key]["value"])
         elif name == "v4_accuracy":
-            for m in ("data_driven_nn", "pinn"):
+            for m in [x for x in NETS if x in plotted]:
                 runs = [r for r in v["runs"] if by_id[r]["method"] == m]
                 for k, h in zip("uvp", plotted[m]):
                     good &= np.isclose(h, np.mean([float(by_id[r][f"test_a_relative_l2_{k}"]) for r in runs]),
                                        rtol=1e-9)
             good &= np.isclose(plotted["ratio_u"], plotted["pinn"][0] / plotted["data_driven_nn"][0])
         elif name == "v4_physics":
-            for m in ("data_driven_nn", "pinn"):
+            for m in [x for x in NETS if x in plotted]:
                 runs = [r for r in v["runs"] if by_id[r]["method"] == m]
                 for n, h in zip(("continuity", "x_momentum", "y_momentum"), plotted[m]):
                     good &= close(h, np.mean([float(by_id[r][f"{n}_residual"]) for r in runs]))
@@ -1042,6 +1062,8 @@ def check_against_results(rows, agg):
             pinn = nums["pinn_gpu_training_time_seconds_mean"]["value"]
             good &= close(plotted["time_fd_data"], fd) and close(plotted["time_dnn_train"], dnn)
             good &= close(plotted["time_pinn_train"], pinn) and close(plotted["ratio"], pinn / (fd + dnn))
+            if "time_hybrid_train" in plotted:
+                good &= close(plotted["time_hybrid_train"], nums["hybrid_gpu_training_time_seconds_mean"]["value"])
         elif name == "v3_rq1":
             for m, heights in plotted.items():
                 runs = [r for r in v["runs"] if by_id[r]["method"] == m]
@@ -1221,6 +1243,8 @@ def main():
         fig, p = fig_v4_cost(nums)
         keys = ("fd_n64_solve_seconds_median", "dnn_gpu_training_time_seconds_mean",
                 "pinn_gpu_training_time_seconds_mean")
+        if "time_hybrid_train" in p:
+            keys += ("hybrid_gpu_training_time_seconds_mean",)
         made.append(save(fig, "v4_cost", sorted({r for k in keys for r in nums[k]["runs"]}), p))
     if wanted("v4_re400"):
         exp4 = C.experiment_dir(400.0)

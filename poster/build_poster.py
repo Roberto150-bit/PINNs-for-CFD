@@ -305,7 +305,8 @@ def column_answer(slide):
         "deep learning framework for solving forward and inverse problems involving nonlinear partial "
         "differential equations. J. Comput. Phys. 378, 686–707.",
     ], size=SMALL_PT, space_after=4)
-    COLUMN_END[4] = block(slide, x, y + 0.1, ["Contact: CONTACT EMAIL"], size=BODY_PT)
+    COLUMN_END[4] = block(slide, x, y + 0.1, ["Contact: roberto.pollicino@quinnipiac.edu · Adviser: brian.oneil@quinnipiac.edu"],
+                          size=SMALL_PT)
 
 
 def build():

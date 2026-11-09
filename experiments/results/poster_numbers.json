@@ -835,6 +835,196 @@
   ],
   "description": "pinn GPU: std model_size_bytes"
  },
+ "hybrid_gpu_test_a_relative_l2_u_mean": {
+  "value": null,
+  "runs": [],
+  "description": "hybrid GPU runs: mean relative L2 of u on test_a"
+ },
+ "hybrid_gpu_test_a_relative_l2_u_std": {
+  "value": null,
+  "runs": [],
+  "description": "hybrid GPU runs: std over seeds"
+ },
+ "hybrid_gpu_test_a_relative_l2_v_mean": {
+  "value": null,
+  "runs": [],
+  "description": "hybrid GPU runs: mean relative L2 of v on test_a"
+ },
+ "hybrid_gpu_test_a_relative_l2_v_std": {
+  "value": null,
+  "runs": [],
+  "description": "hybrid GPU runs: std over seeds"
+ },
+ "hybrid_gpu_test_a_relative_l2_p_mean": {
+  "value": null,
+  "runs": [],
+  "description": "hybrid GPU runs: mean relative L2 of p on test_a"
+ },
+ "hybrid_gpu_test_a_relative_l2_p_std": {
+  "value": null,
+  "runs": [],
+  "description": "hybrid GPU runs: std over seeds"
+ },
+ "hybrid_gpu_test_b_relative_l2_u_mean": {
+  "value": null,
+  "runs": [],
+  "description": "hybrid GPU runs: mean relative L2 of u on test_b"
+ },
+ "hybrid_gpu_test_b_relative_l2_u_std": {
+  "value": null,
+  "runs": [],
+  "description": "hybrid GPU runs: std over seeds"
+ },
+ "hybrid_gpu_test_b_relative_l2_v_mean": {
+  "value": null,
+  "runs": [],
+  "description": "hybrid GPU runs: mean relative L2 of v on test_b"
+ },
+ "hybrid_gpu_test_b_relative_l2_v_std": {
+  "value": null,
+  "runs": [],
+  "description": "hybrid GPU runs: std over seeds"
+ },
+ "hybrid_gpu_test_b_relative_l2_p_mean": {
+  "value": null,
+  "runs": [],
+  "description": "hybrid GPU runs: mean relative L2 of p on test_b"
+ },
+ "hybrid_gpu_test_b_relative_l2_p_std": {
+  "value": null,
+  "runs": [],
+  "description": "hybrid GPU runs: std over seeds"
+ },
+ "hybrid_gpu_continuity_residual_mean": {
+  "value": null,
+  "runs": [],
+  "description": "hybrid GPU: mean continuity_residual"
+ },
+ "hybrid_gpu_continuity_residual_std": {
+  "value": null,
+  "runs": [],
+  "description": "hybrid GPU: std continuity_residual"
+ },
+ "hybrid_gpu_x_momentum_residual_mean": {
+  "value": null,
+  "runs": [],
+  "description": "hybrid GPU: mean x_momentum_residual"
+ },
+ "hybrid_gpu_x_momentum_residual_std": {
+  "value": null,
+  "runs": [],
+  "description": "hybrid GPU: std x_momentum_residual"
+ },
+ "hybrid_gpu_y_momentum_residual_mean": {
+  "value": null,
+  "runs": [],
+  "description": "hybrid GPU: mean y_momentum_residual"
+ },
+ "hybrid_gpu_y_momentum_residual_std": {
+  "value": null,
+  "runs": [],
+  "description": "hybrid GPU: std y_momentum_residual"
+ },
+ "hybrid_gpu_stencil_continuity_rms_core_mean": {
+  "value": null,
+  "runs": [],
+  "description": "hybrid GPU: mean stencil_continuity_rms_core"
+ },
+ "hybrid_gpu_stencil_continuity_rms_core_std": {
+  "value": null,
+  "runs": [],
+  "description": "hybrid GPU: std stencil_continuity_rms_core"
+ },
+ "hybrid_gpu_boundary_rms_mean": {
+  "value": null,
+  "runs": [],
+  "description": "hybrid GPU: mean boundary_rms"
+ },
+ "hybrid_gpu_boundary_rms_std": {
+  "value": null,
+  "runs": [],
+  "description": "hybrid GPU: std boundary_rms"
+ },
+ "hybrid_gpu_initial_rms_mean": {
+  "value": null,
+  "runs": [],
+  "description": "hybrid GPU: mean initial_rms"
+ },
+ "hybrid_gpu_initial_rms_std": {
+  "value": null,
+  "runs": [],
+  "description": "hybrid GPU: std initial_rms"
+ },
+ "hybrid_gpu_training_time_seconds_mean": {
+  "value": null,
+  "runs": [],
+  "description": "hybrid GPU: mean training_time_seconds"
+ },
+ "hybrid_gpu_training_time_seconds_std": {
+  "value": null,
+  "runs": [],
+  "description": "hybrid GPU: std training_time_seconds"
+ },
+ "hybrid_gpu_time_per_step_seconds_mean": {
+  "value": null,
+  "runs": [],
+  "description": "hybrid GPU: mean time_per_step_seconds"
+ },
+ "hybrid_gpu_time_per_step_seconds_std": {
+  "value": null,
+  "runs": [],
+  "description": "hybrid GPU: std time_per_step_seconds"
+ },
+ "hybrid_gpu_inference_time_seconds_mean": {
+  "value": null,
+  "runs": [],
+  "description": "hybrid GPU: mean inference_time_seconds"
+ },
+ "hybrid_gpu_inference_time_seconds_std": {
+  "value": null,
+  "runs": [],
+  "description": "hybrid GPU: std inference_time_seconds"
+ },
+ "hybrid_gpu_inference_single_point_seconds_mean": {
+  "value": null,
+  "runs": [],
+  "description": "hybrid GPU: mean inference_single_point_seconds"
+ },
+ "hybrid_gpu_inference_single_point_seconds_std": {
+  "value": null,
+  "runs": [],
+  "description": "hybrid GPU: std inference_single_point_seconds"
+ },
+ "hybrid_gpu_peak_vram_bytes_mean": {
+  "value": null,
+  "runs": [],
+  "description": "hybrid GPU: mean peak_vram_bytes"
+ },
+ "hybrid_gpu_peak_vram_bytes_std": {
+  "value": null,
+  "runs": [],
+  "description": "hybrid GPU: std peak_vram_bytes"
+ },
+ "hybrid_gpu_peak_ram_bytes_mean": {
+  "value": null,
+  "runs": [],
+  "description": "hybrid GPU: mean peak_ram_bytes"
+ },
+ "hybrid_gpu_peak_ram_bytes_std": {
+  "value": null,
+  "runs": [],
+  "description": "hybrid GPU: std peak_ram_bytes"
+ },
+ "hybrid_gpu_model_size_bytes_mean": {
+  "value": null,
+  "runs": [],
+  "description": "hybrid GPU: mean model_size_bytes"
+ },
+ "hybrid_gpu_model_size_bytes_std": {
+  "value": null,
+  "runs": [],
+  "description": "hybrid GPU: std model_size_bytes"
+ },
  "dnn_cpu_training_time_seconds_mean": {
   "value": 268.5567339890804,
   "runs": [

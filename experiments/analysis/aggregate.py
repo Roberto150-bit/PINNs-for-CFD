@@ -37,6 +37,10 @@ from models.common import config as C  # noqa: E402
 
 RESULTS = "experiments/results"
 EXP = C.EXPERIMENT_DIR
+# Network methods and the short names used in poster_numbers.json keys
+METHODS = (("data_driven_nn", "dnn"), ("pinn", "pinn"), ("hybrid", "hybrid"))
+SHORT = dict(METHODS)
+
 METRIC_COLS = (
     [f"{s}_relative_l2_{k}" for s in ("test_a", "test_b", "full_field") for k in "uvp"]
     + [f"{s}_mse_{k}" for s in ("test_a", "test_b", "full_field") for k in "uvp"]
@@ -157,7 +161,8 @@ def cost_to_solution(summary, fd):
         infer = g["inference_time_seconds"]["mean"]
         if train is None:
             continue
-        total = train + (fd64 if method == "data_driven_nn" else 0.0)
+        # Methods trained on FD data also pay for the simulation that made it
+        total = train + (fd64 if method in ("data_driven_nn", "hybrid") else 0.0)
         entry = {"training_seconds_mean": train, "inference_seconds_mean": infer,
                  "total_cost_to_field_seconds": total, "runs": g["runs"]}
         if fd64 is not None and infer is not None and infer < fd64:
@@ -183,7 +188,7 @@ def poster_numbers(summary, fd, det, cost, validation, transient):
     def put(key, value, run_ids, desc):
         nums[key] = {"value": value, "runs": run_ids, "description": desc}
 
-    for m, short in (("data_driven_nn", "dnn"), ("pinn", "pinn")):
+    for m, short in METHODS:
         for split in ("test_a", "test_b"):
             for k in "uvp":
                 col = f"{split}_relative_l2_{k}"
@@ -229,7 +234,7 @@ def poster_numbers(summary, fd, det, cost, validation, transient):
         if "|" not in key:
             continue
         m, dev = key.split("|")
-        short = "dnn" if m == "data_driven_nn" else "pinn"
+        short = SHORT[m]
         put(f"{short}_{dev}_total_cost_to_field_seconds", e["total_cost_to_field_seconds"], e["runs"],
             f"{m} {dev}: total cost to a usable field")
         put(f"{short}_{dev}_break_even_evaluations", e["break_even_evaluations"], e["runs"],
@@ -306,7 +311,7 @@ def re400_numbers():
         re = os.path.basename(path)[len("experiment_results_re"):-4]
         with open(path) as f:
             rows = [r for r in csv.DictReader(f) if r["device"] == "gpu" and r["timing_run"] in ("False", "")]
-        for m, short in (("data_driven_nn", "dnn"), ("pinn", "pinn")):
+        for m, short in METHODS:
             sel = [r for r in rows if r["method"] == m and r["run_id"].endswith(tuple(f"_s{s}" for s in range(1, 6)))]
             ids = sorted(r["run_id"] for r in sel)
             for col in ["test_a_relative_l2_" + k for k in "uvp"] + ["continuity_residual"]:
@@ -327,7 +332,7 @@ def extended_numbers():
     of each completed 100,000-step run, averaged per (Re, method)."""
     out = {}
     for re, folder in ((100.0, "experiment_001_re100"), (400.0, "experiment_002_re400")):
-        for m, short in (("data_driven_nn", "dnn"), ("pinn", "pinn")):
+        for m, short in METHODS:
             at20, at40, atend, ids = [], [], [], []
             for run in sorted(glob.glob(f"experiments/{folder}/extended/{m}/*_steps100k")):
                 if not os.path.exists(os.path.join(run, "performance.json")):
