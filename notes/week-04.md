@@ -194,7 +194,7 @@ Two more seeds at $Re = 400$ (4 and 5) improve in the same way: $u$ 0.162 and 0.
 
 The same head start at $Re = 10$ (from the $Re = 100$ PINN, seeds 1 to 3, `experiments/results/continuation_re10.csv`) has no clear effect: $u$ 0.150, 0.155 and 0.161 against 0.168, 0.151 and 0.158, so only seed 1 improves; $p$ is slightly lower in every seed (0.50 against 0.52) and $v$ slightly higher (0.195 to 0.200 against 0.192 to 0.195).
 
-### Hybrid network: data loss plus physics loss (3 seeds at $Re = 100$ and $400$):
+### Hybrid network: data loss plus physics loss (3 seeds at each Reynolds number):
 37. The third network is trained on both losses: the data NN's loss on the FD training rows plus the PINN's loss on the equations, initial and boundary conditions (`models/hybrid/src/train.py`). Everything else is shared with the other two networks, and `tests/test_hybrid.py` checks it against the code: same architecture and initialization, Adam with learning rate $10^{-3}$, 20,000 steps, same seeds, same training rows, same mini-batches of 4,096 in the same order, same collocation, initial and boundary points, all loss weights starting at 1, and the same weight check at step 2,000. There is one more difference besides the loss: the hybrid outputs physical $u$, $v$, $p$, which the physics residuals need, while the data NN outputs standardized values. Its data loss has the same value as the data NN's for the same prediction, but the network itself is parametrized differently. Against the PINN the only change is the added data term; against the data NN two things change. A control run with the hybrid code and the data loss only separates the two effects.
 
 38. Results for seeds 1 to 3, the same seeds for all three networks (`experiments/results/experiment_results.csv`, `experiment_results_re400.csv`):
@@ -211,11 +211,17 @@ At $Re = 100$ the hybrid lies between the other two, both in accuracy and in how
 - the PINN's vortex is 11 to 13 spacings away and about three times too weak;
 - its continuity residual is as low as the PINN's and 13 times lower than the data NN's.
 
-It is still about three times less accurate than the data NN. In all six runs the data term was the largest loss term at step 2,000, 20 to 38 times the smallest, so the weights were never rebalanced. Training takes about 870 s on the GPU, slightly more than the PINN (780 s), because both losses are computed at every step.
+It is still about three times less accurate than the data NN.
+
+At $Re = 10$ and $1000$ the pattern is the same (`experiment_results_re10.csv`, `experiment_results_re1000.csv`):
+- test-A $u$ is 0.058 and 0.079 for the hybrid, against 0.019 and 0.017 for the data NN and 0.159 and 0.410 for the PINN;
+- at $Re = 1000$, where the PINN has no vortex inside the cavity, the hybrid's vortex is 0.7 to 1.2 grid spacings from FD at nearly the right strength ($\psi_{min}$ $-0.075$ to $-0.080$ against $-0.077$).
+
+So over the four Reynolds numbers the hybrid's $u$ error stays between 0.050 and 0.079, while the PINN's goes from 0.08 to 0.41 (`analysis_reynolds_trend.png`). In all sixteen runs the data term was the largest loss term at step 2,000, 15 to 52 times the smallest, so the weights were never rebalanced. Training takes about 870 s on the GPU, slightly more than the PINN (780 s), because both losses are computed at every step.
 
 39. Training stability. Results are taken at the final step, so a run that is temporarily worse at the end is reported as worse. To see how often that could happen, I counted spikes: evaluation steps where the test-A error of $u$ is more than twice the best value reached before. This definition was fixed before any hybrid result existed (`experiments/analysis/plots/analysis_spikes.csv`).
 - The data NN has spikes in 8 of its 16 main runs, up to 8 times its best value, but it always recovered before the final step.
-- The PINN and the hybrid have none: their error never rose above 1.7 times its best value.
+- The PINN has none: its error never rose above 1.7 times its best value. The hybrid has one, in 16 runs, and it fell on the final step: at $Re = 100$, seed 5 was at 0.043 at step 19,000 and 0.118 at step 20,000. By the fixed protocol its result is 0.118, worse than the PINN for the same seed (0.076) and about three times the other hybrid seeds (0.037 to 0.053). It is the only run among all main runs of the three networks that ends on a spike. The other new seeds behave like seeds 1 to 3: at $Re = 100$ seed 4 reaches 0.037, and at $Re = 400$ seeds 4 and 5 reach 0.054 and 0.080. Over five seeds the hybrid's $u$ error is 0.061 at $Re = 100$ (standard deviation 0.032, the largest of the three networks because of seed 5) and 0.066 at $Re = 400$ (0.012).
 
 ### Decisions this week:
 40. The G8 overfitting check was relaxed after it failed: the loss must fall at least 100 times in 5,000 steps with $u$ and $v$ MSE below $10^{-3}$, instead of reaching $10^{-4}$. The pressure field's lid-corner spikes keep the pressure term from going lower.

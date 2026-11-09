@@ -42,12 +42,12 @@
   "final_over_best_mean": 1.0582047396270906
  },
  "re100_hybrid": {
-  "runs": 3,
-  "spikes_total": 0,
-  "runs_with_spike": 0,
-  "runs_ending_on_spike": 0,
-  "worst_ratio": 1.3544304782586545,
-  "final_over_best_mean": 1.0620822819207256
+  "runs": 5,
+  "spikes_total": 1,
+  "runs_with_spike": 1,
+  "runs_ending_on_spike": 1,
+  "worst_ratio": 2.858575363187933,
+  "final_over_best_mean": 1.408964441790022
  },
  "re400_data_driven_nn": {
   "runs": 5,
@@ -66,12 +66,12 @@
   "final_over_best_mean": 1.0147337696852157
  },
  "re400_hybrid": {
-  "runs": 3,
+  "runs": 5,
   "spikes_total": 0,
   "runs_with_spike": 0,
   "runs_ending_on_spike": 0,
-  "worst_ratio": 1.2167496575659331,
-  "final_over_best_mean": 1.0010056549999264
+  "worst_ratio": 1.6188315503403512,
+  "final_over_best_mean": 1.02550256789146
  },
  "re1000_data_driven_nn": {
   "runs": 3,
