@@ -700,12 +700,15 @@ def fig_v4_accuracy(data):
         xs = np.arange(3) + (i - (len(methods) - 1) / 2) * width
         bars = ax.bar(xs, means, width * 0.92, yerr=stds, color=COLORS[m], label=LABELS[m],
                       capsize=5, error_kw={"elinewidth": 2, "ecolor": INK})
-        value_labels(ax, bars, lambda h: f"{h:.0f}%" if h >= 10 else f"{h:.1f}%", stds,
-                     fontsize=22 if len(methods) < 3 else 17)
+        if len(methods) < 3:
+            value_labels(ax, bars, lambda h: f"{h:.0f}%" if h >= 10 else f"{h:.1f}%", stds)
+        else:
+            # Three bars per group: the axis already says %, so labels drop it to stay apart
+            value_labels(ax, bars, lambda h: f"{h:.0f}" if h >= 10 else f"{h:.1f}", stds, fontsize=17)
         plotted[m] = [float(b.get_height()) / 100 for b in bars]
     ratio = plotted["pinn"][0] / plotted["data_driven_nn"][0]
-    callout(ax, f"{ratio:.0f}× lower error in u\nfor the data NN", xy=(-(len(methods) - 1) / 2 * width, 100 * plotted["data_driven_nn"][0] * 0.5),
-            xytext=(0.35, 0.80) if len(methods) < 3 else (0.19, 0.64), color=COLORS["data_driven_nn"])
+    callout(ax, f"{ratio:.0f}× lower error in u\nfor the data NN", xy=(-(len(methods) - 1) / 2 * width, 100 * plotted["data_driven_nn"][0] + (0.5 if len(methods) < 3 else 3.6)),
+            xytext=(0.35, 0.80) if len(methods) < 3 else (0.27, 0.70), color=COLORS["data_driven_nn"])
     ax.set_xticks(range(3), ["u", "v", "p"])
     ax.set_ylabel("Error (%)")
     ax.set_ylim(0, max(max(v) for v in plotted.values()) * 100 * 1.35)
@@ -731,7 +734,7 @@ def fig_v4_physics(data):
         value_labels(ax, bars, lambda h: f"{h:.2g}", stds, fontsize=22 if len(methods) < 3 else 17)
         plotted[m] = [float(b.get_height()) for b in bars]
     ratio = plotted["data_driven_nn"][0] / plotted["pinn"][0]
-    callout(ax, f"{ratio:.0f}× less mass\nviolation for the PINN", xy=((methods.index("pinn") - (len(methods) - 1) / 2) * width, plotted["pinn"][0] * 1.6),
+    callout(ax, f"{ratio:.0f}× less mass\nviolation for the PINN", xy=((methods.index("pinn") - (len(methods) - 1) / 2) * width, (data["pinn"]["continuity"][0] + data["pinn"]["continuity"][1]) * 2.8),
             xytext=(0.30, 0.86), color=COLORS["pinn"])
     ax.set_xticks(range(3), ["Mass", "Momentum\n(x)", "Momentum\n(y)"])
     ax.set_yscale("log")
