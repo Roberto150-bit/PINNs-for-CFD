@@ -112,7 +112,7 @@ The data NN fits the values but not their derivatives, so its fields are not div
 ### Sensitivity studies at $Re = 100$ (3 seeds each):
 27. Less data (S1). The data NN with 10% of the training rows reaches $0.050$ for $u$, with 1% $0.133$; at 1% it is worse than the PINN, which uses no data at all ($0.084$).
 
-28. Fewer collocation points (S2). The PINN with 10,000 points is nearly as accurate as with 20,000 ($0.089$ vs $0.084$) in about half the training time. With 5,000 points it is less accurate ($0.119$) and satisfies the PDE only at its training points: its continuity residual at the 50,000 evaluation points is 1.26, about 16 times the 20,000-point runs.
+28. Fewer collocation points (S2). The PINN with 10,000 points is nearly as accurate as with 20,000 ($0.089$ vs $0.084$) in about half the training time. With 5,000 points it is less accurate ($0.119$), and its continuity residual at the 50,000 evaluation points is 1.26, about 16 times the 20,000-point runs. Most of that comes from the two lid corners (item 42): without the points within 0.05 of a lid corner it is 0.028 against 0.017 for the 20,000-point runs, seeds 1–3 (`experiments/analysis/plots/analysis_corner_excluded.csv`). Fewer points do make the PDE fit worse in the flow, but by less than a factor of two.
 
 29. Network size (S3). $4 \times 50$ is worse than $5 \times 64$ for both networks, and $6 \times 100$ is not better. One $6 \times 100$ data NN seed ended on a loss spike at the last steps (error 0.102 against 0.013 to 0.015 for the other two). Results are reported at the final step for every run, including that one.
 

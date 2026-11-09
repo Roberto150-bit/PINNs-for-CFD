@@ -4,7 +4,7 @@ Draft of the Results chapter. The method is described in `notes/methodology_draf
 
 **Conventions.** Errors are relative $L_2$ errors against the $64 \times 64$ finite-difference (FD) reference at the final training step. Test A is the held-out 15% of the space-time points, test B the ten held-out snapshots. Tables show the mean over seeds with the sample standard deviation in brackets and list the seeds used; every number comes from the file named under the table. Tables are generated from those files, not typed.
 
-**Still changing.** Seeds 4–5 at $Re = 10$ and 1000 (all three networks), the data-only control at $Re = 10$ and 1000, and further 100,000-step runs (hybrid at $Re = 400$, seeds 2–3; PINN at $Re = 1000$, seeds 2–3; hybrid at $Re = 1000$, seed 1) are being trained. Every number marked **[3 seeds; 5 pending]** or **[pending]** will change when they are scored; the others are final.
+**Still changing.** Seeds 4–5 at $Re = 1000$ (all three networks), the data-only control at $Re = 10$ and 1000, and further 100,000-step runs (hybrid at $Re = 400$, seeds 2–3; PINN at $Re = 1000$, seeds 2–3; hybrid at $Re = 1000$, seed 1) are being trained. Every number marked **[3 seeds; 5 pending]** or **[pending]** will change when they are scored; the others are final.
 
 ## 4.1 Reference solution
 
@@ -19,9 +19,9 @@ The FD solver reproduces the steady benchmark of Marchi et al. (2009) at $Re = 1
 <!-- table:accuracy -->
 | $Re$ | Network | Seeds | Test A $u$ | Test A $v$ | Test A $p$ | Test B $u$ | Test B $v$ | Test B $p$ |
 |---|---|---|---|---|---|---|---|---|
-| 10 | Data NN | 1,2,3 | 0.019 (0.0027) | 0.018 (0.0014) | 0.119 (0.0016) | 0.015 (0.0037) | 0.015 (0.0016) | 0.122 (0.0013) |
-| 10 | PINN | 1,2,3 | 0.159 (0.0087) | 0.194 (0.0013) | 0.522 (7.1e-04) | 0.155 (0.0085) | 0.195 (0.0012) | 0.507 (0.0023) |
-| 10 | Hybrid | 1,2,3 | 0.058 (0.0012) | 0.054 (0.0072) | 0.216 (0.0038) | 0.049 (7.4e-04) | 0.050 (0.0066) | 0.211 (0.0026) |
+| 10 | Data NN | 1,2,3,4,5 | 0.018 (0.0021) | 0.019 (0.0017) | 0.119 (0.0015) | 0.015 (0.0027) | 0.015 (0.0017) | 0.122 (0.0013) |
+| 10 | PINN | 1,2,3,4,5 | 0.161 (0.0073) | 0.196 (0.0035) | 0.524 (0.0046) | 0.156 (0.007) | 0.196 (0.0039) | 0.509 (0.005) |
+| 10 | Hybrid | 1,2,3,4,5 | 0.061 (0.0081) | 0.059 (0.013) | 0.217 (0.0035) | 0.052 (0.008) | 0.055 (0.013) | 0.211 (0.0021) |
 | 100 | Data NN | 1,2,3,4,5 | 0.017 (0.001) | 0.018 (0.0034) | 0.113 (0.0013) | 0.014 (0.0012) | 0.017 (0.0039) | 0.118 (0.0018) |
 | 100 | PINN | 1,2,3,4,5 | 0.082 (0.011) | 0.166 (0.021) | 0.265 (0.0049) | 0.077 (0.011) | 0.161 (0.020) | 0.239 (0.0057) |
 | 100 | Hybrid | 1,2,3,4,5 | 0.061 (0.032) | 0.059 (0.021) | 0.181 (0.029) | 0.056 (0.031) | 0.055 (0.022) | 0.190 (0.029) |
@@ -35,7 +35,7 @@ The FD solver reproduces the steady benchmark of Marchi et al. (2009) at $Re = 1
 Mean (sample s.d.) over the seeds listed; relative $L_2$ error at the final step. Source: `experiments/results/experiment_results*.csv` (main GPU runs).
 <!-- /table:accuracy -->
 
-$Re = 10$ and 1000: **[3 seeds; 5 pending]**.
+$Re = 1000$: **[3 seeds; 5 pending]**.
 
 **Figures.**
 - `analysis_reynolds_trend.png`: test-A error against $Re$, every seed.
@@ -56,9 +56,9 @@ $Re = 10$ and 1000: **[3 seeds; 5 pending]**.
 <!-- table:physics -->
 | $Re$ | Network | Seeds | Continuity | x-momentum | y-momentum | Continuity, grid stencil (core) | Boundary RMS | Initial-condition RMS |
 |---|---|---|---|---|---|---|---|---|
-| 10 | Data NN | 1,2,3 | 0.584 (0.037) | 57.5 (14.9) | 19.8 (2.07) | 0.059 (0.0046) | 0.0051 (2.9e-04) | 0.0058 (3.9e-04) |
-| 10 | PINN | 1,2,3 | 0.020 (7.8e-04) | 0.051 (0.024) | 0.028 (0.0055) | 0.017 (8.5e-04) | 0.039 (0.0012) | 0.0054 (6.1e-04) |
-| 10 | Hybrid | 1,2,3 | 0.083 (0.011) | 0.228 (0.069) | 0.286 (0.031) | 0.027 (0.0013) | 0.024 (6.0e-04) | 0.0098 (0.0016) |
+| 10 | Data NN | 1,2,3,4,5 | 0.569 (0.037) | 51.6 (13.6) | 19.4 (1.58) | 0.061 (0.0039) | 0.0054 (5.9e-04) | 0.0057 (3.6e-04) |
+| 10 | PINN | 1,2,3,4,5 | 0.018 (0.002) | 0.054 (0.017) | 0.029 (0.0043) | 0.017 (7.6e-04) | 0.039 (8.5e-04) | 0.0052 (7.1e-04) |
+| 10 | Hybrid | 1,2,3,4,5 | 0.078 (0.012) | 0.291 (0.099) | 0.341 (0.087) | 0.028 (0.0026) | 0.024 (0.0014) | 0.011 (0.0032) |
 | 100 | Data NN | 1,2,3,4,5 | 0.546 (0.063) | 5.57 (0.165) | 2.06 (0.199) | 0.055 (0.0027) | 0.0053 (6.6e-04) | 0.0035 (3.9e-04) |
 | 100 | PINN | 1,2,3,4,5 | 0.071 (0.030) | 0.096 (0.045) | 0.054 (0.016) | 0.023 (0.0021) | 0.017 (0.0026) | 0.0049 (0.0017) |
 | 100 | Hybrid | 1,2,3,4,5 | 0.159 (0.059) | 0.875 (0.680) | 0.403 (0.236) | 0.028 (0.0039) | 0.022 (0.013) | 0.0066 (0.0021) |
@@ -77,14 +77,22 @@ The residuals by automatic differentiation are averages over random points, and 
 <!-- table:corner -->
 | $Re$ | Network | Runs | Seeds | All points (primary) | $r \ge 0.02$ | $r \ge 0.05$ | $r \ge 0.1$ |
 |---|---|---|---|---|---|---|---|
-| 10 | Data NN | 20,000 steps | 1,2,3 | 0.584 (0.037) | 0.551 (0.032) | 0.331 (0.047) | 0.186 (0.085) |
-| 10 | PINN | 20,000 steps | 1,2,3 | 0.020 (7.8e-04) | 0.013 (0.001) | 0.012 (8.2e-04) | 0.010 (5.8e-04) |
-| 10 | Hybrid | 20,000 steps | 1,2,3 | 0.083 (0.011) | 0.034 (0.0029) | 0.028 (0.0029) | 0.020 (8.0e-04) |
+| 10 | Data NN | 20,000 steps | 1,2,3,4,5 | 0.569 (0.037) | 0.526 (0.041) | 0.318 (0.039) | 0.169 (0.065) |
+| 10 | PINN | 20,000 steps | 1,2,3,4,5 | 0.018 (0.002) | 0.013 (9.0e-04) | 0.012 (6.5e-04) | 0.011 (5.0e-04) |
+| 10 | Hybrid | 20,000 steps | 1,2,3,4,5 | 0.078 (0.012) | 0.034 (0.0036) | 0.028 (0.0032) | 0.020 (0.0021) |
 | 10 | PINN | warm start (S6) | 1,2,3 | 0.016 (0.0018) | 0.012 (5.8e-04) | 0.011 (5.6e-04) | 0.0092 (4.8e-04) |
 | 100 | Data NN | 20,000 steps | 1,2,3,4,5 | 0.546 (0.063) | 0.494 (0.053) | 0.300 (0.080) | 0.140 (0.024) |
 | 100 | PINN | 20,000 steps | 1,2,3,4,5 | 0.071 (0.030) | 0.019 (0.0046) | 0.016 (0.0048) | 0.014 (0.0042) |
 | 100 | Hybrid | 20,000 steps | 1,2,3,4,5 | 0.159 (0.059) | 0.034 (0.011) | 0.027 (0.012) | 0.023 (0.011) |
 | 100 | Control | control | 1,2,3 | 0.448 (0.029) | 0.392 (0.040) | 0.214 (0.026) | 0.138 (0.024) |
+| 100 | Data NN | S1: 1% of data | 1,2,3 | 0.464 (0.044) | 0.445 (0.046) | 0.355 (0.031) | 0.262 (0.024) |
+| 100 | Data NN | S1: 10% of data | 1,2,3 | 0.587 (0.011) | 0.523 (0.031) | 0.345 (0.019) | 0.181 (0.013) |
+| 100 | PINN | S2: 5,000 points | 1,2,3 | 1.26 (0.278) | 0.428 (0.134) | 0.028 (0.0063) | 0.020 (0.0048) |
+| 100 | PINN | S2: 10,000 points | 1,2,3 | 0.130 (0.046) | 0.058 (0.017) | 0.019 (6.6e-04) | 0.014 (0.0031) |
+| 100 | Data NN | S3: 4 x 50 | 1,2,3 | 0.508 (0.066) | 0.446 (0.074) | 0.239 (0.015) | 0.117 (0.011) |
+| 100 | PINN | S3: 4 x 50 | 1,2,3 | 0.020 (0.0022) | 0.018 (0.0022) | 0.017 (0.0019) | 0.015 (0.0017) |
+| 100 | Data NN | S3: 6 x 100 | 1,2,3 | 0.490 (0.025) | 0.449 (0.035) | 0.313 (0.037) | 0.188 (0.102) |
+| 100 | PINN | S3: 6 x 100 | 1,2,3 | 0.410 (0.204) | 0.023 (0.0022) | 0.014 (0.0023) | 0.012 (0.0026) |
 | 400 | Data NN | 20,000 steps | 1,2,3,4,5 | 0.548 (0.022) | 0.483 (0.035) | 0.314 (0.028) | 0.174 (0.019) |
 | 400 | PINN | 20,000 steps | 1,2,3,4,5 | 0.029 (0.020) | 0.014 (0.0025) | 0.012 (0.0014) | 0.011 (0.0013) |
 | 400 | Hybrid | 20,000 steps | 1,2,3,4,5 | 0.075 (0.070) | 0.033 (0.0065) | 0.027 (0.0067) | 0.025 (0.006) |
@@ -109,7 +117,7 @@ Continuity residual (RMS, automatic differentiation) at the 50,000 evaluation po
 - The residual measures how well a network satisfies the equations, not how close it is to the FD solution. At $Re = 400$ and 1000 the PINN has the smallest residuals and the largest errors.
 - The grid-stencil value (central differences on the $64 \times 64$ grid, away from the walls) is about ten times smaller than the automatic-differentiation value for the data NN, because it averages over a grid spacing; for the PINN the two are similar. The FD reference itself has a stencil continuity of $1.5 \times 10^{-4}$ at $Re = 100$ [`poster_numbers.json`].
 - The corner-excluded values were added after the S5 and S6 results were seen. The all-points value stays the primary result.
-- $Re = 10$ and 1000: **[3 seeds; 5 pending]**.
+- $Re = 1000$: **[3 seeds; 5 pending]**.
 
 ## 4.4 RQ3: Repeatability and robustness
 
@@ -118,9 +126,9 @@ Continuity residual (RMS, automatic differentiation) at the 50,000 evaluation po
 <!-- table:repeat -->
 | $Re$ | Network | Seeds | Test A $u$, min–max | s.d. | s.d. / mean | Runs with a spike | Runs ending on a spike |
 |---|---|---|---|---|---|---|---|
-| 10 | Data NN | 1,2,3 | 0.017–0.022 | 0.0027 | 0.144 | 2 of 3 | 0 |
-| 10 | PINN | 1,2,3 | 0.151–0.168 | 0.0087 | 0.054 | 0 of 3 | 0 |
-| 10 | Hybrid | 1,2,3 | 0.057–0.060 | 0.0012 | 0.021 | 0 of 3 | 0 |
+| 10 | Data NN | 1,2,3,4,5 | 0.017–0.022 | 0.0021 | 0.117 | 3 of 5 | 0 |
+| 10 | PINN | 1,2,3,4,5 | 0.151–0.168 | 0.0073 | 0.045 | 0 of 5 | 0 |
+| 10 | Hybrid | 1,2,3,4,5 | 0.056–0.076 | 0.0081 | 0.133 | 0 of 5 | 0 |
 | 100 | Data NN | 1,2,3,4,5 | 0.015–0.018 | 0.001 | 0.061 | 2 of 5 | 0 |
 | 100 | PINN | 1,2,3,4,5 | 0.072–0.100 | 0.011 | 0.131 | 0 of 5 | 0 |
 | 100 | Hybrid | 1,2,3,4,5 | 0.037–0.118 | 0.032 | 0.533 | 1 of 5 | 1 |
@@ -134,11 +142,11 @@ Continuity residual (RMS, automatic differentiation) at the 50,000 evaluation po
 Spike: an evaluation step $\ge$ 1,000 at which the test-A $u$ error is more than twice the best value at earlier steps (rule fixed before the hybrid runs). Sources: `experiments/results/experiment_results*.csv`, `experiments/analysis/plots/analysis_spikes.csv`.
 <!-- /table:repeat -->
 
-$Re = 10$ and 1000: **[3 seeds; 5 pending]**.
+$Re = 1000$: **[3 seeds; 5 pending]**.
 
 **Figures.**
 - `analysis_repeatability.png`: test-A error against training step, every seed (data NN and PINN).
-- `analysis_three_methods.png`: the same for the three networks, mean and range over seeds.
+- `analysis_three_methods.png` ($Re = 100$, 400) and `analysis_three_methods_re10_re1000.png`: the same for the three networks, mean and range over seeds.
 - `analysis_reynolds_trend.png`: every seed at every $Re$.
 
 **Caveats.**
@@ -153,7 +161,9 @@ $Re = 10$ and 1000: **[3 seeds; 5 pending]**.
 <!-- table:cost -->
 | $Re$ | Network (GPU) | Seeds with valid timing | Training time (s) | Time per step (s) | Full-field inference (s) | Peak VRAM (MiB) |
 |---|---|---|---|---|---|---|
-| 10 | Hybrid | 1,2,3 | 878 (5.40) | 0.044 (2.7e-04) | 0.011 (7.8e-04) | 713 (2.44) |
+| 10 | Data NN | 4,5 | 144 (6.28) | 0.0071 (3.2e-04) | 0.010 (4.0e-04) | 122 (0) |
+| 10 | PINN | 4,5 | 813 (24.1) | 0.040 (0.0012) | 0.010 (4.1e-04) | 706 (1.91) |
+| 10 | Hybrid | 1,2,3,4,5 | 888 (14.6) | 0.044 (7.1e-04) | 0.011 (6.3e-04) | 712 (2.29) |
 | 100 | Data NN | 1,2,3,4,5 | 137 (4.66) | 0.0068 (2.3e-04) | 0.010 (1.6e-04) | 122 (0) |
 | 100 | PINN | 1,2,3,4,5 | 782 (2.22) | 0.039 (1.0e-04) | 0.010 (8.1e-04) | 708 (3.49) |
 | 100 | Hybrid | 1,2,3,4,5 | 882 (14.9) | 0.044 (7.6e-04) | 0.011 (0.0012) | 711 (2.55) |
@@ -180,7 +190,7 @@ Source: `experiments/results/poster_numbers.json`.
 **Caveats.**
 - All times come from one laptop (Intel i5-12450H, RTX 4060 Laptop GPU). FD ran on the CPU, the networks on the GPU.
 - The data NN's cost to a usable field includes the FD solve that produces its data.
-- Runs that shared the GPU are excluded. At $Re = 10$ and 1000 the data NN and PINN seeds 1–3 shared the GPU, so their cost is not reported; seeds 4–5 are timed on a free GPU **[pending]**.
+- Runs that shared the GPU are excluded. At $Re = 10$ and 1000 the data NN and PINN seeds 1–3 shared the GPU, so their cost is not reported; seeds 4–5 are timed on a free GPU (done at $Re = 10$; **[pending]** at $Re = 1000$).
 - At $Re = 1000$ a fair cost must count the $127 \times 127$ solve behind the reference.
 - The break-even counts repeated evaluations of the same flow. A network trained at one $Re$ does not replace an FD solve at another.
 
@@ -216,7 +226,7 @@ $Re = 10$ and 1000 controls: **[pending]**.
 
 ## 4.7 Additional studies
 
-**S1–S3: data, collocation points and network size ($Re = 100$).** With 1% of the training rows the data NN is less accurate than the PINN without data; with 10% it is between the two. Fewer collocation points make the PINN satisfy the equations only at its training points. A larger network helps neither method.
+**S1–S3: data, collocation points and network size ($Re = 100$).** With 1% of the training rows the data NN is less accurate than the PINN without data; with 10% it is between the two. With 5,000 collocation points the PINN's continuity residual at the evaluation points rises sixteenfold, mostly at the lid corners; away from them it is less than twice that of the 20,000-point runs (corner table, Section 4.3). A larger network helps neither method.
 
 <!-- table:sensitivity -->
 | Study | Network | Change | Seeds | Test A $u$ | Continuity |

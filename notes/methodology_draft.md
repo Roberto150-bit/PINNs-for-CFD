@@ -189,18 +189,21 @@ All additional studies use the main settings except for the one factor studied. 
 | S2 | How many collocation points does the PINN need? | 5,000 and 10,000 instead of 20,000 | PINN, $Re = 100$, seeds 1–3 | same |
 | S3 | Does network size matter? | $4 \times 50$ and $6 \times 100$ instead of $5 \times 64$ | both networks, $Re = 100$, seeds 1–3 | same |
 | S4 | Does causal weighting in time help the PINN? | residual weighted by time chunk (Wang, Sankaran and Perdikaris, 2022, Algorithm 1, published schedule) | PINN, $Re = 400$, seeds 1–3 | `experiments/experiment_002_re400/causal/` |
-| S5 | Are the networks under-trained? | 100,000 steps instead of 20,000 | data NN and PINN at $Re = 100$, PINN at $Re = 400$, seeds 1–3; PINN at $Re = 10$ and 1000, seeds 1–3 (in progress) | `experiments/experiment_00*/extended/` |
+| S5 | Are the networks under-trained? | 100,000 steps instead of 20,000 | data NN and PINN at $Re = 100$, PINN at $Re = 400$, seeds 1–3; PINN at $Re = 1000$, seeds 1–3; hybrid at $Re = 400$, seeds 1–3, and at $Re = 1000$, seed 1 | `experiments/experiment_00*/extended/` |
 | S6 | Does starting from a solution at a lower $Re$ help the PINN? | initial weights from the trained PINN at the lower $Re$ (same seed), optimizer state fresh | $Re = 400$ from $Re = 100$, seeds 1–5; $Re = 1000$ from the S6 $Re = 400$ runs, seeds 1–3; $Re = 10$ from $Re = 100$, seeds 1–3 | `experiments/experiment_00*/continuation/` |
 
 S4 uses 32 time chunks; the causality parameter steps through $10^{-2}, 10^{-1}, 1, 10, 100$ whenever every chunk weight exceeds 0.99 [`models/pinn/src/config.py`].
 
 S6 runs have more training in total than the main runs: 40,000 steps at $Re = 400$ and 10, and 60,000 at $Re = 1000$. They are therefore also compared with S5 runs at the same total number of steps where those exist.
 
-The hybrid network (Section 3.4) is run like the other two networks:
-- seeds 1–3 at $Re = 10$, 100, 400 and 1000;
-- seeds 4–5 at $Re = 100$ and 400;
-- one 100,000-step run at $Re = 400$;
-- the data-only control (Section 3.4), seeds 1–3 at $Re = 100$ and 400 [`experiments/experiment_00*/control/`].
+The hybrid network (Section 3.4) is run like the other two networks, seeds 1–5 at every Reynolds number, with the data-only control (Section 3.4), seeds 1–3 at every Reynolds number [`experiments/experiment_00*/control/`].
+
+A final set of runs completes the design so that every network has five seeds at every Reynolds number:
+- seeds 4–5 of the data NN, the PINN and the hybrid at $Re = 10$ and 1000 (seeds 1–3 of the data NN and the PINN there shared the GPU, so only their accuracy is used; seeds 4–5 are timed on a free GPU);
+- the data-only control at $Re = 10$ and 1000, seeds 1–3;
+- the 100,000-step runs listed under S5 for the hybrid and for the PINN at $Re = 1000$ (seeds 2–3).
+
+These runs were planned and their scoring fixed before they started; no setting of an earlier run was changed. The PINN at $Re = 10$ with 100,000 steps, planned under S5, was not run.
 
 Its results are scored by the same evaluator [`experiments/results/experiment_results*.csv`].
 
@@ -226,7 +229,7 @@ All runs used one laptop [`experiments/experiment_001_re100/environment.json`]:
 3. At $Re = 1000$ the reference comes from a $127 \times 127$ solve. The $64 \times 64$ FD solution itself has a test-A error of $u$ of 0.251 against this reference [`experiments/results/experiment_results_re1000.csv`]. A cost comparison at $Re = 1000$ has to count the finer solve.
 4. The overfitting sanity check (Section 4) was relaxed after its first version failed. The original target was a loss of $10^{-4}$, which the pressure term could not reach because of the lid-corner pressure spikes.
 5. Some network runs shared the GPU with another job (flagged in `config.json`). Their accuracy is valid, their times are not used. Some timed runs coincided with operating-system background updates, so their times may be slightly perturbed.
-6. The Reynolds-number trend ($Re = 10$, 1000), studies S4–S6 and the hybrid network were added after the first results at $Re = 100$ and 400. Each was planned and its scoring fixed before its own runs. No setting of an existing run was changed after its results were seen.
+6. The Reynolds-number trend ($Re = 10$, 1000), studies S4–S6 and the hybrid network were added after the first results at $Re = 100$ and 400. Each was planned and its scoring fixed before its own runs. No setting of an existing run was changed after its results were seen. The same holds for the runs that complete five seeds at $Re = 10$ and 1000, the controls at those Reynolds numbers and the extra 100,000-step runs (Section 8), which were added last. The control was added after the first hybrid results had been seen (item 7).
 7. The hybrid network outputs physical values, whereas the data NN outputs standardized values (Section 3.4). This is a second difference between the two besides the loss; the data-only control run measures its effect.
 8. The weight check at step 2,000 never changed the PINN weights at $Re = 100$: the largest-to-smallest ratios were 21.8, 57.5, 18.3, 66.5 and 46.8 [`notes/week-04.md`, item 17]. Whether it changed weights in other runs is recorded in each `config.json`.
 9. The PDE residuals are RMS values over 50,000 random points, so a few points with very large residuals can dominate them. This happens at the two corners where the moving lid meets the side walls: the wall velocity jumps from 1 to 0 there, and the exact solution is singular. For the networks trained longer than 20,000 steps (S5, and S6 at $Re = 400$ and 1000), at least 99.9% of the squared continuity residual comes from the 0.4% of the points that lie within 0.05 of these corners; for some 20,000-step runs the share is also large (91% for `pinn_re400_gpu_s1`, 99% for `hybrid_re400_gpu_s4`). A version of the residual without the points within 0.02, 0.05 and 0.1 of either lid corner is therefore reported next to the primary value (`experiments/analysis/plots/analysis_corner_excluded.csv`). It was added after the S5 and S6 residuals had been seen; the primary value is unchanged.

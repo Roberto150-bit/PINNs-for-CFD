@@ -11,34 +11,40 @@
   "runs": [
    "dnn_re10_gpu_s1",
    "dnn_re10_gpu_s2",
-   "dnn_re10_gpu_s3"
+   "dnn_re10_gpu_s3",
+   "dnn_re10_gpu_s4",
+   "dnn_re10_gpu_s5"
   ],
-  "continuity_r0_mean": 0.5839356780052185,
-  "continuity_r0.02_mean": 0.5505831638971964,
-  "continuity_r0.05_mean": 0.3307870825131734,
-  "continuity_r0.1_mean": 0.18628285825252533
+  "continuity_r0_mean": 0.5685137271881103,
+  "continuity_r0.02_mean": 0.5261418581008911,
+  "continuity_r0.05_mean": 0.3183318555355072,
+  "continuity_r0.1_mean": 0.1687134861946106
  },
  "re10_main_pinn": {
   "runs": [
    "pinn_re10_gpu_s1",
    "pinn_re10_gpu_s2",
-   "pinn_re10_gpu_s3"
+   "pinn_re10_gpu_s3",
+   "pinn_re10_gpu_s4",
+   "pinn_re10_gpu_s5"
   ],
-  "continuity_r0_mean": 0.01958111549417178,
-  "continuity_r0.02_mean": 0.01332476952423652,
-  "continuity_r0.05_mean": 0.012079126201570034,
-  "continuity_r0.1_mean": 0.010468296396235624
+  "continuity_r0_mean": 0.018195079639554024,
+  "continuity_r0.02_mean": 0.012953686900436879,
+  "continuity_r0.05_mean": 0.011955611780285836,
+  "continuity_r0.1_mean": 0.010545723140239716
  },
  "re10_main_hybrid": {
   "runs": [
    "hybrid_re10_gpu_s1",
    "hybrid_re10_gpu_s2",
-   "hybrid_re10_gpu_s3"
+   "hybrid_re10_gpu_s3",
+   "hybrid_re10_gpu_s4",
+   "hybrid_re10_gpu_s5"
   ],
-  "continuity_r0_mean": 0.08254006256659825,
-  "continuity_r0.02_mean": 0.0343411477903525,
-  "continuity_r0.05_mean": 0.027920281514525414,
-  "continuity_r0.1_mean": 0.01955508440732956
+  "continuity_r0_mean": 0.07773644775152207,
+  "continuity_r0.02_mean": 0.03382719904184341,
+  "continuity_r0.05_mean": 0.02761387750506401,
+  "continuity_r0.1_mean": 0.020136725902557374
  },
  "re10_continuation_pinn": {
   "runs": [

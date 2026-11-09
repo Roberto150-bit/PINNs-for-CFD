@@ -5,7 +5,7 @@ Lid-driven cavity, $(x, y, t) \rightarrow (u, v, p)$ on $t \in [0, 5]$. Three me
 - a physics-informed neural network (PINN), trained on the equations only;
 - a hybrid network, trained on both.
 
-All networks use the same $5 \times 64$ architecture, optimizer and 20,000 training steps. Errors are test-A relative $L_2$ errors at the final training step. Means are over seeds: 5 seeds at $Re = 100$ and 400, 3 at $Re = 10$ and 1000. Sources: `experiments/results/experiment_results*.csv` (main runs), `sensitivity_re100.csv`, `causal_re400.csv`, `continuation_re*.csv` and `poster_numbers.json`. The method is described in `notes/methodology_draft.md`.
+All networks use the same $5 \times 64$ architecture, optimizer and 20,000 training steps. Errors are test-A relative $L_2$ errors at the final training step. Means are over seeds: 5 seeds at $Re = 10$, 100 and 400, 3 at $Re = 1000$ (seeds 4–5 there are being trained). Sources: `experiments/results/experiment_results*.csv` (main runs), `sensitivity_re100.csv`, `causal_re400.csv`, `continuation_re*.csv` and `poster_numbers.json`. The method is described in `notes/methodology_draft.md`.
 
 ## RQ1: Accuracy
 
@@ -13,7 +13,7 @@ All networks use the same $5 \times 64$ architecture, optimizer and 20,000 train
 
 | $Re$ | Data NN $u$ / $v$ / $p$ | PINN $u$ / $v$ / $p$ |
 |---|---|---|
-| 10 | 0.019 / 0.018 / 0.119 | 0.159 / 0.194 / 0.522 |
+| 10 | 0.018 / 0.019 / 0.119 | 0.161 / 0.196 / 0.524 |
 | 100 | 0.017 / 0.018 / 0.113 | 0.082 / 0.166 / 0.265 |
 | 400 | 0.023 / 0.025 / 0.161 | 0.357 / 0.905 / 0.889 |
 | 1000 | 0.017 / 0.020 / 0.022 | 0.410 / 0.983 / 1.016 |
@@ -36,18 +36,18 @@ At unseen times (test B, ten held-out snapshots) the errors are similar: 0.014 (
 
 | $Re$ | Continuity residual (RMS), data NN | PINN | Ratio |
 |---|---|---|---|
-| 10 | 0.584 | 0.020 | 30× |
+| 10 | 0.569 | 0.018 | 31× |
 | 100 | 0.546 | 0.071 | 8× |
 | 400 | 0.548 | 0.029 | 19× |
 | 1000 | 0.352 | 0.010 | 34× |
 
-- The x-momentum residual of the data NN is 5.6 at $Re = 100$ and 57.5 at $Re = 10$, against 0.096 and 0.052 for the PINN.
+- The x-momentum residual of the data NN is 5.6 at $Re = 100$ and 51.6 at $Re = 10$, against 0.096 and 0.054 for the PINN.
 - On the grid stencil at $Re = 100$, the continuity RMS is 0.055 (data NN), 0.023 (PINN) and 0.00015 (FD reference) [`poster_numbers.json`].
 - The reverse holds for the boundary conditions: the PINN's boundary error (RMS 0.017 at $Re = 100$, 0.039 at $Re = 10$) is larger than the data NN's (0.005).
 
 **Figures.** `analysis_reynolds_trend.png` (lower panel) and the poster physics figure (`v4_physics__*.png`).
 
-**Caveats.** The network residuals are computed by automatic differentiation at 50,000 points not used in training. They measure how well each network satisfies the equations, not how close it is to the FD solution.
+**Caveats.** The network residuals are computed by automatic differentiation at 50,000 points not used in training. They measure how well each network satisfies the equations, not how close it is to the FD solution. Being averages over random points, they can be dominated by the few points near the two lid corners, where the wall velocity jumps and the exact solution is singular. Without the points within 0.05 of a lid corner, the order PINN < hybrid < data NN is unchanged at every $Re$ [`experiments/analysis/plots/analysis_corner_excluded.csv`, added after the S5 and S6 results were seen].
 
 ## RQ3: Repeatability and robustness
 
@@ -55,7 +55,7 @@ At unseen times (test B, ten held-out snapshots) the errors are similar: 0.014 (
 - Across seeds, both networks are repeatable at $Re = 100$:
   - data NN $u$ error 0.0154–0.0181 (s.d. 0.0010);
   - PINN 0.072–0.100 (s.d. 0.011).
-- Across Reynolds numbers, only the data NN is robust: 0.017–0.023. The PINN goes from 0.082 at $Re = 100$ to 0.159 at $Re = 10$ and 0.36–0.41 at $Re \ge 400$. All seeds fail in the same way, so the failure is systematic, not bad luck.
+- Across Reynolds numbers, only the data NN is robust: 0.017–0.023. The PINN goes from 0.082 at $Re = 100$ to 0.161 at $Re = 10$ and 0.36–0.41 at $Re \ge 400$. All seeds fail in the same way, so the failure is systematic, not bad luck.
 - The data NN's test error shows occasional short-lived rises during training, from which it recovers. The PINN's error decreases smoothly. The spike table is in `experiments/analysis/plots/analysis_spikes.csv` (definition in the methodology draft, Section 5); its counts are not yet in the results tables.
 
 **What changes the PINN at $Re = 400$** (seeds 1–3, $u$ error, same-seed standard runs 0.349):
@@ -77,7 +77,7 @@ Results at other $Re$:
 
 **Sensitivity at $Re = 100$** (3 seeds, `sensitivity_re100.csv`):
 - With 1% of the data the data NN (0.133) is worse than the PINN without data (0.082); with 10% it reaches 0.050.
-- A PINN with 5,000 collocation points satisfies continuity only at its training points: residual 1.26 at the evaluation points.
+- A PINN with 5,000 collocation points has a continuity residual of 1.26 at the evaluation points, mostly from the lid corners: without the points within 0.05 of a lid corner it is 0.028, against 0.017 with 20,000 points [`analysis_corner_excluded.csv`].
 - A larger network ($6 \times 100$) does not help either method. One data NN seed ended on a loss spike (0.102).
 
 **Figures.**
@@ -86,7 +86,7 @@ Results at other $Re$:
 - `analysis_s1_data.png`, `analysis_s2_collocation.png`, `analysis_s3_size.png`
 
 **Caveats.**
-- Only three seeds at $Re = 10$ and 1000 and in the studies.
+- Only three seeds at $Re = 1000$ (seeds 4–5 are being trained) and in the studies.
 - S4–S6 were added after the first $Re = 400$ result. Each was fixed before its own runs, and none changed an existing run.
 - For S5 at $Re = 100$ only $u$ is available; the physics residuals were scored at $Re = 400$ only.
 
@@ -148,7 +148,7 @@ The hybrid costs slightly more to train than the PINN, because it computes both 
 - `analysis_s4_causal.png` (the hybrid next to the causal PINN at $Re = 400$)
 
 **Caveats.**
-- Three seeds per Reynolds number in the tables. Of seeds 4–5 at $Re = 100$, seed 4 is in line (test-A $u$ 0.037). Seed 5 ends on a spike exactly at the last step (spike table), so its reported result, 0.118, is worse than the PINN's for that seed (0.076). At $Re = 400$ seeds 4 and 5 are in line (0.054, 0.080). Over all five seeds the hybrid's test-A $u$ error is 0.061 (s.d. 0.032) at $Re = 100$ and 0.066 (s.d. 0.012) at $Re = 400$. At $Re = 100$ that is the largest seed-to-seed spread of the three networks (data NN s.d. 0.0010, PINN 0.011), entirely because of seed 5. [`experiment_results.csv`, `experiment_results_re400.csv`; spike table `experiments/analysis/plots/analysis_spikes.csv`]
+- Three seeds per Reynolds number in the tables. Of seeds 4–5 at $Re = 100$, seed 4 is in line (test-A $u$ 0.037). Seed 5 ends on a spike exactly at the last step (spike table), so its reported result, 0.118, is worse than the PINN's for that seed (0.076). At $Re = 400$ seeds 4 and 5 are in line (0.054, 0.080). Over all five seeds the hybrid's test-A $u$ error is 0.061 (s.d. 0.008) at $Re = 10$, 0.061 (s.d. 0.032) at $Re = 100$ and 0.066 (s.d. 0.012) at $Re = 400$; at $Re = 10$ seed 5 is the highest (0.076) without a spike. At $Re = 100$ that is the largest seed-to-seed spread of the three networks (data NN s.d. 0.0010, PINN 0.011), entirely because of seed 5. [`experiment_results*.csv`; spike table `experiments/analysis/plots/analysis_spikes.csv`]
 - The hybrid outputs physical $u$, $v$, $p$, while the data NN outputs standardized values. A data-only control (the hybrid code without the physics loss, seeds 1–3) separates the two effects [`control_re100.csv`, `control_re400.csv`; figure `analysis_hybrid_control.png`]:
 
 | | Data NN | Control (physical outputs, data loss) | Hybrid (+ physics loss) |
