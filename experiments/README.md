@@ -9,7 +9,7 @@ Each experiment is a self-contained record: shared configuration, computing envi
 | Folder | Content |
 |---|---|
 | `experiment_001_re100/` | $Re = 100$: main runs, determinism cost, sensitivity studies S1-S3 (`sensitivity/`), longer training S5 (`extended/`) |
-| `experiment_002_re400/` | $Re = 400$: main runs, S5 (`extended/`), causal weighting S4 (`causal/`) |
+| `experiment_002_re400/` | $Re = 400$: main runs, S5 (`extended/`), causal weighting S4 (`causal/`), $Re$ continuation S6 (`continuation/`) |
 | `experiment_003_re10/` | $Re = 10$: Reynolds trend (FD, data NN and PINN, seeds 1-3) |
 | `experiment_004_re1000/` | $Re = 1000$: Reynolds trend (FD, data NN and PINN, seeds 1-3) |
 | `benchmarks/` | Marchi et al. (2009) and Hou et al. (1995) tables |
@@ -32,6 +32,7 @@ python experiments/run_batch.py --extended               # S5, 100,000 steps
 python experiments/run_batch.py --trend fd               # FD at Re 10 and 1000
 python experiments/run_batch.py --trend nn [--trend-re 10]
 python experiments/run_batch.py --causal                 # S4 at Re 400
+python experiments/run_batch.py --continuation           # S6: Re 400 started from Re 100
 ```
 
 A job is skipped when its run folder already holds a `performance.json`, so a batch can be restarted safely.

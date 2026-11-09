@@ -29,6 +29,7 @@ Options used by the studies:
 - `--hidden-layers 6 --neurons 100` — network size (S3)
 - `--steps 100000` — longer training (S5)
 - `--causal` — causal weighting of the PDE residual (S4, Wang, Sankaran and Perdikaris 2022): the time interval is split into 32 chunks and chunk $i$ is weighted by $w_i = \exp(-\varepsilon \sum_{k<i} L_k)$, with $\varepsilon$ raised through $10^{-2}, 10^{-1}, 1, 10, 100$ whenever the smallest weight exceeds 0.99
+- `--init-from <model.keras>` — start from the weights of a trained network with the same architecture instead of random weights; the optimizer starts fresh (S6, $Re$ continuation: the $Re = 400$ PINN started from the $Re = 100$ PINN of the same seed)
 - `--shared-gpu` — the GPU is shared with another job; the run is marked `"timing_valid": false` and its times are not used as cost results
 - `--run-id`, `--exp-dir`, `--tag` — override the run id, the output folder, or add a suffix to the run id
 
