@@ -30,5 +30,20 @@
   "top_rows_mean": 0.0504738023628757,
   "rest_mean": 0.01920201647648821
  },
+ "hybrid": {
+  "runs": [
+   "hybrid_re10_gpu_s1",
+   "hybrid_re10_gpu_s2",
+   "hybrid_re10_gpu_s3"
+  ],
+  "mean_abs_error": 0.00517567719722303,
+  "max_abs_error": 0.3333593236875689,
+  "argmax_xy": [
+   1.0,
+   1.0
+  ],
+  "top_rows_mean": 0.012760697152930656,
+  "rest_mean": 0.004092102917836226
+ },
  "color_max_99th_percentile": 0.13463487286447925
 }

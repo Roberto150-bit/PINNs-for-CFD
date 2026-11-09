@@ -113,9 +113,18 @@ Results at other $Re$:
 
 ## Hybrid network (data + physics loss)
 
-**Finding.** The hybrid lies between the two other networks at $Re = 100$, in both accuracy and physical consistency. At $Re = 400$, where the PINN fails, the hybrid recovers the flow: its error is about five times lower than the PINN's, and its continuity residual is as low as the PINN's. It does not reach the data NN's accuracy at either Reynolds number.
+**Finding.** At every Reynolds number the hybrid lies between the other two networks in accuracy. Unlike the PINN, its error hardly changes with $Re$. At $Re = 400$ and 1000, where the PINN converges to a wrong flow, the hybrid recovers the flow, and its continuity residual stays close to the PINN's. It does not reach the data NN's accuracy at any Reynolds number.
 
-Seeds 1–3, the same seeds for all three networks [`experiment_results.csv`, `experiment_results_re400.csv`]:
+Test-A error of $u$ and continuity residual, seeds 1–3, the same seeds for all three networks [`experiment_results*.csv`]:
+
+| $Re$ | $u$: data NN / PINN / hybrid | Continuity: data NN / PINN / hybrid |
+|---|---|---|
+| 10 | 0.019 / 0.159 / 0.058 | 0.584 / 0.020 / 0.083 |
+| 100 | 0.017 / 0.084 / 0.050 | 0.547 / 0.080 / 0.173 |
+| 400 | 0.023 / 0.349 / 0.065 | 0.549 / 0.038 / 0.041 |
+| 1000 | 0.017 / 0.410 / 0.079 | 0.352 / 0.010 / 0.054 |
+
+All metrics at $Re = 100$ and 400:
 
 | | $Re = 100$: data NN / PINN / hybrid | $Re = 400$: data NN / PINN / hybrid |
 |---|---|---|
@@ -137,6 +146,6 @@ The hybrid costs slightly more to train than the PINN, because it computes both 
 - `analysis_s4_causal.png` (the hybrid next to the causal PINN at $Re = 400$)
 
 **Caveats.**
-- Three seeds per Reynolds number so far. Runs at $Re = 10$ and 1000 and seeds 4–5 are still to be scored.
+- Three seeds per Reynolds number. Seeds 4–5 at $Re = 100$ and 400 are still to be scored.
 - The hybrid outputs physical $u$, $v$, $p$, while the data NN outputs standardized values. The difference between the hybrid and the data NN therefore mixes the effect of the physics loss with the effect of the output units. A data-only control run (the hybrid code without the physics loss) separates the two; its results are not yet available.
-- The loss weights were not tuned: all start at 1, as in the PINN. In all six runs the data term was the largest at step 2,000, 20 to 38 times the smallest term (continuity). That is below the rebalancing threshold of 100, so the weights never changed [each run's `config.json`].
+- The loss weights were not tuned: all start at 1, as in the PINN. In all twelve runs the data term was the largest at step 2,000, 15 to 52 times the smallest term. That is below the rebalancing threshold of 100, so the weights never changed [each run's `config.json`].
