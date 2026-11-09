@@ -115,7 +115,8 @@ def extended_jobs():
     scripts = {"data_driven_nn": ("models/data_driven_nn/src/train.py", "dnn"),
                "pinn": ("models/pinn/src/train.py", "pinn")}
     order = [(100.0, "data_driven_nn", s) for s in (1, 2, 3)] + [
-        (100.0, "pinn", 1), (400.0, "pinn", 1), (100.0, "pinn", 2), (400.0, "pinn", 2), (100.0, "pinn", 3)]
+        (100.0, "pinn", 1), (400.0, "pinn", 1), (100.0, "pinn", 2), (400.0, "pinn", 2), (100.0, "pinn", 3),
+        (400.0, "pinn", 3)]
     out = []
     for re, method, s in order:
         script, short = scripts[method]

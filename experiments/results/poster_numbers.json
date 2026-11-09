@@ -1914,26 +1914,29 @@
   "description": "S5 Re 100 data_driven_nn: completed 100k-step runs"
  },
  "s5_re100_pinn_u_at_20k_mean": {
-  "value": 0.09019983544042573,
+  "value": 0.08405453355615582,
   "runs": [
    "pinn_re100_gpu_s1_steps100k",
-   "pinn_re100_gpu_s2_steps100k"
+   "pinn_re100_gpu_s2_steps100k",
+   "pinn_re100_gpu_s3_steps100k"
   ],
   "description": "S5 Re 100 pinn: test-A rel. L2 u at step 20,000"
  },
  "s5_re100_pinn_u_at_100k_mean": {
-  "value": 0.08084089358548753,
+  "value": 0.08170908901161554,
   "runs": [
    "pinn_re100_gpu_s1_steps100k",
-   "pinn_re100_gpu_s2_steps100k"
+   "pinn_re100_gpu_s2_steps100k",
+   "pinn_re100_gpu_s3_steps100k"
   ],
   "description": "S5 Re 100 pinn: test-A rel. L2 u at step 100,000"
  },
  "s5_re100_pinn_n_runs": {
-  "value": 2,
+  "value": 3,
   "runs": [
    "pinn_re100_gpu_s1_steps100k",
-   "pinn_re100_gpu_s2_steps100k"
+   "pinn_re100_gpu_s2_steps100k",
+   "pinn_re100_gpu_s3_steps100k"
   ],
   "description": "S5 Re 100 pinn: completed 100k-step runs"
  },
