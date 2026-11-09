@@ -203,18 +203,18 @@ def column_question(slide):
               text=["A trained neural network predicts a flow in milliseconds instead of running a slow "
                     "simulation. A data-driven network (data NN) learns from simulation results, so a "
                     "simulation must run first. A physics-informed network (PINN) [3] learns only from "
-                    "the flow equations: no data, but more computing.",
+                    "the flow equations: no data, but more computing. A hybrid learns from both.",
                     "RQ1  Which is more accurate?",
                     "RQ2  Which obeys the physics better?",
                     "RQ3  Which is more reliable across seeds and flow speeds?",
                     "RQ4  What does each cost?"],
               size=BODY_PT)
     COLUMN_END[1] = panel(slide, x, y,
-                          "Both networks were built and scored the same way; only what they learn from differs.",
+                          "All three networks were built and scored the same way; only what they learn from differs.",
                           fig="pipelines",
                           text=["Test flow: fluid in a box driven by a sliding lid. Reference: a "
                                 "finite-difference (FD) simulation that matches published results [1, 2]. "
-                                "Both networks: 17,091 parameters, 20,000 training steps, 3-5 seeds, scored on "
+                                "All three: 17,091 parameters, 20,000 training steps, 3-5 seeds, scored on "
                                 "points and times never seen in training."],
                           size=BODY_PT)
 
@@ -225,16 +225,19 @@ def column_rq12(slide):
               "RQ1: The data NN matches the simulation "
               f"{ratio('pinn_gpu_test_a_relative_l2_u_mean', 'dnn_gpu_test_a_relative_l2_u_mean')}× more closely.",
               fig="v4_accuracy",
-              text=[f"Error in u: {pct('dnn_gpu_test_a_relative_l2_u_mean')} vs "
-                    f"{pct('pinn_gpu_test_a_relative_l2_u_mean')} (Re = 100, mean of 5 seeds)."])
+              text=[f"Error in u at Re = 100: data NN {pct('dnn_gpu_test_a_relative_l2_u_mean')}, hybrid "
+                    f"{pct('hybrid_gpu_test_a_relative_l2_u_mean')}, PINN {pct('pinn_gpu_test_a_relative_l2_u_mean')} "
+                    f"(mean of {num('dnn_gpu_n_runs', '{:.0f}')}, {num('hybrid_gpu_n_runs', '{:.0f}')} and "
+                    f"{num('pinn_gpu_n_runs', '{:.0f}')} seeds)."])
     COLUMN_END[2] = panel(slide, x, y,
                           "RQ2: The PINN obeys the flow equations "
                           f"{ratio('dnn_gpu_continuity_residual_mean', 'pinn_gpu_continuity_residual_mean')}× "
                           "more closely.",
                           fig="v4_physics",
-                          text=["Violation of mass conservation: "
-                                f"{num('pinn_gpu_continuity_residual_mean', '{:.2g}')} for the PINN vs "
-                                f"{num('dnn_gpu_continuity_residual_mean', '{:.2g}')} for the data NN."])
+                          text=["Violation of mass conservation: PINN "
+                                f"{num('pinn_gpu_continuity_residual_mean', '{:.2g}')}, hybrid "
+                                f"{num('hybrid_gpu_continuity_residual_mean', '{:.2g}')}, data NN "
+                                f"{num('dnn_gpu_continuity_residual_mean', '{:.2g}')}."])
 
 
 def trend_evidence():
@@ -282,19 +285,19 @@ def column_answer(slide):
               f"{ratio('pinn_gpu_total_cost_to_field_seconds', 'dnn_gpu_total_cost_to_field_seconds', '{:.1f}')}× "
               "more training time.",
               fig="v4_cost",
-              text=[f"Here the simulation took only {num('fd_n64_solve_seconds_median', '{:.1f}')} s, so data "
-                    "was cheap. GPU memory: "
+              text=[f"The simulation took only {num('fd_n64_solve_seconds_median', '{:.1f}')} s, so data "
+                    "was cheap; the hybrid pays for both. GPU memory: "
                     f"{num('pinn_gpu_peak_vram_bytes_mean', '{:.0f}', 1 / 2**20)} MB (PINN) vs "
                     f"{num('dnn_gpu_peak_vram_bytes_mean', '{:.0f}', 1 / 2**20)} MB (data NN)."])
     y = panel(slide, x, y,
-              "Neither wins outright; their opposite strengths point to a hybrid.",
-              text=["• Data NN: more accurate and cheaper, when simulation data already exists.",
-                    "• PINN: needs no data and obeys the physics, but costs more and needs far more "
+              "No method wins on everything; each trades accuracy, physics and cost.",
+              text=["• Data NN: most accurate and cheapest, when simulation data already exists.",
+                    "• PINN: needs no data and obeys the physics best, but costs more and needs far more "
                     "training as the flow speeds up.",
-                    "• Reusing what a network already learned helps: starting at Re = 400 from the "
-                    "trained Re = 100 PINN more than halved its error.",
-                    "• Next: a hybrid trained on a little data plus the physics loss could cut both the "
-                    "data and the computing needed (not tested here)."],
+                    "• Hybrid: in between on accuracy and physics, but it needs the data and the most "
+                    "training time.",
+                    "• Reusing a trained network helps: starting at Re = 400 from the trained Re = 100 PINN "
+                    "more than halved its error."],
               size=BODY_PT)
     y = block(slide, x, y, [
         "[1] Marchi, C. H., Suero, R., and Araki, L. K. 2009. The lid-driven square cavity flow: numerical "

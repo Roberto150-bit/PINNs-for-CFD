@@ -196,6 +196,7 @@ def poster_numbers(summary, fd, det, cost, validation, transient):
                     f"{m} GPU runs: mean relative L2 of {k} on {split}")
                 put(f"{short}_gpu_{col}_std", g(m, "gpu", col, "std"), runs(m, "gpu"),
                     f"{m} GPU runs: std over seeds")
+        put(f"{short}_gpu_n_runs", len(runs(m, "gpu")) or None, runs(m, "gpu"), f"{m} GPU: number of seeds (Re 100)")
         for col in ("continuity_residual", "x_momentum_residual", "y_momentum_residual",
                     "stencil_continuity_rms_core", "boundary_rms", "initial_rms",
                     "training_time_seconds", "time_per_step_seconds", "inference_time_seconds",

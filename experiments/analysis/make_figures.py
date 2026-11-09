@@ -358,7 +358,7 @@ def fig_schematic():
 
 
 def fig_pipelines():
-    """FD → data → data NN; physics → PINN; one shared evaluator."""
+    """FD → data → data NN; physics → PINN; data + physics → hybrid; one shared evaluator."""
     fig, ax = plt.subplots(figsize=(WIDTH, 3.5), constrained_layout=True)
     ax.axis("off")
     ax.set_xlim(0, 15)
@@ -374,17 +374,18 @@ def fig_pipelines():
     box(0.2, 6.0, 3.0, 2.0, "FD\nsolver", COLORS["finite_difference"])
     box(4.6, 6.0, 3.0, 2.0, "FD\ndata", COLORS["finite_difference"])
     box(9.0, 6.0, 2.6, 2.0, "Data\nNN", COLORS["data_driven_nn"])
+    box(9.0, 3.2, 2.6, 2.0, "Hybrid", COLORS["hybrid"])
     box(0.2, 0.4, 3.0, 2.0, "Physics", INK2)
     box(9.0, 0.4, 2.6, 2.0, "PINN", COLORS["pinn"])
-    box(12.4, 3.2, 2.4, 2.0, "Eval.", INK)
-    arrow(3.4, 7.0, 4.6, 7.0)
-    arrow(7.8, 7.0, 9.0, 7.0)
-    arrow(3.4, 1.4, 9.0, 1.4)
-    arrow(11.8, 6.6, 12.6, 5.4)
-    arrow(11.8, 1.8, 12.6, 3.0)
-    ax.annotate("", (12.4, 4.2), (1.7, 5.9), arrowprops={"arrowstyle": "-|>", "lw": 2, "ls": ":",
-                                                         "color": COLORS["finite_difference"],
-                                                         "connectionstyle": "arc3,rad=0.12"})
+    box(12.6, 2.6, 2.2, 3.2, "Eval.\nvs FD", INK)
+    arrow(3.4, 7.0, 4.6, 7.0)                 # solver -> data
+    arrow(7.8, 7.0, 9.0, 7.0)                 # data -> data NN
+    arrow(7.8, 6.2, 9.0, 4.8)                 # data -> hybrid
+    arrow(3.4, 1.4, 9.0, 1.4)                 # physics -> PINN
+    arrow(3.4, 2.2, 9.0, 3.6)                 # physics -> hybrid
+    arrow(11.8, 6.6, 12.7, 5.6)
+    arrow(11.8, 4.2, 12.6, 4.2)
+    arrow(11.8, 1.8, 12.7, 2.8)
     return fig, {}
 
 
@@ -395,13 +396,13 @@ def fig_pipelines():
 WIDE = 9.6             # inches: one column of the three-column poster layout
 
 
-def value_labels(ax, bars, fmt, errs=None):
+def value_labels(ax, bars, fmt, errs=None, fontsize=22):
     """Write each bar's value just above the bar (and above its error bar, if any)."""
     for i, b in enumerate(bars):
         h = b.get_height()
         top = h + (errs[i] if errs is not None else 0)
         ax.annotate(fmt(h), (b.get_x() + b.get_width() / 2, top), xytext=(0, 4),
-                    textcoords="offset points", ha="center", va="bottom", fontsize=22, color=INK)
+                    textcoords="offset points", ha="center", va="bottom", fontsize=fontsize, color=INK)
 
 
 def fig_v2_accuracy(data):
@@ -699,11 +700,12 @@ def fig_v4_accuracy(data):
         xs = np.arange(3) + (i - (len(methods) - 1) / 2) * width
         bars = ax.bar(xs, means, width * 0.92, yerr=stds, color=COLORS[m], label=LABELS[m],
                       capsize=5, error_kw={"elinewidth": 2, "ecolor": INK})
-        value_labels(ax, bars, lambda h: f"{h:.0f}%" if h >= 10 else f"{h:.1f}%", stds)
+        value_labels(ax, bars, lambda h: f"{h:.0f}%" if h >= 10 else f"{h:.1f}%", stds,
+                     fontsize=22 if len(methods) < 3 else 17)
         plotted[m] = [float(b.get_height()) / 100 for b in bars]
     ratio = plotted["pinn"][0] / plotted["data_driven_nn"][0]
     callout(ax, f"{ratio:.0f}× lower error in u\nfor the data NN", xy=(-(len(methods) - 1) / 2 * width, 100 * plotted["data_driven_nn"][0] * 0.5),
-            xytext=(0.35, 0.80), color=COLORS["data_driven_nn"])
+            xytext=(0.35, 0.80) if len(methods) < 3 else (0.19, 0.64), color=COLORS["data_driven_nn"])
     ax.set_xticks(range(3), ["u", "v", "p"])
     ax.set_ylabel("Error (%)")
     ax.set_ylim(0, max(max(v) for v in plotted.values()) * 100 * 1.35)
@@ -726,7 +728,7 @@ def fig_v4_physics(data):
         xs = np.arange(3) + (i - (len(methods) - 1) / 2) * width
         bars = ax.bar(xs, means, width * 0.92, yerr=stds, color=COLORS[m], label=LABELS[m], capsize=5,
                       error_kw={"elinewidth": 2, "ecolor": INK})
-        value_labels(ax, bars, lambda h: f"{h:.2g}", stds)
+        value_labels(ax, bars, lambda h: f"{h:.2g}", stds, fontsize=22 if len(methods) < 3 else 17)
         plotted[m] = [float(b.get_height()) for b in bars]
     ratio = plotted["data_driven_nn"][0] / plotted["pinn"][0]
     callout(ax, f"{ratio:.0f}× less mass\nviolation for the PINN", xy=((methods.index("pinn") - (len(methods) - 1) / 2) * width, plotted["pinn"][0] * 1.6),
@@ -737,7 +739,10 @@ def fig_v4_physics(data):
     plain_log_axis(ax.yaxis, subs=(1.0,))
     ax.set_ylabel("Equation violation")
     ax.grid(axis="x", visible=False)
-    ax.legend(frameon=False, loc="upper right", ncols=1 if len(methods) < 3 else 3, fontsize=20)
+    if len(methods) < 3:
+        ax.legend(frameon=False, loc="upper right")
+    else:
+        fig.legend(*ax.get_legend_handles_labels(), frameon=False, loc="outside lower center", ncols=3)
     plotted["ratio_mass"] = ratio
     return fig, plotted
 
@@ -831,12 +836,13 @@ def fig_v4_cost(nums):
         ax.annotate(f"{tot:.0f} s", (tot, y), xytext=(8, 0), textcoords="offset points", va="center",
                     fontsize=24, color=INK)
     ratio = pinn / (fd + dnn)
-    ax.annotate(f"PINN needs {ratio:.1f}× more GPU time", xy=(pinn * 0.6, 0.5), xycoords="data",
+    note_y = 0.5 if hyb is None else -0.75          # below the PINN bar when there are three rows
+    ax.annotate(f"PINN needs {ratio:.1f}× more GPU time", xy=(pinn * 0.6, note_y), xycoords="data",
                 fontsize=22, color=COLORS["pinn"], ha="center", va="center",
                 bbox={"boxstyle": "round,pad=0.35", "fc": "white", "ec": COLORS["pinn"], "lw": 2})
     ax.set_yticks(list(range(len(labels)))[::-1], labels)
     ax.set_xlim(0, max(t for _, t in totals) * 1.22)
-    ax.set_ylim(-0.6, len(labels) - 0.4)
+    ax.set_ylim(-0.6 if hyb is None else -1.15, len(labels) - 0.4)
     ax.set_xlabel("Seconds (making data + training)")
     ax.grid(axis="y", visible=False)
     plotted = {"time_fd_data": float(b_data[0].get_width()), "time_dnn_train": float(b_tr[0].get_width()),

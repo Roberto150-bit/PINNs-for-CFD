@@ -9,6 +9,9 @@
   "fd_re100_n64_transient_timing_r1",
   "fd_re100_n64_transient_timing_r2",
   "fd_re100_n64_transient_timing_r3",
+  "hybrid_re100_gpu_s1",
+  "hybrid_re100_gpu_s2",
+  "hybrid_re100_gpu_s3",
   "pinn_re100_gpu_s1",
   "pinn_re100_gpu_s2",
   "pinn_re100_gpu_s3",
@@ -19,6 +22,7 @@
   "time_fd_data": 3.9274441010002192,
   "time_dnn_train": 137.00257639621015,
   "time_pinn_train": 781.9692135369447,
-  "ratio": 5.548634781844961
+  "ratio": 5.548634781844961,
+  "time_hybrid_train": 871.7848645065873
  }
 }
