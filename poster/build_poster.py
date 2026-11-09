@@ -248,16 +248,18 @@ def trend_evidence():
     def key(r, m):
         return f"{m}_gpu_test_a_relative_l2_u_mean" if r == "100" else f"re{r}_{m}_gpu_test_a_relative_l2_u_mean"
 
-    dnn = ", ".join(pct(key(r, "dnn")) for r in res)
+    def series(m, rs):
+        # "1.9, 1.7, 2.3, 1.7%": one percent sign per list keeps the caption short
+        vals = [pct(key(r, m)) for r in rs]
+        return ", ".join(v.rstrip("%") for v in vals[:-1]) + (", " if len(vals) > 1 else "") + vals[-1]
+
     pinn_res = [r for r in res if key(r, "pinn") in NUMS]
-    pinn = ", ".join(pct(key(r, "pinn")) for r in pinn_res)
     hyb_res = [r for r in res if NUMS.get(key(r, "hybrid"), {}).get("value") is not None]
-    hyb = ", ".join(pct(key(r, "hybrid")) for r in hyb_res)
-    text = f"Every seed is a dot. Error in u at Re = {', '.join(res)}: data NN {dnn}; PINN {pinn}"
+    text = f"Every seed is a dot. Error in u at Re = {', '.join(res)}: data NN {series('dnn', res)}; "            f"PINN {series('pinn', pinn_res)}"
     if pinn_res != res:
         text += f" (Re = {', '.join(pinn_res)})"
     if hyb_res:
-        text += f"; hybrid {hyb}" + ("" if hyb_res == res else f" (Re = {', '.join(hyb_res)})")
+        text += f"; hybrid {series('hybrid', hyb_res)}" + ("" if hyb_res == res else f" (Re = {', '.join(hyb_res)})")
     return [text + "."]
 
 
@@ -271,17 +273,15 @@ def column_rq3(slide):
                           "RQ3: At Re = 400 the PINN obeys the equations but needs more training, "
                           "or a head start, to get the flow right.",
                           fig="v4_re400",
-                          text=["Flow at t = 5 (✕ = vortex). After 20,000 steps the PINN conserves mass "
-                                "better than the data NN "
+                          text=["Flow at t = 5 (✕ = vortex). The PINN conserves mass better than the data NN "
                                 f"({num('re400_pinn_gpu_continuity_residual_mean', '{:.2f}')} vs "
-                                f"{num('re400_dnn_gpu_continuity_residual_mean', '{:.2f}')}) yet puts the "
-                                "vortex by the lid. Its error in u falls from "
-                                f"{pct('s5_re400_pinn_u_at_20k_mean')} to {pct('s5_re400_pinn_u_at_100k_mean')} "
-                                f"with 100,000 steps ({num('s5_re400_pinn_n_runs', '{:.0f}')} seeds), and from "
-                                f"{pct('s6_re400_base_u_mean')} to {pct('s6_re400_warm_u_mean')} in 20,000 steps "
-                                "when it starts from the trained Re = 100 PINN "
-                                f"({num('s6_re400_n_runs', '{:.0f}')} seeds); after the same 40,000 steps "
-                                f"a random start is at {pct('s5_re400_pinn_u_at_40k_mean')}. With data added, the "
+                                f"{num('re400_dnn_gpu_continuity_residual_mean', '{:.2f}')}) yet puts the vortex "
+                                "by the lid. Error in u: "
+                                f"{pct('s5_re400_pinn_u_at_20k_mean')} → {pct('s5_re400_pinn_u_at_100k_mean')} with "
+                                f"5× more steps ({num('s5_re400_pinn_n_runs', '{:.0f}')} seeds); "
+                                f"{pct('s6_re400_base_u_mean')} → {pct('s6_re400_warm_u_mean')} starting from the "
+                                f"trained Re = 100 PINN ({num('s6_re400_n_runs', '{:.0f}')} seeds; a random start "
+                                f"is at {pct('s5_re400_pinn_u_at_40k_mean')} after the same 40,000 steps). The "
                                 f"hybrid gets the flow right ({pct('re400_hybrid_gpu_test_a_relative_l2_u_mean')}) "
                                 "and conserves mass like the PINN "
                                 f"({num('re400_hybrid_gpu_continuity_residual_mean', '{:.2f}')})."])
