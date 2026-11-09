@@ -9,6 +9,7 @@ already holds a performance.json, so the batch can be restarted safely.
     python experiments/run_batch.py [--re 400] [--dry-run]
     python experiments/run_batch.py --sensitivity      (studies S1-S3, Re 100)
     python experiments/run_batch.py --extended         (study S5, 100,000 steps)
+    python experiments/run_batch.py --extended-trend   (S5 extension: PINN Re 1000 and Re 10, 100,000 steps)
     python experiments/run_batch.py --trend fd         (Reynolds trend: FD at Re 10 and 1000)
     python experiments/run_batch.py --trend nn         (Reynolds trend: networks at Re 10 and 1000)
     python experiments/run_batch.py --causal           (study S4: causal weighting, PINN Re 400)
@@ -101,6 +102,23 @@ def sensitivity_jobs():
 
 
 EXTENDED_STEPS = 100_000
+
+
+def extended_trend_jobs():
+    """S5 extension across Re: PINN at Re 1000 and Re 10, 100,000 steps, seeds 1-3.
+
+    Same setup as S5. Order alternates Re 1000 and Re 10 per seed, so that if
+    the night ends early both have the same number of seeds.
+    """
+    out = []
+    for s in (1, 2, 3):
+        for re in (1000.0, 10.0):
+            EXP = f"{C.experiment_dir(re)}/extended"
+            rid = f"pinn_re{re:g}_gpu_s{s}_steps{EXTENDED_STEPS // 1000}k"
+            out.append((f"{EXP}/pinn/{rid}",
+                        [PY, "models/pinn/src/train.py", "--device", "gpu", "--seed", str(s), "--re", f"{re:g}",
+                         "--steps", str(EXTENDED_STEPS), "--run-id", rid, "--exp-dir", EXP]))
+    return out
 
 
 def extended_jobs():
@@ -225,12 +243,15 @@ def continuation_jobs(target=400.0):
         return out
     EXP = f"{C.experiment_dir(400.0)}/continuation"
     out = []
-    for s in (1, 2, 3):
+    # Seeds 1-3 ran on a shared GPU; seeds 4-5 were added later (GPU not shared) so that
+    # S6 at Re 400 has the same 5 seeds as the standard Re 400 runs.
+    for s in (1, 2, 3, 4, 5):
         rid = f"pinn_re400_gpu_s{s}_from_re100"
         init = f"{C.experiment_dir(100.0)}/pinn/pinn_re100_gpu_s{s}/model.keras"
         out.append((f"{EXP}/pinn/{rid}",
                     [PY, "models/pinn/src/train.py", "--device", "gpu", "--seed", str(s), "--re", "400",
-                     "--init-from", init, "--shared-gpu", "--run-id", rid, "--exp-dir", EXP]))
+                     "--init-from", init, "--run-id", rid, "--exp-dir", EXP]
+                    + (["--shared-gpu"] if s <= 3 else [])))
     return out
 
 
@@ -240,13 +261,24 @@ def main():
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--sensitivity", action="store_true")
     parser.add_argument("--extended", action="store_true")
-    parser.add_argument("--trend", choices=["fd", "nn"], default=None)
+    parser.add_argument("--extended-trend", action="store_true")
+    parser.add_argument("--trend",choices=["fd", "nn"], default=None)
     parser.add_argument("--causal", action="store_true")
     parser.add_argument("--continuation", type=float, nargs="?", const=400.0, default=None,
                         help="S6 target Re: 400 (from Re 100, default) or 1000 (from the S6 Re 400 runs)")
     parser.add_argument("--trend-re", type=float, nargs="+", default=list(TREND_RE),
                         help="Reynolds numbers for --trend (default: 10 and 1000)")
+    parser.add_argument("--no-start-after", default=None, metavar="HH:MM",
+                        help="start no new job after this clock time (the next one if earlier than now)")
     args = parser.parse_args()
+    deadline = None
+    if args.no_start_after:
+        import datetime as dt
+        now = dt.datetime.now()
+        hh, mm = map(int, args.no_start_after.split(":"))
+        deadline = now.replace(hour=hh, minute=mm, second=0, microsecond=0)
+        if deadline <= now:
+            deadline += dt.timedelta(days=1)
     env = dict(os.environ, PYTHONDONTWRITEBYTECODE="1", TF_CPP_MIN_LOG_LEVEL="2")
     if args.continuation:
         job_list = continuation_jobs(args.continuation)
@@ -254,6 +286,8 @@ def main():
         job_list = causal_jobs()
     elif args.trend:
         job_list = trend_jobs(args.trend, args.trend_re)
+    elif args.extended_trend:
+        job_list = extended_trend_jobs()
     elif args.extended:
         job_list = extended_jobs()
     elif args.sensitivity:
@@ -262,7 +296,7 @@ def main():
         job_list = jobs(args.re)
     for run_dir, cmd in job_list:
         name = os.path.basename(run_dir)
-        if args.extended or args.trend or args.causal or args.continuation is not None:
+        if args.extended or args.extended_trend or args.trend or args.causal or args.continuation is not None:
             LOG_DIR = os.path.join(os.path.dirname(os.path.dirname(run_dir)), "logs")
         else:
             LOG_DIR = os.path.join(C.experiment_dir(args.re), "sensitivity" if args.sensitivity else "", "logs")
@@ -270,6 +304,9 @@ def main():
         if os.path.exists(os.path.join(run_dir, "performance.json")):
             print(f"skip {name} (complete)", flush=True)
             continue
+        if deadline is not None and dt.datetime.now() > deadline:
+            print(f"{time.strftime('%Y-%m-%d %H:%M:%S')} stop: no new job after {args.no_start_after}", flush=True)
+            break
         print(f"{time.strftime('%Y-%m-%d %H:%M:%S')} start {name}: {' '.join(cmd[1:])}", flush=True)
         if args.dry_run:
             continue
