@@ -237,15 +237,17 @@
   ]
  },
  "re400_hybrid_gpu_test_a_relative_l2_u_mean": {
-  "value": 0.06546351420972317,
+  "value": 0.06607512831671274,
   "description": "Re 400 hybrid GPU runs: mean test_a_relative_l2_u",
   "runs": [
    "hybrid_re400_gpu_s1",
    "hybrid_re400_gpu_s2",
-   "hybrid_re400_gpu_s3"
+   "hybrid_re400_gpu_s3",
+   "hybrid_re400_gpu_s4",
+   "hybrid_re400_gpu_s5"
   ],
   "printed_as": [
-   "6.5%"
+   "6.6%"
   ]
  },
  "re1000_hybrid_gpu_test_a_relative_l2_u_mean": {
@@ -394,15 +396,17 @@
   ]
  },
  "re400_hybrid_gpu_continuity_residual_mean": {
-  "value": 0.04092768505780911,
+  "value": 0.07469071511108244,
   "description": "Re 400 hybrid GPU runs: mean continuity_residual",
   "runs": [
    "hybrid_re400_gpu_s1",
    "hybrid_re400_gpu_s2",
-   "hybrid_re400_gpu_s3"
+   "hybrid_re400_gpu_s3",
+   "hybrid_re400_gpu_s4",
+   "hybrid_re400_gpu_s5"
   ],
   "printed_as": [
-   "0.04"
+   "0.07"
   ]
  },
  "pinn_gpu_total_cost_to_field_seconds": {

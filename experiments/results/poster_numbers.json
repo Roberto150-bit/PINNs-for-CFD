@@ -2576,74 +2576,90 @@
   "description": "Re 400 pinn GPU runs: max continuity_residual"
  },
  "re400_hybrid_gpu_test_a_relative_l2_u_mean": {
-  "value": 0.06546351420972317,
+  "value": 0.06607512831671274,
   "runs": [
    "hybrid_re400_gpu_s1",
    "hybrid_re400_gpu_s2",
-   "hybrid_re400_gpu_s3"
+   "hybrid_re400_gpu_s3",
+   "hybrid_re400_gpu_s4",
+   "hybrid_re400_gpu_s5"
   ],
   "description": "Re 400 hybrid GPU runs: mean test_a_relative_l2_u"
  },
  "re400_hybrid_gpu_test_a_relative_l2_u_min": {
-  "value": 0.05471047765818311,
+  "value": 0.053714051862948746,
   "runs": [
    "hybrid_re400_gpu_s1",
    "hybrid_re400_gpu_s2",
-   "hybrid_re400_gpu_s3"
+   "hybrid_re400_gpu_s3",
+   "hybrid_re400_gpu_s4",
+   "hybrid_re400_gpu_s5"
   ],
   "description": "Re 400 hybrid GPU runs: min test_a_relative_l2_u"
  },
  "re400_hybrid_gpu_test_a_relative_l2_u_max": {
-  "value": 0.07605379108024998,
+  "value": 0.08027104709144542,
   "runs": [
    "hybrid_re400_gpu_s1",
    "hybrid_re400_gpu_s2",
-   "hybrid_re400_gpu_s3"
+   "hybrid_re400_gpu_s3",
+   "hybrid_re400_gpu_s4",
+   "hybrid_re400_gpu_s5"
   ],
   "description": "Re 400 hybrid GPU runs: max test_a_relative_l2_u"
  },
  "re400_hybrid_gpu_test_a_relative_l2_v_mean": {
-  "value": 0.07434095704015817,
+  "value": 0.07123784854780049,
   "runs": [
    "hybrid_re400_gpu_s1",
    "hybrid_re400_gpu_s2",
-   "hybrid_re400_gpu_s3"
+   "hybrid_re400_gpu_s3",
+   "hybrid_re400_gpu_s4",
+   "hybrid_re400_gpu_s5"
   ],
   "description": "Re 400 hybrid GPU runs: mean test_a_relative_l2_v"
  },
  "re400_hybrid_gpu_test_a_relative_l2_v_min": {
-  "value": 0.06749754976925804,
+  "value": 0.05067633636769473,
   "runs": [
    "hybrid_re400_gpu_s1",
    "hybrid_re400_gpu_s2",
-   "hybrid_re400_gpu_s3"
+   "hybrid_re400_gpu_s3",
+   "hybrid_re400_gpu_s4",
+   "hybrid_re400_gpu_s5"
   ],
   "description": "Re 400 hybrid GPU runs: min test_a_relative_l2_v"
  },
  "re400_hybrid_gpu_test_a_relative_l2_v_max": {
-  "value": 0.0815991628358733,
+  "value": 0.08249003525083325,
   "runs": [
    "hybrid_re400_gpu_s1",
    "hybrid_re400_gpu_s2",
-   "hybrid_re400_gpu_s3"
+   "hybrid_re400_gpu_s3",
+   "hybrid_re400_gpu_s4",
+   "hybrid_re400_gpu_s5"
   ],
   "description": "Re 400 hybrid GPU runs: max test_a_relative_l2_v"
  },
  "re400_hybrid_gpu_test_a_relative_l2_p_mean": {
-  "value": 0.23087567845083357,
+  "value": 0.2281936660705679,
   "runs": [
    "hybrid_re400_gpu_s1",
    "hybrid_re400_gpu_s2",
-   "hybrid_re400_gpu_s3"
+   "hybrid_re400_gpu_s3",
+   "hybrid_re400_gpu_s4",
+   "hybrid_re400_gpu_s5"
   ],
   "description": "Re 400 hybrid GPU runs: mean test_a_relative_l2_p"
  },
  "re400_hybrid_gpu_test_a_relative_l2_p_min": {
-  "value": 0.2190318950651783,
+  "value": 0.2143528712229764,
   "runs": [
    "hybrid_re400_gpu_s1",
    "hybrid_re400_gpu_s2",
-   "hybrid_re400_gpu_s3"
+   "hybrid_re400_gpu_s3",
+   "hybrid_re400_gpu_s4",
+   "hybrid_re400_gpu_s5"
   ],
   "description": "Re 400 hybrid GPU runs: min test_a_relative_l2_p"
  },
@@ -2652,16 +2668,20 @@
   "runs": [
    "hybrid_re400_gpu_s1",
    "hybrid_re400_gpu_s2",
-   "hybrid_re400_gpu_s3"
+   "hybrid_re400_gpu_s3",
+   "hybrid_re400_gpu_s4",
+   "hybrid_re400_gpu_s5"
   ],
   "description": "Re 400 hybrid GPU runs: max test_a_relative_l2_p"
  },
  "re400_hybrid_gpu_continuity_residual_mean": {
-  "value": 0.04092768505780911,
+  "value": 0.07469071511108244,
   "runs": [
    "hybrid_re400_gpu_s1",
    "hybrid_re400_gpu_s2",
-   "hybrid_re400_gpu_s3"
+   "hybrid_re400_gpu_s3",
+   "hybrid_re400_gpu_s4",
+   "hybrid_re400_gpu_s5"
   ],
   "description": "Re 400 hybrid GPU runs: mean continuity_residual"
  },
@@ -2670,16 +2690,20 @@
   "runs": [
    "hybrid_re400_gpu_s1",
    "hybrid_re400_gpu_s2",
-   "hybrid_re400_gpu_s3"
+   "hybrid_re400_gpu_s3",
+   "hybrid_re400_gpu_s4",
+   "hybrid_re400_gpu_s5"
   ],
   "description": "Re 400 hybrid GPU runs: min continuity_residual"
  },
  "re400_hybrid_gpu_continuity_residual_max": {
-  "value": 0.0457501756841903,
+  "value": 0.19869180693492725,
   "runs": [
    "hybrid_re400_gpu_s1",
    "hybrid_re400_gpu_s2",
-   "hybrid_re400_gpu_s3"
+   "hybrid_re400_gpu_s3",
+   "hybrid_re400_gpu_s4",
+   "hybrid_re400_gpu_s5"
   ],
   "description": "Re 400 hybrid GPU runs: max continuity_residual"
  },

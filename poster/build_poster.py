@@ -290,7 +290,7 @@ def column_rq3(slide):
                                 f"trained Re = 100 PINN ({num('s6_re400_n_runs', '{:.0f}')} seeds; a random start "
                                 f"is at {pct('s5_re400_pinn_u_at_40k_mean')} after the same 40,000 steps). The "
                                 f"hybrid gets the flow right ({pct('re400_hybrid_gpu_test_a_relative_l2_u_mean')}) "
-                                "and conserves mass like the PINN "
+                                "and conserves mass far better than the data NN "
                                 f"({num('re400_hybrid_gpu_continuity_residual_mean', '{:.2f}')})."])
 
 
