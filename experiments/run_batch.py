@@ -11,6 +11,7 @@ already holds a performance.json, so the batch can be restarted safely.
     python experiments/run_batch.py --extended         (study S5, 100,000 steps)
     python experiments/run_batch.py --hybrid           (hybrid network: data + physics loss, Re 10-1000)
     python experiments/run_batch.py --hybrid-control   (hybrid with data loss only: control, Re 100 and 400)
+    python experiments/run_batch.py --day              (2026-11-09: seeds 4-5 at Re 10/1000, controls, 100k runs)
     python experiments/run_batch.py --extended-trend   (S5 extension: PINN Re 1000 and Re 10, 100,000 steps)
     python experiments/run_batch.py --trend fd         (Reynolds trend: FD at Re 10 and 1000)
     python experiments/run_batch.py --trend nn         (Reynolds trend: networks at Re 10 and 1000)
@@ -129,12 +130,41 @@ def hybrid_jobs():
     return out
 
 
-def hybrid_control_jobs():
+def day_jobs():
+    """Day of 2026-11-09 (D24), GPU not shared, in this order:
+    1. seeds 4-5 at Re 10 and Re 1000 for all three networks (5 seeds at every Re);
+    2. the data-only hybrid control at Re 10 and 1000 (seeds 1-3);
+    3. hybrid at Re 400, 100,000 steps, seeds 2-3 (3 seeds with seed 1);
+    4. PINN at Re 1000, 100,000 steps, seeds 2-3 (3 seeds with seed 1);
+    5. hybrid at Re 1000, 100,000 steps, seed 1."""
+    scripts = {"dnn": ("data_driven_nn", "models/data_driven_nn/src/train.py"),
+               "pinn": ("pinn", "models/pinn/src/train.py"),
+               "hybrid": ("hybrid", "models/hybrid/src/train.py")}
+    out = []
+    for re in (10.0, 1000.0):
+        for short in ("dnn", "pinn", "hybrid"):
+            method, script = scripts[short]
+            for s in (4, 5):
+                out.append((f"{C.experiment_dir(re)}/{method}/{short}_re{re:g}_gpu_s{s}",
+                            [PY, script, "--device", "gpu", "--seed", str(s), "--re", f"{re:g}"]))
+    out += hybrid_control_jobs((10.0, 1000.0))
+    for re, short, seeds in ((400.0, "hybrid", (2, 3)), (1000.0, "pinn", (2, 3)), (1000.0, "hybrid", (1,))):
+        method, script = scripts[short]
+        EXP = f"{C.experiment_dir(re)}/extended"
+        for s in seeds:
+            rid = f"{short}_re{re:g}_gpu_s{s}_steps{EXTENDED_STEPS // 1000}k"
+            out.append((f"{EXP}/{method}/{rid}",
+                        [PY, script, "--device", "gpu", "--seed", str(s), "--re", f"{re:g}",
+                         "--steps", str(EXTENDED_STEPS), "--run-id", rid, "--exp-dir", EXP]))
+    return out
+
+
+def hybrid_control_jobs(res=(100.0, 400.0)):
     """Control for the hybrid (D23): hybrid code with the data loss only (no physics terms),
     physical outputs, seeds 1-3 at Re 100 and 400. Hybrid vs this control isolates the physics
     loss; this control vs the data NN isolates the output units. GPU not shared."""
     out = []
-    for re in (100.0, 400.0):
+    for re in res:
         EXP = f"{C.experiment_dir(re)}/control"
         for s in (1, 2, 3):
             rid = f"hybrid_re{re:g}_gpu_s{s}_dataonly"
@@ -304,6 +334,7 @@ def main():
     parser.add_argument("--extended-trend", action="store_true")
     parser.add_argument("--hybrid", action="store_true")
     parser.add_argument("--hybrid-control", action="store_true")
+    parser.add_argument("--day", action="store_true", help="runs of 2026-11-09 (D24)")
     parser.add_argument("--trend",choices=["fd", "nn"], default=None)
     parser.add_argument("--causal", action="store_true")
     parser.add_argument("--continuation", type=float, nargs="?", const=400.0, default=None,
@@ -328,6 +359,8 @@ def main():
         job_list = causal_jobs()
     elif args.trend:
         job_list = trend_jobs(args.trend, args.trend_re)
+    elif args.day:
+        job_list = day_jobs()
     elif args.hybrid_control:
         job_list = hybrid_control_jobs()
     elif args.hybrid:
@@ -344,7 +377,9 @@ def main():
         name = os.path.basename(run_dir)
         if args.hybrid and "/extended/" not in run_dir:
             LOG_DIR = os.path.join(os.path.dirname(os.path.dirname(run_dir)), "logs")
-        elif args.extended or args.extended_trend or args.hybrid or args.hybrid_control or args.trend or args.causal or args.continuation is not None:
+        elif args.day and "/extended/" not in run_dir and "/control/" not in run_dir:
+            LOG_DIR = os.path.join(os.path.dirname(os.path.dirname(run_dir)), "logs")
+        elif args.extended or args.extended_trend or args.hybrid or args.hybrid_control or args.day or args.trend or args.causal or args.continuation is not None:
             LOG_DIR = os.path.join(os.path.dirname(os.path.dirname(run_dir)), "logs")
         else:
             LOG_DIR = os.path.join(C.experiment_dir(args.re), "sensitivity" if args.sensitivity else "", "logs")
