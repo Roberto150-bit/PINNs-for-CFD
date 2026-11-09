@@ -256,7 +256,7 @@ def column_question(slide):
         "simulation (finite differences, FD), checked against published results [1, 2], is the "
         "answer key. All three networks have the same size (17,091 parameters) and the same "
         "20,000 training steps, and are scored on points and moments they never saw. Each is "
-        "trained 3 to 5 times from different random starts to check that results repeat.",
+        "trained 5 times from different random starts to check that results repeat.",
     ], size=BODY_PT)
 
 
