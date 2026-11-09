@@ -101,6 +101,46 @@
   "continuity_r0.05_mean": 0.21418931086858115,
   "continuity_r0.1_mean": 0.1384317303697268
  },
+ "re100_sensitivity_data_driven_nn": {
+  "runs": [
+   "dnn_re100_gpu_s1_arch4x50",
+   "dnn_re100_gpu_s1_arch6x100",
+   "dnn_re100_gpu_s1_frac1",
+   "dnn_re100_gpu_s1_frac10",
+   "dnn_re100_gpu_s2_arch4x50",
+   "dnn_re100_gpu_s2_arch6x100",
+   "dnn_re100_gpu_s2_frac1",
+   "dnn_re100_gpu_s2_frac10",
+   "dnn_re100_gpu_s3_arch4x50",
+   "dnn_re100_gpu_s3_arch6x100",
+   "dnn_re100_gpu_s3_frac1",
+   "dnn_re100_gpu_s3_frac10"
+  ],
+  "continuity_r0_mean": 0.5125042274594307,
+  "continuity_r0.02_mean": 0.46594514697790146,
+  "continuity_r0.05_mean": 0.31317076707879704,
+  "continuity_r0.1_mean": 0.18688089400529861
+ },
+ "re100_sensitivity_pinn": {
+  "runs": [
+   "pinn_re100_gpu_s1_arch4x50",
+   "pinn_re100_gpu_s1_arch6x100",
+   "pinn_re100_gpu_s1_col10000",
+   "pinn_re100_gpu_s1_col5000",
+   "pinn_re100_gpu_s2_arch4x50",
+   "pinn_re100_gpu_s2_arch6x100",
+   "pinn_re100_gpu_s2_col10000",
+   "pinn_re100_gpu_s2_col5000",
+   "pinn_re100_gpu_s3_arch4x50",
+   "pinn_re100_gpu_s3_arch6x100",
+   "pinn_re100_gpu_s3_col10000",
+   "pinn_re100_gpu_s3_col5000"
+  ],
+  "continuity_r0_mean": 0.45390125441675383,
+  "continuity_r0.02_mean": 0.13166801709060869,
+  "continuity_r0.05_mean": 0.01960586345133682,
+  "continuity_r0.1_mean": 0.015404424940546354
+ },
  "re400_main_data_driven_nn": {
   "runs": [
    "dnn_re400_gpu_s1",

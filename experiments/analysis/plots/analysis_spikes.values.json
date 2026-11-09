@@ -2,28 +2,28 @@
  "definition": "eval step k >= 1000 with test-A rel. L2 of u > 2 x the best value at steps 500..k-500; step 1 excluded",
  "fixed": "2026-11-09 00:36, before any hybrid result",
  "re10_data_driven_nn": {
-  "runs": 3,
-  "spikes_total": 4,
-  "runs_with_spike": 2,
+  "runs": 5,
+  "spikes_total": 6,
+  "runs_with_spike": 3,
   "runs_ending_on_spike": 0,
   "worst_ratio": 6.7224318885056045,
-  "final_over_best_mean": 1.1526676363705641
+  "final_over_best_mean": 1.1604790848911732
  },
  "re10_pinn": {
-  "runs": 3,
+  "runs": 5,
   "spikes_total": 0,
   "runs_with_spike": 0,
   "runs_ending_on_spike": 0,
-  "worst_ratio": 1.1829855958702677,
-  "final_over_best_mean": 1.0758243999914594
+  "worst_ratio": 1.2645982196158008,
+  "final_over_best_mean": 1.0889718540512907
  },
  "re10_hybrid": {
-  "runs": 3,
+  "runs": 5,
   "spikes_total": 0,
   "runs_with_spike": 0,
   "runs_ending_on_spike": 0,
-  "worst_ratio": 1.1481542954444095,
-  "final_over_best_mean": 1.0
+  "worst_ratio": 1.1953150515355875,
+  "final_over_best_mean": 1.0391346868168063
  },
  "re100_data_driven_nn": {
   "runs": 5,
@@ -74,20 +74,20 @@
   "final_over_best_mean": 1.02550256789146
  },
  "re1000_data_driven_nn": {
-  "runs": 3,
-  "spikes_total": 3,
-  "runs_with_spike": 2,
+  "runs": 5,
+  "spikes_total": 5,
+  "runs_with_spike": 3,
   "runs_ending_on_spike": 0,
   "worst_ratio": 8.047003349478649,
-  "final_over_best_mean": 1.0659941190079463
+  "final_over_best_mean": 1.0395964714047676
  },
  "re1000_pinn": {
-  "runs": 3,
+  "runs": 4,
   "spikes_total": 0,
   "runs_with_spike": 0,
   "runs_ending_on_spike": 0,
   "worst_ratio": 1.1231106978428844,
-  "final_over_best_mean": 1.0004037002466364
+  "final_over_best_mean": 1.0003027751849773
  },
  "re1000_hybrid": {
   "runs": 3,

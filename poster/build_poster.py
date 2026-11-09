@@ -298,9 +298,10 @@ def column_rq3(slide):
     y = picture(slide, x, y, "v4_trend")
     res = [r for r in ("10", "100", "400", "1000") if NUMS.get(u_key(r, "hybrid"), {}).get("value") is not None]
     y = caption(slide, x, y, [
-        "Each dot is one training run; dots close together mean the result repeats. The data NN "
-        "stays near 2% and the hybrid under 10% at every speed. The PINN gets worse as the flow "
-        f"speeds up: {series([u_key(r, 'pinn') for r in res])} error at Re = {', '.join(res)}."])
+        "Each dot is one training run; dots close together mean the result repeats. Average error "
+        f"in u at Re = {', '.join(res)}: data NN {series([u_key(r, 'dnn') for r in res])}; hybrid "
+        f"{series([u_key(r, 'hybrid') for r in res])}; PINN {series([u_key(r, 'pinn') for r in res])}. "
+        "Only the PINN gets much worse as the flow speeds up."])
     y = lead(slide, x, y, [
         "What goes wrong at Re = 400: the PINN puts the center of the swirl (✕) by the lid "
         "instead of in the middle, although it obeys the rules better than the data NN "
