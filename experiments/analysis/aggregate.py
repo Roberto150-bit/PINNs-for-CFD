@@ -269,7 +269,44 @@ def poster_numbers(summary, fd, det, cost, validation, transient):
         nums[key] = e
     for key, e in continuation_numbers().items():
         nums[key] = e
+    for key, e in control_numbers().items():
+        nums[key] = e
     return nums
+
+
+def control_numbers():
+    """Hybrid control (D23): hybrid code with the data loss only, physical outputs. Compared
+    with the hybrid and the data NN runs of the same seeds at the same Re.
+    Keys: ctrl_re<Re>_<dataonly|hybrid|dnn>_<u|cont>_mean, ctrl_re<Re>_n_runs."""
+    out = {}
+    for re in ("100", "400"):
+        path = os.path.join(RESULTS, f"control_re{re}.csv")
+        main = os.path.join(RESULTS, "experiment_results.csv" if re == "100" else f"experiment_results_re{re}.csv")
+        if not (os.path.exists(path) and os.path.exists(main)):
+            continue
+        with open(path) as f:
+            ctrl = [r for r in csv.DictReader(f) if r["status"] == "evaluated" and r["test_a_relative_l2_u"]]
+        with open(main) as f:
+            base = {r["run_id"]: r for r in csv.DictReader(f)}
+        groups = {"dataonly": [], "hybrid": [], "dnn": []}
+        for r in ctrl:
+            hyb_id = r["run_id"].replace("_dataonly", "")
+            dnn_id = hyb_id.replace("hybrid_", "dnn_")
+            if hyb_id in base and dnn_id in base:
+                groups["dataonly"].append(r)
+                groups["hybrid"].append(base[hyb_id])
+                groups["dnn"].append(base[dnn_id])
+        if not groups["dataonly"]:
+            continue
+        ids = sorted(x["run_id"] for g in groups.values() for x in g)
+        out[f"ctrl_re{re}_n_runs"] = {"value": len(groups["dataonly"]), "runs": ids,
+                                      "description": f"hybrid data-only control at Re {re}: runs with same-seed hybrid and data NN"}
+        for name, rows in groups.items():
+            for short, col in (("u", "test_a_relative_l2_u"), ("cont", "continuity_residual")):
+                out[f"ctrl_re{re}_{name}_{short}_mean"] = {
+                    "value": statistics.mean(float(x[col]) for x in rows), "runs": ids,
+                    "description": f"Re {re}, seeds of the control runs: {name} mean {col}"}
+    return out
 
 
 def continuation_numbers():

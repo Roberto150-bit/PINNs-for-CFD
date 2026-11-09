@@ -244,7 +244,9 @@ def column_rq12(slide):
                           text=["Violation of mass conservation: PINN "
                                 f"{num('pinn_gpu_continuity_residual_mean', '{:.2g}')}, hybrid "
                                 f"{num('hybrid_gpu_continuity_residual_mean', '{:.2g}')}, data NN "
-                                f"{num('dnn_gpu_continuity_residual_mean', '{:.2g}')}."])
+                                f"{num('dnn_gpu_continuity_residual_mean', '{:.2g}')}. Without its physics loss the hybrid has "
+                                f"{num('ctrl_re100_dataonly_cont_mean', '{:.2f}')} (error in u "
+                                f"{pct('ctrl_re100_dataonly_u_mean')} vs {pct('ctrl_re100_hybrid_u_mean')}, same seeds)."])
 
 
 def trend_evidence():
@@ -291,7 +293,9 @@ def column_rq3(slide):
                                 f"is at {pct('s5_re400_pinn_u_at_40k_mean')} after the same 40,000 steps). The "
                                 f"hybrid gets the flow right ({pct('re400_hybrid_gpu_test_a_relative_l2_u_mean')}) "
                                 "and conserves mass far better than the data NN "
-                                f"({num('re400_hybrid_gpu_continuity_residual_mean', '{:.2f}')})."])
+                                f"({num('re400_hybrid_gpu_continuity_residual_mean', '{:.2f}')}); trained 5× longer "
+                                f"it reaches {pct('s5_re400_hybrid_u_at_100k_mean')} "
+                                f"({num('s5_re400_hybrid_n_runs', '{:.0f}')} seed)."])
 
 
 def column_answer(slide):

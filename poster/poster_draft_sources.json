@@ -148,6 +148,60 @@
    "0.16"
   ]
  },
+ "ctrl_re100_dataonly_cont_mean": {
+  "value": 0.4484790722726757,
+  "description": "Re 100, seeds of the control runs: dataonly mean continuity_residual",
+  "runs": [
+   "dnn_re100_gpu_s1",
+   "dnn_re100_gpu_s2",
+   "dnn_re100_gpu_s3",
+   "hybrid_re100_gpu_s1",
+   "hybrid_re100_gpu_s1_dataonly",
+   "hybrid_re100_gpu_s2",
+   "hybrid_re100_gpu_s2_dataonly",
+   "hybrid_re100_gpu_s3",
+   "hybrid_re100_gpu_s3_dataonly"
+  ],
+  "printed_as": [
+   "0.45"
+  ]
+ },
+ "ctrl_re100_dataonly_u_mean": {
+  "value": 0.02964506614343755,
+  "description": "Re 100, seeds of the control runs: dataonly mean test_a_relative_l2_u",
+  "runs": [
+   "dnn_re100_gpu_s1",
+   "dnn_re100_gpu_s2",
+   "dnn_re100_gpu_s3",
+   "hybrid_re100_gpu_s1",
+   "hybrid_re100_gpu_s1_dataonly",
+   "hybrid_re100_gpu_s2",
+   "hybrid_re100_gpu_s2_dataonly",
+   "hybrid_re100_gpu_s3",
+   "hybrid_re100_gpu_s3_dataonly"
+  ],
+  "printed_as": [
+   "3.0%"
+  ]
+ },
+ "ctrl_re100_hybrid_u_mean": {
+  "value": 0.04977471700424133,
+  "description": "Re 100, seeds of the control runs: hybrid mean test_a_relative_l2_u",
+  "runs": [
+   "dnn_re100_gpu_s1",
+   "dnn_re100_gpu_s2",
+   "dnn_re100_gpu_s3",
+   "hybrid_re100_gpu_s1",
+   "hybrid_re100_gpu_s1_dataonly",
+   "hybrid_re100_gpu_s2",
+   "hybrid_re100_gpu_s2_dataonly",
+   "hybrid_re100_gpu_s3",
+   "hybrid_re100_gpu_s3_dataonly"
+  ],
+  "printed_as": [
+   "5.0%"
+  ]
+ },
  "re10_dnn_gpu_test_a_relative_l2_u_mean": {
   "value": 0.018753917353266907,
   "description": "Re 10 data_driven_nn GPU runs: mean test_a_relative_l2_u",
@@ -407,6 +461,26 @@
   ],
   "printed_as": [
    "0.07"
+  ]
+ },
+ "s5_re400_hybrid_u_at_100k_mean": {
+  "value": 0.04366219624380926,
+  "description": "S5 Re 400 hybrid: test-A rel. L2 u at step 100,000",
+  "runs": [
+   "hybrid_re400_gpu_s1_steps100k"
+  ],
+  "printed_as": [
+   "4.4%"
+  ]
+ },
+ "s5_re400_hybrid_n_runs": {
+  "value": 1,
+  "description": "S5 Re 400 hybrid: completed 100k-step runs",
+  "runs": [
+   "hybrid_re400_gpu_s1_steps100k"
+  ],
+  "printed_as": [
+   "1"
   ]
  },
  "pinn_gpu_total_cost_to_field_seconds": {
