@@ -163,36 +163,39 @@
   ]
  },
  "s5_re400_pinn_u_at_20k_mean": {
-  "value": 0.3612308447849198,
+  "value": 0.3487813834501524,
   "description": "S5 Re 400 pinn: test-A rel. L2 u at step 20,000",
   "runs": [
    "pinn_re400_gpu_s1_steps100k",
-   "pinn_re400_gpu_s2_steps100k"
+   "pinn_re400_gpu_s2_steps100k",
+   "pinn_re400_gpu_s3_steps100k"
   ],
   "printed_as": [
-   "36%"
+   "35%"
   ]
  },
  "s5_re400_pinn_u_at_100k_mean": {
-  "value": 0.13756004850099185,
+  "value": 0.14063441435940516,
   "description": "S5 Re 400 pinn: test-A rel. L2 u at step 100,000",
   "runs": [
    "pinn_re400_gpu_s1_steps100k",
-   "pinn_re400_gpu_s2_steps100k"
+   "pinn_re400_gpu_s2_steps100k",
+   "pinn_re400_gpu_s3_steps100k"
   ],
   "printed_as": [
    "14%"
   ]
  },
  "s5_re400_pinn_n_runs": {
-  "value": 2,
+  "value": 3,
   "description": "S5 Re 400 pinn: completed 100k-step runs",
   "runs": [
    "pinn_re400_gpu_s1_steps100k",
-   "pinn_re400_gpu_s2_steps100k"
+   "pinn_re400_gpu_s2_steps100k",
+   "pinn_re400_gpu_s3_steps100k"
   ],
   "printed_as": [
-   "2"
+   "3"
   ]
  },
  "s6_re400_base_u_mean": {
@@ -241,14 +244,15 @@
   ]
  },
  "s5_re400_pinn_u_at_40k_mean": {
-  "value": 0.22357999478557247,
+  "value": 0.2122648968144738,
   "description": "S5 Re 400 pinn: test-A rel. L2 u at step 40,000",
   "runs": [
    "pinn_re400_gpu_s1_steps100k",
-   "pinn_re400_gpu_s2_steps100k"
+   "pinn_re400_gpu_s2_steps100k",
+   "pinn_re400_gpu_s3_steps100k"
   ],
   "printed_as": [
-   "22%"
+   "21%"
   ]
  },
  "pinn_gpu_total_cost_to_field_seconds": {
