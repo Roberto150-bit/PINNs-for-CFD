@@ -315,7 +315,9 @@ def column_rq3(slide):
         f"{pct('s5_re400_pinn_u_at_100k_mean')}, {num('s5_re400_pinn_n_runs', '{:.0f}')} runs) or starting "
         f"from the network already trained at Re = 100 ({pct('s6_re400_base_u_mean')} → "
         f"{pct('s6_re400_warm_u_mean')}, {num('s6_re400_n_runs', '{:.0f}')} runs). Adding data, as the "
-        f"hybrid does, gets it right directly: {pct('re400_hybrid_gpu_test_a_relative_l2_u_mean')}."])
+        f"hybrid does, gets it right directly: {pct('re400_hybrid_gpu_test_a_relative_l2_u_mean')}. At "
+        "Re = 1000, 5× longer training still leaves the PINN at "
+        f"{pct('s5_re1000_pinn_u_at_100k_mean')} ({num('s5_re1000_pinn_n_runs', '{:.0f}')} runs)."])
 
 
 def comparison_table(slide, x, y, width=COL_W):
