@@ -1,11 +1,16 @@
 {
- "figure": "residuals",
+ "figure": "v3_rq2",
  "runs": [
   "dnn_re100_gpu_s1",
   "dnn_re100_gpu_s2",
   "dnn_re100_gpu_s3",
   "dnn_re100_gpu_s4",
   "dnn_re100_gpu_s5",
+  "hybrid_re100_gpu_s1",
+  "hybrid_re100_gpu_s2",
+  "hybrid_re100_gpu_s3",
+  "hybrid_re100_gpu_s4",
+  "hybrid_re100_gpu_s5",
   "pinn_re100_gpu_s1",
   "pinn_re100_gpu_s2",
   "pinn_re100_gpu_s3",

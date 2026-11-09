@@ -628,7 +628,7 @@ def fig_v3_rq3(data):
     fig, ax = plt.subplots(figsize=(WIDTH, 3.9), constrained_layout=True)
     res = sorted(data)
     plotted = {}
-    offset = {"data_driven_nn": -0.14, "pinn": 0.14}
+    offset = {"data_driven_nn": -0.2, "pinn": 0.0, "hybrid": 0.2}
     for i, re in enumerate(res):
         for m, d in data[re].items():
             ys = 100 * np.array(d["err"])

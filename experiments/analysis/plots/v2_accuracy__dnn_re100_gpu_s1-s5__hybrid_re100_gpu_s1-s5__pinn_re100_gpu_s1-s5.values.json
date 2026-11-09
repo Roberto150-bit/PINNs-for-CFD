@@ -1,11 +1,16 @@
 {
- "figure": "accuracy",
+ "figure": "v2_accuracy",
  "runs": [
   "dnn_re100_gpu_s1",
   "dnn_re100_gpu_s2",
   "dnn_re100_gpu_s3",
   "dnn_re100_gpu_s4",
   "dnn_re100_gpu_s5",
+  "hybrid_re100_gpu_s1",
+  "hybrid_re100_gpu_s2",
+  "hybrid_re100_gpu_s3",
+  "hybrid_re100_gpu_s4",
+  "hybrid_re100_gpu_s5",
   "pinn_re100_gpu_s1",
   "pinn_re100_gpu_s2",
   "pinn_re100_gpu_s3",
@@ -13,25 +18,15 @@
   "pinn_re100_gpu_s5"
  ],
  "plotted": {
-  "test_a|data_driven_nn": [
+  "data_driven_nn": [
    0.016877733667527487,
    0.018404726173390916,
    0.11285319082567176
   ],
-  "test_a|pinn": [
-   0.08231617035423817,
+  "pinn": [
+   0.08231617035423816,
    0.16634544469756016,
    0.2650151274881018
-  ],
-  "test_b|data_driven_nn": [
-   0.014368313550018353,
-   0.016600861717849975,
-   0.11819557960489724
-  ],
-  "test_b|pinn": [
-   0.07745883001498746,
-   0.16148992503174112,
-   0.23864325741610495
   ]
  }
 }
