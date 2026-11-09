@@ -2960,30 +2960,38 @@
   "description": "S5 Re 400 pinn: completed 100k-step runs"
  },
  "s5_re400_hybrid_u_at_40k_mean": {
-  "value": 0.05317134947988932,
+  "value": 0.04670040106492767,
   "runs": [
-   "hybrid_re400_gpu_s1_steps100k"
+   "hybrid_re400_gpu_s1_steps100k",
+   "hybrid_re400_gpu_s2_steps100k",
+   "hybrid_re400_gpu_s3_steps100k"
   ],
   "description": "S5 Re 400 hybrid: test-A rel. L2 u at step 40,000"
  },
  "s5_re400_hybrid_u_at_20k_mean": {
-  "value": 0.07605379108024998,
+  "value": 0.06546351420972317,
   "runs": [
-   "hybrid_re400_gpu_s1_steps100k"
+   "hybrid_re400_gpu_s1_steps100k",
+   "hybrid_re400_gpu_s2_steps100k",
+   "hybrid_re400_gpu_s3_steps100k"
   ],
   "description": "S5 Re 400 hybrid: test-A rel. L2 u at step 20,000"
  },
  "s5_re400_hybrid_u_at_100k_mean": {
-  "value": 0.04366219624380926,
+  "value": 0.04616166013261983,
   "runs": [
-   "hybrid_re400_gpu_s1_steps100k"
+   "hybrid_re400_gpu_s1_steps100k",
+   "hybrid_re400_gpu_s2_steps100k",
+   "hybrid_re400_gpu_s3_steps100k"
   ],
   "description": "S5 Re 400 hybrid: test-A rel. L2 u at step 100,000"
  },
  "s5_re400_hybrid_n_runs": {
-  "value": 1,
+  "value": 3,
   "runs": [
-   "hybrid_re400_gpu_s1_steps100k"
+   "hybrid_re400_gpu_s1_steps100k",
+   "hybrid_re400_gpu_s2_steps100k",
+   "hybrid_re400_gpu_s3_steps100k"
   ],
   "description": "S5 Re 400 hybrid: completed 100k-step runs"
  },
