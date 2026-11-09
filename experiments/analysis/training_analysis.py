@@ -18,6 +18,8 @@ Figures
     s1_data, s2_collocation, s3_size   sensitivity studies (Re 100)
     reynolds_trend      test-A error and PDE residual vs Reynolds number
     s4_causal           PINN with and without causal weighting at Re 400 (--only causal)
+    s6_continuation     PINN at Re 400 started from random weights or from the Re 100 PINN
+    s6_continuation_re1000   the same at Re 1000, started from the S6 Re 400 PINN
 Also writes experiments/results/reynolds_trend.csv.
 """
 import argparse
@@ -486,6 +488,64 @@ def fig_causal(seeds=TREND_SEEDS):
     save(fig, "s4_causal", values)
 
 
+CONTINUATION_FROM = {400.0: 100.0, 1000.0: 400.0}
+
+
+def continuation_dirs(re, seeds=TREND_SEEDS):
+    base = os.path.join(C.experiment_dir(re), "continuation", "pinn")
+    name = f"pinn_re{re:g}_gpu_s{{}}_from_re{CONTINUATION_FROM[re]:g}"
+    return [os.path.join(base, name.format(s)) for s in seeds
+            if os.path.isfile(os.path.join(base, name.format(s), "metrics.json"))]
+
+
+def fig_continuation(re=400.0, seeds=TREND_SEEDS):
+    """S6: test-A error vs training step and final test-A error for the PINN
+    started from random weights and from the trained PINN at the lower Re
+    (same seeds): Re 400 from Re 100, Re 1000 from the S6 Re 400 runs."""
+    cont = continuation_dirs(re, seeds)
+    if not cont:
+        print(f"continuation re{re:g}: skipped (no evaluated S6 runs yet)")
+        return
+    done = [int(rid(d).split("_s")[1].split("_")[0]) for d in cont]
+    src = CONTINUATION_FROM[re]
+    groups = [("PINN, random start", "-", [run_dir(re, "pinn", s) for s in done]),
+              (f"PINN, started from Re = {src:g}", "--", cont)]
+    fig, axes = plt.subplots(2, 1, figsize=(WIDTH, 8.4), layout="constrained",
+                             gridspec_kw={"height_ratios": [1.3, 1]})
+    values = {"note": f"same seeds in both groups; steps are steps of Re {re:g} training "
+                      f"(the started-from-Re-{src:g} runs had {20000 if src == 100.0 else 40000:,} "
+                      "steps at lower Re before)"}
+    c = COLORS["pinn"]
+    for i, (label, ls, dirs) in enumerate(groups):
+        evs = [read_csv(os.path.join(d, "eval_history.csv")) for d in dirs]
+        steps = evs[0]["step"]
+        mean, lo, hi = band([e["rel_l2_u"] for e in evs])
+        axes[0].fill_between(steps, lo, hi, color=c, alpha=0.2 if ls == "-" else 0.1, lw=0)
+        axes[0].plot(steps, mean, color=c if ls == "-" else INK2, ls=ls, label=label)
+        test_a = [float(json.load(open(os.path.join(d, "metrics.json")))["accuracy"]["test_a"]["relative_l2_u"])
+                  for d in dirs]
+        hollow = ls == "--"
+        axes[1].scatter([i] * len(test_a), test_a, s=90, alpha=0.8, zorder=3,
+                        facecolors="white" if hollow else c,
+                        edgecolors=INK2 if hollow else "white", linewidths=2 if hollow else 1)
+        axes[1].plot([i - 0.25, i + 0.25], [np.mean(test_a)] * 2, color=c if ls == "-" else INK2, ls=ls, zorder=4)
+        values[label] = {"runs": [rid(d) for d in dirs], "step": tolist(steps), "mean": tolist(mean),
+                         "min": tolist(lo), "max": tolist(hi), "test_a_relative_l2_u": test_a,
+                         "test_a_mean": float(np.mean(test_a))}
+    for ax in axes:
+        ax.set_yscale("log")
+        plain_log_axis(ax.yaxis, subs=(1.0, 2.0, 5.0))
+        ax.set_ylabel("Rel. L2, u")
+    axes[0].set_xlabel(f"Training step at Re = {re:g}")
+    axes[1].set_xticks(range(len(groups)), ["Random\nstart", f"From\nRe = {src:g}"])
+    axes[1].set_xlim(-0.6, len(groups) - 0.4)
+    axes[1].grid(False, axis="x")
+    axes[1].set_title("Test A, final step, every seed", loc="left")
+    fig.legend(*axes[0].get_legend_handles_labels(), loc="outside lower center", ncols=1, frameon=False,
+               handlelength=1.6)
+    save(fig, "s6_continuation" if re == 400.0 else f"s6_continuation_re{re:g}", values)
+
+
 FIGURES = {
     "loss_components": fig_loss_components,
     "generalization": fig_generalization,
@@ -495,6 +555,7 @@ FIGURES = {
     "sensitivity": fig_sensitivity,
     "reynolds_trend": fig_reynolds_trend,
     "causal": fig_causal,
+    "continuation": lambda: [fig_continuation(re) for re in CONTINUATION_FROM],
 }
 
 
