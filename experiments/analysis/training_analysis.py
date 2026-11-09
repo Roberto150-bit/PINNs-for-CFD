@@ -24,6 +24,7 @@ Figures
     three_methods_re10_re1000   the same at Re 10 and 1000
     spikes              spike count per run (table: analysis_spikes.csv, no figure)
     hybrid_control      data NN vs data-only control vs hybrid, same seeds (Re 100 and 400)
+    hybrid_control_re10_re1000   the same at Re 10 and 1000
     corner_excluded     PDE residual RMS without the lid-corner neighbourhoods (table:
                         analysis_corner_excluded.csv, no figure; CPU, about 2 minutes)
 The hybrid (data + physics loss) is drawn wherever its runs exist.
@@ -687,13 +688,13 @@ def control_dir(re, seed):
     return os.path.join(C.experiment_dir(re), "control", "hybrid", f"hybrid_re{re:g}_gpu_s{seed}_dataonly")
 
 
-def fig_hybrid_control(res=(100.0, 400.0), seeds=TREND_SEEDS):
+def fig_hybrid_control(res=(100.0, 400.0), seeds=TREND_SEEDS, name="hybrid_control"):
     """Data NN -> data-only control (only the output units change) -> hybrid
     (only the physics loss is added): test-A error of u and continuity residual
     per seed, from each run's metrics.json. Drawn once every control run exists."""
     have = {re: [s for s in seeds if scored(control_dir(re, s))] for re in res}
     if not all(len(v) == len(seeds) for v in have.values()):
-        print("hybrid_control: skipped (control runs not all scored yet)")
+        print(f"{name}: skipped (control runs not all scored yet)")
         return
     fig, axes = plt.subplots(2, len(res), figsize=(WIDTH, 8.4), layout="constrained", sharex=True,
                              squeeze=False)
@@ -724,7 +725,7 @@ def fig_hybrid_control(res=(100.0, 400.0), seeds=TREND_SEEDS):
         ax.set_xticks(range(len(CONTROL_STEPS)), ["Data\nNN", "Con-\ntrol", "Hy-\nbrid"], fontsize=20)
     axes[0, 0].set_ylabel("Rel. L2, u")
     axes[1, 0].set_ylabel("Continuity\nresidual")
-    save(fig, "hybrid_control", values)
+    save(fig, name, values)
 
 
 CORNER_RADII = (0.0, 0.02, 0.05, 0.1)   # fixed 2026-11-09 10:16, after the S5/S6 residuals were seen
@@ -813,7 +814,8 @@ FIGURES = {
     "continuation": lambda: [fig_continuation(re) for re in CONTINUATION_FROM],
     "three_methods": lambda: [fig_three_methods(), fig_three_methods((10.0, 1000.0), name="three_methods_re10_re1000")],
     "spikes": table_spikes,
-    "hybrid_control": fig_hybrid_control,
+    "hybrid_control": lambda: [fig_hybrid_control(),
+                               fig_hybrid_control((10.0, 1000.0), name="hybrid_control_re10_re1000")],
     "corner_excluded": table_corner_excluded,
 }
 

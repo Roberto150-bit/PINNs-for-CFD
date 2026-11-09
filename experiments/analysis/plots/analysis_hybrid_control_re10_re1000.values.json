@@ -1,0 +1,114 @@
+{
+ "note": "same seeds in every group; each dot one run, line the mean",
+ "groups": {
+  "data_driven_nn": "standardized outputs, data loss",
+  "control": "physical outputs, data loss",
+  "hybrid": "physical outputs, data + physics loss"
+ },
+ "re10": {
+  "data_driven_nn": {
+   "runs": [
+    "dnn_re10_gpu_s1",
+    "dnn_re10_gpu_s2",
+    "dnn_re10_gpu_s3"
+   ],
+   "test_a_relative_l2_u": [
+    0.016911473058933427,
+    0.02185354054693077,
+    0.017496738453936525
+   ],
+   "continuity_residual": [
+    0.569176076666966,
+    0.5570732189659295,
+    0.6255576652700573
+   ]
+  },
+  "control": {
+   "runs": [
+    "hybrid_re10_gpu_s1_dataonly",
+    "hybrid_re10_gpu_s2_dataonly",
+    "hybrid_re10_gpu_s3_dataonly"
+   ],
+   "test_a_relative_l2_u": [
+    0.018950524597636655,
+    0.020653288686435747,
+    0.02416558478410489
+   ],
+   "continuity_residual": [
+    0.7284107406067335,
+    0.7144510635905198,
+    0.6215636626434576
+   ]
+  },
+  "hybrid": {
+   "runs": [
+    "hybrid_re10_gpu_s1",
+    "hybrid_re10_gpu_s2",
+    "hybrid_re10_gpu_s3"
+   ],
+   "test_a_relative_l2_u": [
+    0.05723971545642185,
+    0.059716303495186376,
+    0.05842661248562507
+   ],
+   "continuity_residual": [
+    0.0728166633692687,
+    0.09466706834179547,
+    0.08013644217978719
+   ]
+  }
+ },
+ "re1000": {
+  "data_driven_nn": {
+   "runs": [
+    "dnn_re1000_gpu_s1",
+    "dnn_re1000_gpu_s2",
+    "dnn_re1000_gpu_s3"
+   ],
+   "test_a_relative_l2_u": [
+    0.017169870996181173,
+    0.02013353799291064,
+    0.014157737368367855
+   ],
+   "continuity_residual": [
+    0.34498102373649664,
+    0.33553458577612105,
+    0.37518291437415063
+   ]
+  },
+  "control": {
+   "runs": [
+    "hybrid_re1000_gpu_s1_dataonly",
+    "hybrid_re1000_gpu_s2_dataonly",
+    "hybrid_re1000_gpu_s3_dataonly"
+   ],
+   "test_a_relative_l2_u": [
+    0.09867747909521883,
+    0.07922053770534099,
+    0.09714366985803322
+   ],
+   "continuity_residual": [
+    0.25336507471232966,
+    0.27205940899274994,
+    0.2770550081465096
+   ]
+  },
+  "hybrid": {
+   "runs": [
+    "hybrid_re1000_gpu_s1",
+    "hybrid_re1000_gpu_s2",
+    "hybrid_re1000_gpu_s3"
+   ],
+   "test_a_relative_l2_u": [
+    0.07836695396815414,
+    0.06928069283138885,
+    0.08956570652240503
+   ],
+   "continuity_residual": [
+    0.05800108270621138,
+    0.05249790550776894,
+    0.05153166506700164
+   ]
+  }
+ }
+}

@@ -4,7 +4,7 @@ Draft of the Results chapter. The method is described in `notes/methodology_draf
 
 **Conventions.** Errors are relative $L_2$ errors against the $64 \times 64$ finite-difference (FD) reference at the final training step. Test A is the held-out 15% of the space-time points, test B the ten held-out snapshots. Tables show the mean over seeds with the sample standard deviation in brackets and list the seeds used; every number comes from the file named under the table. Tables are generated from those files, not typed.
 
-**Still changing.** Seeds 4–5 at $Re = 1000$ (all three networks), the data-only control at $Re = 10$ and 1000, and further 100,000-step runs (hybrid at $Re = 400$, seeds 2–3; PINN at $Re = 1000$, seeds 2–3; hybrid at $Re = 1000$, seed 1) are being trained. Every number marked **[3 seeds; 5 pending]** or **[pending]** will change when they are scored; the others are final.
+**Still changing.** The data-only control at $Re = 10$ and 1000 and further 100,000-step runs (hybrid at $Re = 400$, seeds 2–3; PINN at $Re = 1000$, seeds 2–3; hybrid at $Re = 1000$, seed 1) are being trained. Every number marked **[3 seeds; 5 pending]** or **[pending]** will change when they are scored; the others are final.
 
 ## 4.1 Reference solution
 
@@ -28,14 +28,13 @@ The FD solver reproduces the steady benchmark of Marchi et al. (2009) at $Re = 1
 | 400 | Data NN | 1,2,3,4,5 | 0.023 (0.0015) | 0.025 (0.0024) | 0.161 (0.0084) | 0.020 (0.0011) | 0.023 (0.0026) | 0.166 (0.0099) |
 | 400 | PINN | 1,2,3,4,5 | 0.356 (0.019) | 0.905 (0.076) | 0.889 (0.090) | 0.352 (0.018) | 0.901 (0.076) | 0.888 (0.084) |
 | 400 | Hybrid | 1,2,3,4,5 | 0.066 (0.012) | 0.071 (0.013) | 0.228 (0.014) | 0.055 (0.0097) | 0.067 (0.013) | 0.233 (0.0072) |
-| 1000 | Data NN | 1,2,3 | 0.017 (0.003) | 0.020 (0.0059) | 0.022 (0.011) | 0.014 (0.0025) | 0.018 (0.006) | 0.018 (0.009) |
-| 1000 | PINN | 1,2,3 | 0.410 (0.0052) | 0.983 (0.0091) | 1.02 (0.029) | 0.405 (0.0048) | 0.980 (0.0088) | 0.989 (0.0046) |
-| 1000 | Hybrid | 1,2,3 | 0.079 (0.010) | 0.105 (9.2e-04) | 0.154 (0.012) | 0.056 (0.0065) | 0.097 (0.0047) | 0.092 (0.0013) |
+| 1000 | Data NN | 1,2,3,4,5 | 0.016 (0.0024) | 0.019 (0.0047) | 0.020 (0.0084) | 0.014 (0.002) | 0.017 (0.0048) | 0.016 (0.0067) |
+| 1000 | PINN | 1,2,3,4,5 | 0.416 (0.0096) | 0.984 (0.0065) | 1.02 (0.023) | 0.411 (0.0089) | 0.981 (0.0063) | 0.989 (0.0033) |
+| 1000 | Hybrid | 1,2,3,4,5 | 0.082 (0.012) | 0.102 (0.0045) | 0.169 (0.036) | 0.062 (0.016) | 0.096 (0.0044) | 0.116 (0.060) |
 
 Mean (sample s.d.) over the seeds listed; relative $L_2$ error at the final step. Source: `experiments/results/experiment_results*.csv` (main GPU runs).
 <!-- /table:accuracy -->
 
-$Re = 1000$: **[3 seeds; 5 pending]**.
 
 **Figures.**
 - `analysis_reynolds_trend.png`: test-A error against $Re$, every seed.
@@ -65,9 +64,9 @@ $Re = 1000$: **[3 seeds; 5 pending]**.
 | 400 | Data NN | 1,2,3,4,5 | 0.548 (0.022) | 2.08 (0.483) | 0.724 (0.058) | 0.063 (0.012) | 0.0055 (6.4e-04) | 0.0033 (4.8e-04) |
 | 400 | PINN | 1,2,3,4,5 | 0.029 (0.020) | 0.036 (0.0039) | 0.026 (0.017) | 0.017 (0.0021) | 0.031 (0.0044) | 0.0034 (7.1e-04) |
 | 400 | Hybrid | 1,2,3,4,5 | 0.075 (0.070) | 0.213 (0.207) | 0.090 (0.055) | 0.031 (0.006) | 0.022 (0.0033) | 0.0062 (0.0028) |
-| 1000 | Data NN | 1,2,3 | 0.352 (0.021) | 1.32 (0.391) | 0.428 (0.022) | 0.042 (0.0022) | 0.0042 (0.0012) | 0.0022 (1.5e-04) |
-| 1000 | PINN | 1,2,3 | 0.010 (6.0e-04) | 0.022 (0.0046) | 0.014 (0.004) | 0.014 (6.5e-04) | 0.028 (2.4e-04) | 0.004 (0.0012) |
-| 1000 | Hybrid | 1,2,3 | 0.054 (0.0035) | 0.118 (0.018) | 0.109 (0.0084) | 0.034 (0.0033) | 0.027 (0.0031) | 0.0073 (9.1e-04) |
+| 1000 | Data NN | 1,2,3,4,5 | 0.338 (0.024) | 1.32 (0.279) | 0.436 (0.019) | 0.043 (0.0025) | 0.004 (9.1e-04) | 0.0023 (2.5e-04) |
+| 1000 | PINN | 1,2,3,4,5 | 0.012 (0.0016) | 0.030 (0.012) | 0.013 (0.0032) | 0.014 (5.8e-04) | 0.028 (8.5e-04) | 0.0049 (0.0016) |
+| 1000 | Hybrid | 1,2,3,4,5 | 0.052 (0.0042) | 0.119 (0.013) | 0.096 (0.019) | 0.035 (0.0028) | 0.025 (0.0036) | 0.0076 (8.7e-04) |
 
 Residuals: RMS by automatic differentiation at 50,000 fresh interior points; grid stencil: second-order central differences on the $64 \times 64$ grid, 3 points from the walls. Mean (s.d.) over the seeds listed. Source: `experiments/results/experiment_results*.csv`.
 <!-- /table:physics -->
@@ -80,6 +79,7 @@ The residuals by automatic differentiation are averages over random points, and 
 | 10 | Data NN | 20,000 steps | 1,2,3,4,5 | 0.569 (0.037) | 0.526 (0.041) | 0.318 (0.039) | 0.169 (0.065) |
 | 10 | PINN | 20,000 steps | 1,2,3,4,5 | 0.018 (0.002) | 0.013 (9.0e-04) | 0.012 (6.5e-04) | 0.011 (5.0e-04) |
 | 10 | Hybrid | 20,000 steps | 1,2,3,4,5 | 0.078 (0.012) | 0.034 (0.0036) | 0.028 (0.0032) | 0.020 (0.0021) |
+| 10 | Control | control | 1,2,3 | 0.688 (0.058) | 0.636 (0.070) | 0.310 (0.090) | 0.162 (0.055) |
 | 10 | PINN | warm start (S6) | 1,2,3 | 0.016 (0.0018) | 0.012 (5.8e-04) | 0.011 (5.6e-04) | 0.0092 (4.8e-04) |
 | 100 | Data NN | 20,000 steps | 1,2,3,4,5 | 0.546 (0.063) | 0.494 (0.053) | 0.300 (0.080) | 0.140 (0.024) |
 | 100 | PINN | 20,000 steps | 1,2,3,4,5 | 0.071 (0.030) | 0.019 (0.0046) | 0.016 (0.0048) | 0.014 (0.0042) |
@@ -100,9 +100,9 @@ The residuals by automatic differentiation are averages over random points, and 
 | 400 | PINN | 100,000 steps (S5) | 1,2,3 | 1.55 (0.311) | 0.105 (0.086) | 0.0083 (5.2e-04) | 0.0056 (6.0e-04) |
 | 400 | Hybrid | 100,000 steps (S5) | 1 | 0.613 | 0.100 | 0.020 | 0.015 |
 | 400 | PINN | warm start (S6) | 1,2,3,4,5 | 1.32 (0.178) | 0.042 (0.018) | 0.010 (0.0017) | 0.0086 (0.0015) |
-| 1000 | Data NN | 20,000 steps | 1,2,3 | 0.352 (0.021) | 0.251 (0.01) | 0.163 (0.016) | 0.122 (0.024) |
-| 1000 | PINN | 20,000 steps | 1,2,3 | 0.010 (6.0e-04) | 0.0096 (6.6e-04) | 0.0091 (6.7e-04) | 0.0084 (1.5e-04) |
-| 1000 | Hybrid | 20,000 steps | 1,2,3 | 0.054 (0.0035) | 0.039 (0.0047) | 0.030 (1.0e-03) | 0.026 (6.2e-04) |
+| 1000 | Data NN | 20,000 steps | 1,2,3,4,5 | 0.338 (0.024) | 0.244 (0.017) | 0.161 (0.013) | 0.115 (0.019) |
+| 1000 | PINN | 20,000 steps | 1,2,3,4,5 | 0.012 (0.0016) | 0.011 (0.0018) | 0.010 (0.0019) | 0.0097 (0.002) |
+| 1000 | Hybrid | 20,000 steps | 1,2,3,4,5 | 0.052 (0.0042) | 0.040 (0.0043) | 0.031 (0.0037) | 0.028 (0.0037) |
 | 1000 | PINN | 100,000 steps (S5) | 1 | 0.821 | 0.229 | 0.0091 | 0.0063 |
 | 1000 | PINN | warm start (S6) | 1,2,3 | 1.27 (0.794) | 0.112 (0.105) | 0.0083 (0.0019) | 0.007 (0.002) |
 
@@ -117,7 +117,6 @@ Continuity residual (RMS, automatic differentiation) at the 50,000 evaluation po
 - The residual measures how well a network satisfies the equations, not how close it is to the FD solution. At $Re = 400$ and 1000 the PINN has the smallest residuals and the largest errors.
 - The grid-stencil value (central differences on the $64 \times 64$ grid, away from the walls) is about ten times smaller than the automatic-differentiation value for the data NN, because it averages over a grid spacing; for the PINN the two are similar. The FD reference itself has a stencil continuity of $1.5 \times 10^{-4}$ at $Re = 100$ [`poster_numbers.json`].
 - The corner-excluded values were added after the S5 and S6 results were seen. The all-points value stays the primary result.
-- $Re = 1000$: **[3 seeds; 5 pending]**.
 
 ## 4.4 RQ3: Repeatability and robustness
 
@@ -135,14 +134,13 @@ Continuity residual (RMS, automatic differentiation) at the 50,000 evaluation po
 | 400 | Data NN | 1,2,3,4,5 | 0.021–0.025 | 0.0015 | 0.064 | 2 of 5 | 0 |
 | 400 | PINN | 1,2,3,4,5 | 0.324–0.371 | 0.019 | 0.053 | 0 of 5 | 0 |
 | 400 | Hybrid | 1,2,3,4,5 | 0.054–0.080 | 0.012 | 0.183 | 0 of 5 | 0 |
-| 1000 | Data NN | 1,2,3 | 0.014–0.020 | 0.003 | 0.174 | 2 of 3 | 0 |
-| 1000 | PINN | 1,2,3 | 0.404–0.413 | 0.0052 | 0.013 | 0 of 3 | 0 |
-| 1000 | Hybrid | 1,2,3 | 0.069–0.090 | 0.010 | 0.129 | 0 of 3 | 0 |
+| 1000 | Data NN | 1,2,3,4,5 | 0.014–0.020 | 0.0024 | 0.144 | 3 of 5 | 0 |
+| 1000 | PINN | 1,2,3,4,5 | 0.404–0.428 | 0.0096 | 0.023 | 0 of 5 | 0 |
+| 1000 | Hybrid | 1,2,3,4,5 | 0.069–0.099 | 0.012 | 0.145 | 0 of 5 | 0 |
 
 Spike: an evaluation step $\ge$ 1,000 at which the test-A $u$ error is more than twice the best value at earlier steps (rule fixed before the hybrid runs). Sources: `experiments/results/experiment_results*.csv`, `experiments/analysis/plots/analysis_spikes.csv`.
 <!-- /table:repeat -->
 
-$Re = 1000$: **[3 seeds; 5 pending]**.
 
 **Figures.**
 - `analysis_repeatability.png`: test-A error against training step, every seed (data NN and PINN).
@@ -170,7 +168,9 @@ $Re = 1000$: **[3 seeds; 5 pending]**.
 | 400 | Data NN | 1,2,3,4,5 | 148 (7.34) | 0.0073 (3.7e-04) | 0.010 (3.1e-04) | 122 (0) |
 | 400 | PINN | 1,2,3,4,5 | 779 (3.02) | 0.039 (1.5e-04) | 0.010 (6.5e-04) | 707 (2.60) |
 | 400 | Hybrid | 1,2,3,4,5 | 882 (11.5) | 0.044 (5.9e-04) | 0.011 (5.9e-04) | 710 (1.66) |
-| 1000 | Hybrid | 1,2,3 | 896 (1.28) | 0.045 (6.3e-05) | 0.010 (6.0e-05) | 713 (2.11) |
+| 1000 | Data NN | 4,5 | 141 (3.64) | 0.007 (1.9e-04) | 0.012 (0.0022) | 122 (0) |
+| 1000 | PINN | 4,5 | 828 (22.6) | 0.041 (0.0011) | 0.010 (1.8e-04) | 705 (0.206) |
+| 1000 | Hybrid | 1,2,3,4,5 | 897 (0.981) | 0.045 (4.5e-05) | 0.010 (9.1e-04) | 713 (2.82) |
 
 Only runs whose `config.json` has a valid timing (GPU not shared). Mean (s.d.). Source: `experiments/results/experiment_results*.csv`.
 
@@ -190,7 +190,7 @@ Source: `experiments/results/poster_numbers.json`.
 **Caveats.**
 - All times come from one laptop (Intel i5-12450H, RTX 4060 Laptop GPU). FD ran on the CPU, the networks on the GPU.
 - The data NN's cost to a usable field includes the FD solve that produces its data.
-- Runs that shared the GPU are excluded. At $Re = 10$ and 1000 the data NN and PINN seeds 1–3 shared the GPU, so their cost is not reported; seeds 4–5 are timed on a free GPU (done at $Re = 10$; **[pending]** at $Re = 1000$).
+- Runs that shared the GPU are excluded. At $Re = 10$ and 1000 the data NN and PINN seeds 1–3 shared the GPU, so their cost is not reported; seeds 4–5 are timed on a free GPU.
 - At $Re = 1000$ a fair cost must count the $127 \times 127$ solve behind the reference.
 - The break-even counts repeated evaluations of the same flow. A network trained at one $Re$ does not replace an FD solve at another.
 
@@ -203,6 +203,9 @@ Accuracy, physics and cost of the hybrid are in the tables of Sections 4.2–4.5
 <!-- table:control -->
 | $Re$ | Network | Seeds | Test A $u$ | Test A $v$ | Test A $p$ | Continuity | x-momentum |
 |---|---|---|---|---|---|---|---|
+| 10 | Data NN | 1,2,3 | 0.019 (0.0027) | 0.018 (0.0014) | 0.119 (0.0016) | 0.584 (0.037) | 57.5 (14.9) |
+| 10 | Control (data loss only, physical outputs) | 1,2,3 | 0.021 (0.0027) | 0.036 (0.012) | 0.125 (0.0034) | 0.688 (0.058) | 48.4 (7.64) |
+| 10 | Hybrid | 1,2,3 | 0.058 (0.0012) | 0.054 (0.0072) | 0.216 (0.0038) | 0.083 (0.011) | 0.228 (0.069) |
 | 100 | Data NN | 1,2,3 | 0.017 (0.0014) | 0.018 (0.0011) | 0.113 (0.0012) | 0.547 (0.076) | 5.62 (0.090) |
 | 100 | Control (data loss only, physical outputs) | 1,2,3 | 0.030 (0.0059) | 0.039 (0.0042) | 0.126 (0.0031) | 0.448 (0.029) | 2.43 (0.272) |
 | 100 | Hybrid | 1,2,3 | 0.050 (0.0036) | 0.053 (0.0062) | 0.169 (0.0023) | 0.173 (0.032) | 1.01 (0.745) |

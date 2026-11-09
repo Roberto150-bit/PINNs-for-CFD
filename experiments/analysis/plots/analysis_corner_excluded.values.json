@@ -57,6 +57,17 @@
   "continuity_r0.05_mean": 0.01050983959188064,
   "continuity_r0.1_mean": 0.009181849658489227
  },
+ "re10_control_hybrid": {
+  "runs": [
+   "hybrid_re10_gpu_s1_dataonly",
+   "hybrid_re10_gpu_s2_dataonly",
+   "hybrid_re10_gpu_s3_dataonly"
+  ],
+  "continuity_r0_mean": 0.6881418426831564,
+  "continuity_r0.02_mean": 0.6361429293950399,
+  "continuity_r0.05_mean": 0.31042904655138653,
+  "continuity_r0.1_mean": 0.1620156541466713
+ },
  "re100_main_data_driven_nn": {
   "runs": [
    "dnn_re100_gpu_s1",
@@ -234,34 +245,40 @@
   "runs": [
    "dnn_re1000_gpu_s1",
    "dnn_re1000_gpu_s2",
-   "dnn_re1000_gpu_s3"
+   "dnn_re1000_gpu_s3",
+   "dnn_re1000_gpu_s4",
+   "dnn_re1000_gpu_s5"
   ],
-  "continuity_r0_mean": 0.35189952452977497,
-  "continuity_r0.02_mean": 0.2514198124408722,
-  "continuity_r0.05_mean": 0.16347119212150574,
-  "continuity_r0.1_mean": 0.12171875933806102
+  "continuity_r0_mean": 0.33812463879585264,
+  "continuity_r0.02_mean": 0.2436649352312088,
+  "continuity_r0.05_mean": 0.1613893210887909,
+  "continuity_r0.1_mean": 0.11549038290977479
  },
  "re1000_main_pinn": {
   "runs": [
    "pinn_re1000_gpu_s1",
    "pinn_re1000_gpu_s2",
-   "pinn_re1000_gpu_s3"
+   "pinn_re1000_gpu_s3",
+   "pinn_re1000_gpu_s4",
+   "pinn_re1000_gpu_s5"
   ],
-  "continuity_r0_mean": 0.010474229541917643,
-  "continuity_r0.02_mean": 0.009611754367748896,
-  "continuity_r0.05_mean": 0.009123698808252811,
-  "continuity_r0.1_mean": 0.008396990907688936
+  "continuity_r0_mean": 0.011567139811813832,
+  "continuity_r0.02_mean": 0.010805756784975529,
+  "continuity_r0.05_mean": 0.01036730855703354,
+  "continuity_r0.1_mean": 0.009708409942686558
  },
  "re1000_main_hybrid": {
   "runs": [
    "hybrid_re1000_gpu_s1",
    "hybrid_re1000_gpu_s2",
-   "hybrid_re1000_gpu_s3"
+   "hybrid_re1000_gpu_s3",
+   "hybrid_re1000_gpu_s4",
+   "hybrid_re1000_gpu_s5"
   ],
-  "continuity_r0_mean": 0.0540102186302344,
-  "continuity_r0.02_mean": 0.03856309379140536,
-  "continuity_r0.05_mean": 0.02957570677002271,
-  "continuity_r0.1_mean": 0.026493285472194355
+  "continuity_r0_mean": 0.052390915155410764,
+  "continuity_r0.02_mean": 0.04013157337903976,
+  "continuity_r0.05_mean": 0.03111489899456501,
+  "continuity_r0.1_mean": 0.027982843667268754
  },
  "re1000_extended_pinn": {
   "runs": [
