@@ -268,7 +268,8 @@ def column_rq3(slide):
                                 f"{num('re400_dnn_gpu_continuity_residual_mean', '{:.2f}')}) yet puts the "
                                 "vortex by the lid. After 100,000 steps its error in u falls from "
                                 f"{pct('s5_re400_pinn_u_at_20k_mean')} to {pct('s5_re400_pinn_u_at_100k_mean')} "
-                                "(one seed): under-trained, not unable."])
+                                f"(mean of {num('s5_re400_pinn_n_runs', '{:.0f}')} seeds): under-trained, "
+                                "not unable."])
 
 
 def column_answer(slide):
