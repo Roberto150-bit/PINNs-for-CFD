@@ -30,15 +30,17 @@
   ]
  },
  "hybrid_gpu_test_a_relative_l2_u_mean": {
-  "value": 0.04977471700424133,
+  "value": 0.0607195018697933,
   "description": "hybrid GPU runs: mean relative L2 of u on test_a",
   "runs": [
    "hybrid_re100_gpu_s1",
    "hybrid_re100_gpu_s2",
-   "hybrid_re100_gpu_s3"
+   "hybrid_re100_gpu_s3",
+   "hybrid_re100_gpu_s4",
+   "hybrid_re100_gpu_s5"
   ],
   "printed_as": [
-   "5.0%"
+   "6.1%"
   ]
  },
  "dnn_gpu_n_runs": {
@@ -56,15 +58,17 @@
   ]
  },
  "hybrid_gpu_n_runs": {
-  "value": 3,
+  "value": 5,
   "description": "hybrid GPU: number of seeds (Re 100)",
   "runs": [
    "hybrid_re100_gpu_s1",
    "hybrid_re100_gpu_s2",
-   "hybrid_re100_gpu_s3"
+   "hybrid_re100_gpu_s3",
+   "hybrid_re100_gpu_s4",
+   "hybrid_re100_gpu_s5"
   ],
   "printed_as": [
-   "3"
+   "5"
   ]
  },
  "pinn_gpu_n_runs": {
@@ -79,6 +83,26 @@
   ],
   "printed_as": [
    "5"
+  ]
+ },
+ "spike_re100_hybrid_worst_best": {
+  "value": 0.0411200045846254,
+  "description": "hybrid_re100_gpu_s5: best test-A u error during training",
+  "runs": [
+   "hybrid_re100_gpu_s5"
+  ],
+  "printed_as": [
+   "4.1%"
+  ]
+ },
+ "spike_re100_hybrid_worst_final": {
+  "value": 0.11754463203978503,
+  "description": "hybrid_re100_gpu_s5: test-A u error at the final step",
+  "runs": [
+   "hybrid_re100_gpu_s5"
+  ],
+  "printed_as": [
+   "12%"
   ]
  },
  "dnn_gpu_continuity_residual_mean": {
@@ -111,15 +135,17 @@
   ]
  },
  "hybrid_gpu_continuity_residual_mean": {
-  "value": 0.17278025855128218,
+  "value": 0.15940463572849822,
   "description": "hybrid GPU: mean continuity_residual",
   "runs": [
    "hybrid_re100_gpu_s1",
    "hybrid_re100_gpu_s2",
-   "hybrid_re100_gpu_s3"
+   "hybrid_re100_gpu_s3",
+   "hybrid_re100_gpu_s4",
+   "hybrid_re100_gpu_s5"
   ],
   "printed_as": [
-   "0.17"
+   "0.16"
   ]
  },
  "re10_dnn_gpu_test_a_relative_l2_u_mean": {
@@ -198,6 +224,18 @@
    "41%"
   ]
  },
+ "re10_hybrid_gpu_test_a_relative_l2_u_mean": {
+  "value": 0.05846087714574443,
+  "description": "Re 10 hybrid GPU runs: mean test_a_relative_l2_u",
+  "runs": [
+   "hybrid_re10_gpu_s1",
+   "hybrid_re10_gpu_s2",
+   "hybrid_re10_gpu_s3"
+  ],
+  "printed_as": [
+   "5.8%"
+  ]
+ },
  "re400_hybrid_gpu_test_a_relative_l2_u_mean": {
   "value": 0.06546351420972317,
   "description": "Re 400 hybrid GPU runs: mean test_a_relative_l2_u",
@@ -208,6 +246,18 @@
   ],
   "printed_as": [
    "6.5%"
+  ]
+ },
+ "re1000_hybrid_gpu_test_a_relative_l2_u_mean": {
+  "value": 0.07907111777398268,
+  "description": "Re 1000 hybrid GPU runs: mean test_a_relative_l2_u",
+  "runs": [
+   "hybrid_re1000_gpu_s1",
+   "hybrid_re1000_gpu_s2",
+   "hybrid_re1000_gpu_s3"
+  ],
+  "printed_as": [
+   "7.9%"
   ]
  },
  "re400_pinn_gpu_continuity_residual_mean": {

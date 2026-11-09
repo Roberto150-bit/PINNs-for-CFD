@@ -219,6 +219,12 @@ def column_question(slide):
                           size=BODY_PT)
 
 
+def seed_counts():
+    """'mean of 5 seeds each' when all three methods have the same count, else the list."""
+    n = [num(f"{m}_gpu_n_runs", "{:.0f}") for m in ("dnn", "hybrid", "pinn")]
+    return f"mean of {n[0]} seeds each" if len(set(n)) == 1 else f"mean of {n[0]}, {n[1]} and {n[2]} seeds"
+
+
 def column_rq12(slide):
     x = COL_X[1]
     y = panel(slide, x, TOP,
@@ -227,8 +233,7 @@ def column_rq12(slide):
               fig="v4_accuracy",
               text=[f"Error in u at Re = 100: data NN {pct('dnn_gpu_test_a_relative_l2_u_mean')}, hybrid "
                     f"{pct('hybrid_gpu_test_a_relative_l2_u_mean')}, PINN {pct('pinn_gpu_test_a_relative_l2_u_mean')} "
-                    f"(mean of {num('dnn_gpu_n_runs', '{:.0f}')}, {num('hybrid_gpu_n_runs', '{:.0f}')} and "
-                    f"{num('pinn_gpu_n_runs', '{:.0f}')} seeds). One hybrid seed ends on a spike "
+                    f"({seed_counts()}). One hybrid seed ends on a spike "
                     f"({pct('spike_re100_hybrid_worst_best')} → {pct('spike_re100_hybrid_worst_final')} in its last "
                     "500 steps); like every run, it is scored at its final step."])
     COLUMN_END[2] = panel(slide, x, y,
