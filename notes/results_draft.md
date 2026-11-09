@@ -4,7 +4,7 @@ Draft of the Results chapter. The method is described in `notes/methodology_draf
 
 **Conventions.** Errors are relative $L_2$ errors against the $64 \times 64$ finite-difference (FD) reference at the final training step. Test A is the held-out 15% of the space-time points, test B the ten held-out snapshots. Tables show the mean over seeds with the sample standard deviation in brackets and list the seeds used; every number comes from the file named under the table. Tables are generated from those files, not typed.
 
-**Still changing.** The data-only control at $Re = 10$ and 1000 and further 100,000-step runs (hybrid at $Re = 400$, seeds 2–3; PINN at $Re = 1000$, seeds 2–3; hybrid at $Re = 1000$, seed 1) are being trained. Every number marked **[3 seeds; 5 pending]** or **[pending]** will change when they are scored; the others are final.
+**Still changing.** Further 100,000-step runs (hybrid at $Re = 400$, seeds 2–3; PINN at $Re = 1000$, seeds 2–3; hybrid at $Re = 1000$, seed 1) are being trained. Every number marked **[3 seeds; 5 pending]** or **[pending]** will change when they are scored; the others are final.
 
 ## 4.1 Reference solution
 
@@ -103,6 +103,7 @@ The residuals by automatic differentiation are averages over random points, and 
 | 1000 | Data NN | 20,000 steps | 1,2,3,4,5 | 0.338 (0.024) | 0.244 (0.017) | 0.161 (0.013) | 0.115 (0.019) |
 | 1000 | PINN | 20,000 steps | 1,2,3,4,5 | 0.012 (0.0016) | 0.011 (0.0018) | 0.010 (0.0019) | 0.0097 (0.002) |
 | 1000 | Hybrid | 20,000 steps | 1,2,3,4,5 | 0.052 (0.0042) | 0.040 (0.0043) | 0.031 (0.0037) | 0.028 (0.0037) |
+| 1000 | Control | control | 1,2,3 | 0.267 (0.012) | 0.230 (0.0095) | 0.195 (0.0029) | 0.154 (0.0059) |
 | 1000 | PINN | 100,000 steps (S5) | 1 | 0.821 | 0.229 | 0.0091 | 0.0063 |
 | 1000 | PINN | warm start (S6) | 1,2,3 | 1.27 (0.794) | 0.112 (0.105) | 0.0083 (0.0019) | 0.007 (0.002) |
 
@@ -196,7 +197,7 @@ Source: `experiments/results/poster_numbers.json`.
 
 ## 4.6 Hybrid network
 
-**Finding.** Adding the FD data to the PINN loss gives a network that avoids the PINN's failure at $Re = 400$ and 1000, with an error of 6–8% in $u$ at every Reynolds number and residuals between those of the PINN and the data NN. It does not reach the data NN's accuracy. The data-only control shows that a large part of the gap to the data NN comes from the output units (physical instead of standardized), not from the physics loss.
+**Finding.** Adding the FD data to the PINN loss gives a network that avoids the PINN's failure at $Re = 400$ and 1000, with an error of 6–8% in $u$ at every Reynolds number and residuals between those of the PINN and the data NN. It does not reach the data NN's accuracy. The data-only control splits the gap to the data NN into two parts that change with $Re$: the cost of the output units (physical instead of standardized) grows from almost nothing at $Re = 10$ to most of the gap at $Re = 1000$, while the accuracy cost of the physics loss shrinks, and at $Re = 1000$ the physics loss improves accuracy over the control.
 
 Accuracy, physics and cost of the hybrid are in the tables of Sections 4.2–4.5. The control separates the two differences between the hybrid and the data NN:
 
@@ -212,14 +213,16 @@ Accuracy, physics and cost of the hybrid are in the tables of Sections 4.2–4.5
 | 400 | Data NN | 1,2,3 | 0.023 (0.002) | 0.025 (0.0016) | 0.158 (0.004) | 0.549 (0.030) | 2.08 (0.555) |
 | 400 | Control (data loss only, physical outputs) | 1,2,3 | 0.053 (0.0014) | 0.066 (0.0094) | 0.201 (0.003) | 0.326 (0.054) | 0.686 (0.055) |
 | 400 | Hybrid | 1,2,3 | 0.065 (0.011) | 0.074 (0.0071) | 0.231 (0.017) | 0.041 (0.0043) | 0.177 (0.188) |
+| 1000 | Data NN | 1,2,3 | 0.017 (0.003) | 0.020 (0.0059) | 0.022 (0.011) | 0.352 (0.021) | 1.32 (0.391) |
+| 1000 | Control (data loss only, physical outputs) | 1,2,3 | 0.092 (0.011) | 0.099 (0.0086) | 0.154 (0.015) | 0.267 (0.012) | 0.303 (0.041) |
+| 1000 | Hybrid | 1,2,3 | 0.079 (0.010) | 0.105 (9.2e-04) | 0.154 (0.012) | 0.054 (0.0035) | 0.118 (0.018) |
 
 Same seeds in the three rows of each $Re$. Sources: `experiments/results/control_re*.csv`, `experiment_results*.csv`.
 <!-- /table:control -->
 
-$Re = 10$ and 1000 controls: **[pending]**.
 
 **Figures.**
-- `analysis_hybrid_control.png`: data NN, control and hybrid, every seed.
+- `analysis_hybrid_control.png` ($Re = 100$, 400) and `analysis_hybrid_control_re10_re1000.png`: data NN, control and hybrid, every seed.
 - `analysis_three_methods.png`, `analysis_reynolds_trend.png`, `analysis_error_map_re400.png`.
 
 **Caveats.**

@@ -299,5 +299,16 @@
   "continuity_r0.02_mean": 0.11151622422039509,
   "continuity_r0.05_mean": 0.008305635303258896,
   "continuity_r0.1_mean": 0.006984976896395286
+ },
+ "re1000_control_hybrid": {
+  "runs": [
+   "hybrid_re1000_gpu_s1_dataonly",
+   "hybrid_re1000_gpu_s2_dataonly",
+   "hybrid_re1000_gpu_s3_dataonly"
+  ],
+  "continuity_r0_mean": 0.26749316851298016,
+  "continuity_r0.02_mean": 0.23009123901526132,
+  "continuity_r0.05_mean": 0.19462443888187408,
+  "continuity_r0.1_mean": 0.15374508003393808
  }
 }

@@ -149,12 +149,14 @@ The hybrid costs slightly more to train than the PINN, because it computes both 
 
 **Caveats.**
 - Three seeds per Reynolds number in the tables. Of seeds 4–5 at $Re = 100$, seed 4 is in line (test-A $u$ 0.037). Seed 5 ends on a spike exactly at the last step (spike table), so its reported result, 0.118, is worse than the PINN's for that seed (0.076). At $Re = 400$ seeds 4 and 5 are in line (0.054, 0.080). Over all five seeds the hybrid's test-A $u$ error is 0.061 (s.d. 0.008) at $Re = 10$, 0.061 (s.d. 0.032) at $Re = 100$, 0.066 (s.d. 0.012) at $Re = 400$ and 0.082 (s.d. 0.012) at $Re = 1000$; at $Re = 10$ seed 5 is the highest (0.076) without a spike. At $Re = 100$ that is the largest seed-to-seed spread of the three networks (data NN s.d. 0.0010, PINN 0.011), entirely because of seed 5. [`experiment_results*.csv`; spike table `experiments/analysis/plots/analysis_spikes.csv`]
-- The hybrid outputs physical $u$, $v$, $p$, while the data NN outputs standardized values. A data-only control (the hybrid code without the physics loss, seeds 1–3) separates the two effects [`control_re100.csv`, `control_re400.csv`; figure `analysis_hybrid_control.png`]:
+- The hybrid outputs physical $u$, $v$, $p$, while the data NN outputs standardized values. A data-only control (the hybrid code without the physics loss, seeds 1–3) separates the two effects [`control_re*.csv`; figures `analysis_hybrid_control.png`, `analysis_hybrid_control_re10_re1000.png`]:
 
-| | Data NN | Control (physical outputs, data loss) | Hybrid (+ physics loss) |
-|---|---|---|---|
-| $Re = 100$: test-A $u$ / continuity | 0.017 / 0.547 | 0.030 / 0.448 | 0.050 / 0.173 |
-| $Re = 400$: test-A $u$ / continuity | 0.023 / 0.549 | 0.053 / 0.326 | 0.065 / 0.041 |
+| $Re$ | Test-A $u$: data NN / control / hybrid | Continuity: data NN / control / hybrid |
+|---|---|---|
+| 10 | 0.019 / 0.021 / 0.058 | 0.584 / 0.688 / 0.083 |
+| 100 | 0.017 / 0.030 / 0.050 | 0.547 / 0.448 / 0.173 |
+| 400 | 0.023 / 0.053 / 0.065 | 0.549 / 0.326 / 0.041 |
+| 1000 | 0.017 / 0.092 / 0.079 | 0.352 / 0.267 / 0.054 |
 
-  The output units alone make $u$ 1.7 times (Re 100) and 2.3 times (Re 400) less accurate: about half and four fifths of the gap between hybrid and data NN on a logarithmic scale. Against a data-only network with the same outputs, the physics loss itself costs a factor of 1.7 (Re 100) and 1.25 (Re 400) in $u$ error, and lowers the continuity residual by 2.6 and 8 times.
-- The loss weights were not tuned: all start at 1, as in the PINN. In all sixteen runs the data term was the largest at step 2,000, 15 to 52 times the smallest term. That is below the rebalancing threshold of 100, so the weights never changed [each run's `config.json`].
+  The cost of the output units grows with $Re$: the control's $u$ error is 1.1, 1.7, 2.3 and 5.3 times the data NN's at $Re = 10$, 100, 400 and 1000. The effect of the physics loss on accuracy shrinks with $Re$: against the control it multiplies the $u$ error by 2.8, 1.7 and 1.25 at $Re = 10$, 100 and 400, and at $Re = 1000$ it lowers it (0.86; lower in each of the three seeds). At every $Re$ the physics loss lowers the continuity residual, by 2.6 to 8.3 times. So at low $Re$ the hybrid's gap to the data NN comes almost entirely from the physics loss, at high $Re$ from the output units.
+- The loss weights were not tuned: all start at 1, as in the PINN. In all twenty main runs the data term was the largest at step 2,000, 15 to 53 times the smallest term. That is below the rebalancing threshold of 100, so the weights never changed [each run's `config.json`].
