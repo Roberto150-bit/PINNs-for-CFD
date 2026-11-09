@@ -1,4 +1,19 @@
 {
+ "dnn_gpu_test_a_relative_l2_u_mean": {
+  "value": 0.016877733667527487,
+  "description": "data_driven_nn GPU runs: mean relative L2 of u on test_a",
+  "runs": [
+   "dnn_re100_gpu_s1",
+   "dnn_re100_gpu_s2",
+   "dnn_re100_gpu_s3",
+   "dnn_re100_gpu_s4",
+   "dnn_re100_gpu_s5"
+  ],
+  "printed_as": [
+   "1.7%",
+   "0.017"
+  ]
+ },
  "pinn_gpu_test_a_relative_l2_u_mean": {
   "value": 0.08231617035423817,
   "description": "pinn GPU runs: mean relative L2 of u on test_a",
@@ -12,21 +27,6 @@
   "printed_as": [
    "0.082",
    "8.2%"
-  ]
- },
- "dnn_gpu_test_a_relative_l2_u_mean": {
-  "value": 0.016877733667527487,
-  "description": "data_driven_nn GPU runs: mean relative L2 of u on test_a",
-  "runs": [
-   "dnn_re100_gpu_s1",
-   "dnn_re100_gpu_s2",
-   "dnn_re100_gpu_s3",
-   "dnn_re100_gpu_s4",
-   "dnn_re100_gpu_s5"
-  ],
-  "printed_as": [
-   "0.017",
-   "1.7%"
   ]
  },
  "hybrid_gpu_test_a_relative_l2_u_mean": {
@@ -202,44 +202,6 @@
    "5.0%"
   ]
  },
- "re10_dnn_gpu_test_a_relative_l2_u_mean": {
-  "value": 0.018753917353266907,
-  "description": "Re 10 data_driven_nn GPU runs: mean test_a_relative_l2_u",
-  "runs": [
-   "dnn_re10_gpu_s1",
-   "dnn_re10_gpu_s2",
-   "dnn_re10_gpu_s3"
-  ],
-  "printed_as": [
-   "1.9%"
-  ]
- },
- "re400_dnn_gpu_test_a_relative_l2_u_mean": {
-  "value": 0.023067831286254385,
-  "description": "Re 400 data_driven_nn GPU runs: mean test_a_relative_l2_u",
-  "runs": [
-   "dnn_re400_gpu_s1",
-   "dnn_re400_gpu_s2",
-   "dnn_re400_gpu_s3",
-   "dnn_re400_gpu_s4",
-   "dnn_re400_gpu_s5"
-  ],
-  "printed_as": [
-   "2.3%"
-  ]
- },
- "re1000_dnn_gpu_test_a_relative_l2_u_mean": {
-  "value": 0.017153715452486555,
-  "description": "Re 1000 data_driven_nn GPU runs: mean test_a_relative_l2_u",
-  "runs": [
-   "dnn_re1000_gpu_s1",
-   "dnn_re1000_gpu_s2",
-   "dnn_re1000_gpu_s3"
-  ],
-  "printed_as": [
-   "1.7%"
-  ]
- },
  "re10_pinn_gpu_test_a_relative_l2_u_mean": {
   "value": 0.15925177016425301,
   "description": "Re 10 pinn GPU runs: mean test_a_relative_l2_u",
@@ -276,44 +238,6 @@
   ],
   "printed_as": [
    "41%"
-  ]
- },
- "re10_hybrid_gpu_test_a_relative_l2_u_mean": {
-  "value": 0.05846087714574443,
-  "description": "Re 10 hybrid GPU runs: mean test_a_relative_l2_u",
-  "runs": [
-   "hybrid_re10_gpu_s1",
-   "hybrid_re10_gpu_s2",
-   "hybrid_re10_gpu_s3"
-  ],
-  "printed_as": [
-   "5.8%"
-  ]
- },
- "re400_hybrid_gpu_test_a_relative_l2_u_mean": {
-  "value": 0.06607512831671274,
-  "description": "Re 400 hybrid GPU runs: mean test_a_relative_l2_u",
-  "runs": [
-   "hybrid_re400_gpu_s1",
-   "hybrid_re400_gpu_s2",
-   "hybrid_re400_gpu_s3",
-   "hybrid_re400_gpu_s4",
-   "hybrid_re400_gpu_s5"
-  ],
-  "printed_as": [
-   "6.6%"
-  ]
- },
- "re1000_hybrid_gpu_test_a_relative_l2_u_mean": {
-  "value": 0.07907111777398268,
-  "description": "Re 1000 hybrid GPU runs: mean test_a_relative_l2_u",
-  "runs": [
-   "hybrid_re1000_gpu_s1",
-   "hybrid_re1000_gpu_s2",
-   "hybrid_re1000_gpu_s3"
-  ],
-  "printed_as": [
-   "7.9%"
   ]
  },
  "re400_pinn_gpu_continuity_residual_mean": {
@@ -437,21 +361,9 @@
    "5"
   ]
  },
- "s5_re400_pinn_u_at_40k_mean": {
-  "value": 0.2122648968144738,
-  "description": "S5 Re 400 pinn: test-A rel. L2 u at step 40,000",
-  "runs": [
-   "pinn_re400_gpu_s1_steps100k",
-   "pinn_re400_gpu_s2_steps100k",
-   "pinn_re400_gpu_s3_steps100k"
-  ],
-  "printed_as": [
-   "21%"
-  ]
- },
- "re400_hybrid_gpu_continuity_residual_mean": {
-  "value": 0.07469071511108244,
-  "description": "Re 400 hybrid GPU runs: mean continuity_residual",
+ "re400_hybrid_gpu_test_a_relative_l2_u_mean": {
+  "value": 0.06607512831671274,
+  "description": "Re 400 hybrid GPU runs: mean test_a_relative_l2_u",
   "runs": [
    "hybrid_re400_gpu_s1",
    "hybrid_re400_gpu_s2",
@@ -460,55 +372,7 @@
    "hybrid_re400_gpu_s5"
   ],
   "printed_as": [
-   "0.07"
-  ]
- },
- "s5_re400_hybrid_u_at_100k_mean": {
-  "value": 0.04366219624380926,
-  "description": "S5 Re 400 hybrid: test-A rel. L2 u at step 100,000",
-  "runs": [
-   "hybrid_re400_gpu_s1_steps100k"
-  ],
-  "printed_as": [
-   "4.4%"
-  ]
- },
- "s5_re400_hybrid_n_runs": {
-  "value": 1,
-  "description": "S5 Re 400 hybrid: completed 100k-step runs",
-  "runs": [
-   "hybrid_re400_gpu_s1_steps100k"
-  ],
-  "printed_as": [
-   "1"
-  ]
- },
- "pinn_gpu_total_cost_to_field_seconds": {
-  "value": 781.9692135369447,
-  "description": "pinn gpu: total cost to a usable field",
-  "runs": [
-   "pinn_re100_gpu_s1",
-   "pinn_re100_gpu_s2",
-   "pinn_re100_gpu_s3",
-   "pinn_re100_gpu_s4",
-   "pinn_re100_gpu_s5"
-  ],
-  "printed_as": [
-   "781.969"
-  ]
- },
- "dnn_gpu_total_cost_to_field_seconds": {
-  "value": 140.93002049721036,
-  "description": "data_driven_nn gpu: total cost to a usable field",
-  "runs": [
-   "dnn_re100_gpu_s1",
-   "dnn_re100_gpu_s2",
-   "dnn_re100_gpu_s3",
-   "dnn_re100_gpu_s4",
-   "dnn_re100_gpu_s5"
-  ],
-  "printed_as": [
-   "140.930"
+   "6.6%"
   ]
  },
  "fd_n64_solve_seconds_median": {
@@ -523,9 +387,9 @@
    "3.9"
   ]
  },
- "pinn_gpu_peak_vram_bytes_mean": {
-  "value": 742203289.6,
-  "description": "pinn GPU: mean peak_vram_bytes",
+ "pinn_gpu_total_cost_to_field_seconds": {
+  "value": 781.9692135369447,
+  "description": "pinn gpu: total cost to a usable field",
   "runs": [
    "pinn_re100_gpu_s1",
    "pinn_re100_gpu_s2",
@@ -534,12 +398,13 @@
    "pinn_re100_gpu_s5"
   ],
   "printed_as": [
-   "708"
+   "781.969",
+   "782 s"
   ]
  },
- "dnn_gpu_peak_vram_bytes_mean": {
-  "value": 127467008.0,
-  "description": "data_driven_nn GPU: mean peak_vram_bytes",
+ "dnn_gpu_total_cost_to_field_seconds": {
+  "value": 140.93002049721036,
+  "description": "data_driven_nn gpu: total cost to a usable field",
   "runs": [
    "dnn_re100_gpu_s1",
    "dnn_re100_gpu_s2",
@@ -548,7 +413,46 @@
    "dnn_re100_gpu_s5"
   ],
   "printed_as": [
-   "122"
+   "140.930",
+   "141 s"
+  ]
+ },
+ "re1000_dnn_gpu_test_a_relative_l2_u_mean": {
+  "value": 0.017153715452486555,
+  "description": "Re 1000 data_driven_nn GPU runs: mean test_a_relative_l2_u",
+  "runs": [
+   "dnn_re1000_gpu_s1",
+   "dnn_re1000_gpu_s2",
+   "dnn_re1000_gpu_s3"
+  ],
+  "printed_as": [
+   "1.7%"
+  ]
+ },
+ "re1000_hybrid_gpu_test_a_relative_l2_u_mean": {
+  "value": 0.07907111777398268,
+  "description": "Re 1000 hybrid GPU runs: mean test_a_relative_l2_u",
+  "runs": [
+   "hybrid_re1000_gpu_s1",
+   "hybrid_re1000_gpu_s2",
+   "hybrid_re1000_gpu_s3"
+  ],
+  "printed_as": [
+   "7.9%"
+  ]
+ },
+ "hybrid_gpu_total_cost_to_field_seconds": {
+  "value": 886.3512805166454,
+  "description": "hybrid gpu: total cost to a usable field",
+  "runs": [
+   "hybrid_re100_gpu_s1",
+   "hybrid_re100_gpu_s2",
+   "hybrid_re100_gpu_s3",
+   "hybrid_re100_gpu_s4",
+   "hybrid_re100_gpu_s5"
+  ],
+  "printed_as": [
+   "886 s"
   ]
  }
 }

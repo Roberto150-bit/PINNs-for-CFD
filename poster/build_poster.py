@@ -1,13 +1,13 @@
 """Build poster/poster_draft.pptx on the SCE Project Day template.
 
-Layout (36 x 24 in) follows the template's four-column grid. The poster tells one
-story; every panel heading is an action title (the finding as a sentence), each
-results figure carries its key comparison as an on-chart callout, and the text
-under it is one line of evidence:
-  column 1: the question (RQ1-RQ4) and the fair-test design
+Layout (36 x 24 in) follows the template's four-column grid with one heading per
+column. Each figure has a plain-language lead (what is measured, how to read it)
+and a caption (what it shows, with the numbers); the last column ends with a
+comparison table of the three networks:
+  column 1: the question, the three networks, RQ1-RQ4 and the fair test
   column 2: RQ1 accuracy, RQ2 physical consistency
-  column 3: RQ3 reliability across flow speeds, and why satisfying the equations is not enough
-  column 4: RQ4 cost, the answer (no single winner; hybrid as future work), references
+  column 3: RQ3 faster flows, and why obeying the equations is not enough
+  column 4: RQ4 cost, comparison table, conclusion, references
 
 Every number in the text is read from experiments/results/poster_numbers.json
 (generated from the run folders by aggregate.py); a missing value appears as
@@ -196,131 +196,203 @@ def panel(slide, x, y, title, fig=None, text=None, size=CAPTION_PT):
     return y + GAP
 
 
-def column_question(slide):
-    x = COL_X[0]
-    y = panel(slide, x, TOP,
-              "Which is the better way to teach a network fluid flow: simulation data or physics?",
-              text=["A trained neural network predicts a flow in milliseconds instead of running a slow "
-                    "simulation. A data-driven network (data NN) learns from simulation results, so a "
-                    "simulation must run first. A physics-informed network (PINN) [3] learns only from "
-                    "the flow equations: no data, but more computing. A hybrid learns from both.",
-                    "RQ1  Which is more accurate?",
-                    "RQ2  Which obeys the physics better?",
-                    "RQ3  Which is more reliable across seeds and flow speeds?",
-                    "RQ4  What does each cost?"],
-              size=BODY_PT)
-    COLUMN_END[1] = panel(slide, x, y,
-                          "All three networks were built and scored the same way; only what they learn from differs.",
-                          fig="pipelines",
-                          text=["Test flow: fluid in a box driven by a sliding lid. Reference: a "
-                                "finite-difference (FD) simulation that matches published results [1, 2]. "
-                                "All three: 17,091 parameters, 20,000 training steps, 3-5 seeds, scored on "
-                                "points and times never seen in training."],
-                          size=BODY_PT)
+COL_HEAD_PT = HEAD_PT
+INTRO_PT = 22
+
+
+def col_heading(slide, x, y, text, width=COL_W):
+    """One heading per column (the only headings on the poster)."""
+    textbox(slide, x, y, width, 0.75, [text], size=COL_HEAD_PT, color=HEAD_COLOR, bold=True, space_after=0)
+    return y + 0.85
+
+
+def lead(slide, x, y, paragraphs, size=INTRO_PT):
+    """Plain-language context placed before a figure: what is measured and how to read it."""
+    return block(slide, x, y, paragraphs, size=size, space_after=6)
+
+
+def caption(slide, x, y, paragraphs, size=CAPTION_PT):
+    """What the figure shows, in words, with the key numbers."""
+    return block(slide, x, y, paragraphs, size=size, space_after=6) + GAP
 
 
 def seed_counts():
     """'mean of 5 seeds each' when all three methods have the same count, else the list."""
     n = [num(f"{m}_gpu_n_runs", "{:.0f}") for m in ("dnn", "hybrid", "pinn")]
-    return f"mean of {n[0]} seeds each" if len(set(n)) == 1 else f"mean of {n[0]}, {n[1]} and {n[2]} seeds"
+    return f"mean of {n[0]} runs each" if len(set(n)) == 1 else f"mean of {n[0]}, {n[1]} and {n[2]} runs"
+
+
+def series(keys):
+    """'16, 8.2, 36, 41%': one percent sign per list keeps the text short."""
+    vals = [pct(k) for k in keys]
+    return ", ".join(v.rstrip("%") for v in vals[:-1]) + (", " if len(vals) > 1 else "") + vals[-1]
+
+
+def u_key(re, m):
+    return f"{m}_gpu_test_a_relative_l2_u_mean" if re == "100" else f"re{re}_{m}_gpu_test_a_relative_l2_u_mean"
+
+
+def column_question(slide):
+    x = COL_X[0]
+    y = col_heading(slide, x, TOP, "Introduction")
+    y = block(slide, x, y, [
+        "Engineers predict how fluids move (air over a wing, blood in an artery) by solving the "
+        "equations of fluid motion on a computer. That is accurate but slow. A trained neural "
+        "network can predict the same flow in milliseconds, but how should it be taught?",
+        "I compared three ways of teaching the same network:",
+        "• Data NN: learns from the results of finished simulations, so a simulation must run first.",
+        "• PINN (physics-informed neural network) [3]: learns only from the laws of fluid motion, "
+        "with no simulation data.",
+        "• Hybrid: learns from both.",
+        "RQ1  Which predicts the flow most accurately?",
+        "RQ2  Which best respects the laws of physics?",
+        "RQ3  Which stays reliable as the flow gets faster?",
+        "RQ4  What does each cost to train?",
+    ], size=BODY_PT, space_after=7) + 0.2
+    y = col_heading(slide, x, y, "Methods")
+    y = picture(slide, x, y, "pipelines")
+    COLUMN_END[1] = caption(slide, x, y, [
+        "The test: fluid in a square box, stirred by a lid sliding along the top. A trusted "
+        "simulation (finite differences, FD), checked against published results [1, 2], is the "
+        "answer key. All three networks have the same size (17,091 parameters) and the same "
+        "20,000 training steps, and are scored on points and moments they never saw. Each is "
+        "trained 3 to 5 times from different random starts to check that results repeat.",
+    ], size=BODY_PT)
 
 
 def column_rq12(slide):
     x = COL_X[1]
-    y = panel(slide, x, TOP,
-              "RQ1: The data NN matches the simulation "
-              f"{ratio('pinn_gpu_test_a_relative_l2_u_mean', 'dnn_gpu_test_a_relative_l2_u_mean')}× more closely.",
-              fig="v4_accuracy",
-              text=[f"Error in u at Re = 100: data NN {pct('dnn_gpu_test_a_relative_l2_u_mean')}, hybrid "
-                    f"{pct('hybrid_gpu_test_a_relative_l2_u_mean')}, PINN {pct('pinn_gpu_test_a_relative_l2_u_mean')} "
-                    f"({seed_counts()}). One hybrid seed ends on a spike "
-                    f"({pct('spike_re100_hybrid_worst_best')} → {pct('spike_re100_hybrid_worst_final')} in its last "
-                    "500 steps); like every run, it is scored at its final step."])
-    COLUMN_END[2] = panel(slide, x, y,
-                          "RQ2: The PINN obeys the flow equations "
-                          f"{ratio('dnn_gpu_continuity_residual_mean', 'pinn_gpu_continuity_residual_mean')}× "
-                          "more closely.",
-                          fig="v4_physics",
-                          text=["Violation of mass conservation: PINN "
-                                f"{num('pinn_gpu_continuity_residual_mean', '{:.2g}')}, hybrid "
-                                f"{num('hybrid_gpu_continuity_residual_mean', '{:.2g}')}, data NN "
-                                f"{num('dnn_gpu_continuity_residual_mean', '{:.2g}')}. Without its physics loss the hybrid's mass violation is "
-                                f"{num('ctrl_re100_dataonly_cont_mean', '{:.2f}')} (error in u "
-                                f"{pct('ctrl_re100_dataonly_u_mean')} vs {pct('ctrl_re100_hybrid_u_mean')}, same seeds)."])
-
-
-def trend_evidence():
-    """One line of evidence for the Reynolds-number trend, listing every Re that has results."""
-    res = [r for r in ("10", "100", "400", "1000")
-           if r == "100" or f"re{r}_dnn_gpu_test_a_relative_l2_u_mean" in NUMS]
-
-    def key(r, m):
-        return f"{m}_gpu_test_a_relative_l2_u_mean" if r == "100" else f"re{r}_{m}_gpu_test_a_relative_l2_u_mean"
-
-    def series(m, rs):
-        # "1.9, 1.7, 2.3, 1.7%": one percent sign per list keeps the caption short
-        vals = [pct(key(r, m)) for r in rs]
-        return ", ".join(v.rstrip("%") for v in vals[:-1]) + (", " if len(vals) > 1 else "") + vals[-1]
-
-    pinn_res = [r for r in res if key(r, "pinn") in NUMS]
-    hyb_res = [r for r in res if NUMS.get(key(r, "hybrid"), {}).get("value") is not None]
-    text = f"Every seed is a dot. Error in u at Re = {', '.join(res)}: data NN {series('dnn', res)}; "            f"PINN {series('pinn', pinn_res)}"
-    if pinn_res != res:
-        text += f" (Re = {', '.join(pinn_res)})"
-    if hyb_res:
-        text += f"; hybrid {series('hybrid', hyb_res)}" + ("" if hyb_res == res else f" (Re = {', '.join(hyb_res)})")
-    return [text + "."]
+    y = col_heading(slide, x, TOP, "Results")
+    y = lead(slide, x, y, [
+        "RQ1 accuracy. Error: how far each prediction is from the answer key, in percent, for the "
+        "speeds u (left-right) and v (up-down) and the pressure p. Lower is better."])
+    y = picture(slide, x, y, "v4_accuracy")
+    y = caption(slide, x, y, [
+        "The data NN is the most accurate: "
+        f"{pct('dnn_gpu_test_a_relative_l2_u_mean')} error in u, "
+        f"{ratio('pinn_gpu_test_a_relative_l2_u_mean', 'dnn_gpu_test_a_relative_l2_u_mean')}× better than the "
+        f"PINN ({pct('pinn_gpu_test_a_relative_l2_u_mean')}); the hybrid is in between "
+        f"({pct('hybrid_gpu_test_a_relative_l2_u_mean')}; {seed_counts()}). One hybrid run jumped from "
+        f"{pct('spike_re100_hybrid_worst_best')} to {pct('spike_re100_hybrid_worst_final')} in its last "
+        "training steps; every run is reported as it ended."])
+    y = lead(slide, x, y, [
+        "RQ2 physics. Real fluid cannot appear or vanish (mass) and obeys Newton's laws "
+        "(momentum). Bars: how much each prediction breaks these rules. Lower is better."])
+    y = picture(slide, x, y, "v4_physics")
+    COLUMN_END[2] = caption(slide, x, y, [
+        "The PINN, which is taught the rules, breaks them "
+        f"{ratio('dnn_gpu_continuity_residual_mean', 'pinn_gpu_continuity_residual_mean')}× less than the "
+        f"data NN ({num('pinn_gpu_continuity_residual_mean', '{:.2g}')} vs "
+        f"{num('dnn_gpu_continuity_residual_mean', '{:.2g}')}); the hybrid keeps most of that benefit "
+        f"({num('hybrid_gpu_continuity_residual_mean', '{:.2g}')}). Without its physics lessons the hybrid "
+        f"breaks the rules more ({num('ctrl_re100_dataonly_cont_mean', '{:.2f}')}) but is more accurate "
+        f"({pct('ctrl_re100_dataonly_u_mean')} vs {pct('ctrl_re100_hybrid_u_mean')})."])
 
 
 def column_rq3(slide):
     x = COL_X[2]
-    y = panel(slide, x, TOP,
-              "RQ3: As the flow speeds up, only the PINN breaks down.",
-              fig="v4_trend",
-              text=trend_evidence())
-    COLUMN_END[3] = panel(slide, x, y,
-                          "RQ3: At Re = 400 the PINN obeys the equations but needs more training, "
-                          "or a head start, to get the flow right.",
-                          fig="v4_re400",
-                          text=["Flow at t = 5 (✕ = vortex). The PINN conserves mass better than the data NN "
-                                f"({num('re400_pinn_gpu_continuity_residual_mean', '{:.2f}')} vs "
-                                f"{num('re400_dnn_gpu_continuity_residual_mean', '{:.2f}')}) yet puts the vortex "
-                                "by the lid. Error in u: "
-                                f"{pct('s5_re400_pinn_u_at_20k_mean')} → {pct('s5_re400_pinn_u_at_100k_mean')} with "
-                                f"5× more steps ({num('s5_re400_pinn_n_runs', '{:.0f}')} seeds); "
-                                f"{pct('s6_re400_base_u_mean')} → {pct('s6_re400_warm_u_mean')} starting from the "
-                                f"trained Re = 100 PINN ({num('s6_re400_n_runs', '{:.0f}')} seeds; a random start "
-                                f"is at {pct('s5_re400_pinn_u_at_40k_mean')} after the same 40,000 steps). The "
-                                f"hybrid gets the flow right ({pct('re400_hybrid_gpu_test_a_relative_l2_u_mean')}) "
-                                "and conserves mass far better than the data NN "
-                                f"({num('re400_hybrid_gpu_continuity_residual_mean', '{:.2f}')}); trained 5× longer "
-                                f"it reaches {pct('s5_re400_hybrid_u_at_100k_mean')} "
-                                f"({num('s5_re400_hybrid_n_runs', '{:.0f}')} seed)."])
+    y = TOP + 0.85                       # under the Results heading that spans columns 2 and 3
+    y = lead(slide, x, y, [
+        "RQ3 faster flows. The Reynolds number (Re) measures how fast and swirly a flow is: at Re = 10 it is "
+        "slow like honey; at Re = 1000 it is fast, with sharp swirls that are harder to learn."])
+    y = picture(slide, x, y, "v4_trend")
+    res = [r for r in ("10", "100", "400", "1000") if NUMS.get(u_key(r, "hybrid"), {}).get("value") is not None]
+    y = caption(slide, x, y, [
+        "Each dot is one training run; dots close together mean the result repeats. The data NN "
+        "stays near 2% and the hybrid under 10% at every speed. The PINN gets worse as the flow "
+        f"speeds up: {series([u_key(r, 'pinn') for r in res])} error at Re = {', '.join(res)}."])
+    y = lead(slide, x, y, [
+        "What goes wrong at Re = 400: the PINN puts the center of the swirl (✕) by the lid "
+        "instead of in the middle, although it obeys the rules better than the data NN "
+        f"({num('re400_pinn_gpu_continuity_residual_mean', '{:.2f}')} vs "
+        f"{num('re400_dnn_gpu_continuity_residual_mean', '{:.2f}')}): obeying the equations is not "
+        "enough."])
+    y = picture(slide, x, y, "v4_re400")
+    COLUMN_END[3] = caption(slide, x, y, [
+        f"Two things help the PINN: training 5× longer ({pct('s5_re400_pinn_u_at_20k_mean')} → "
+        f"{pct('s5_re400_pinn_u_at_100k_mean')}, {num('s5_re400_pinn_n_runs', '{:.0f}')} runs) or starting "
+        f"from the network already trained at Re = 100 ({pct('s6_re400_base_u_mean')} → "
+        f"{pct('s6_re400_warm_u_mean')}, {num('s6_re400_n_runs', '{:.0f}')} runs). Adding data, as the "
+        f"hybrid does, gets it right directly: {pct('re400_hybrid_gpu_test_a_relative_l2_u_mean')}."])
+
+
+def comparison_table(slide, x, y, width=COL_W):
+    """Final comparison: one row per question, best value per row shaded."""
+    def val(key, kind):
+        return pct(key) if kind == "pct" else num(key, "{:.2g}") if kind == "g" else num(key, "{:.0f} s")
+
+    rows = [("Needs simulation data", ["Yes", "No", "Yes"], 1),
+            ("RQ1  Error, Re = 100",
+             [val(k, "pct") for k in ("dnn_gpu_test_a_relative_l2_u_mean", "pinn_gpu_test_a_relative_l2_u_mean",
+                                      "hybrid_gpu_test_a_relative_l2_u_mean")], None),
+            ("RQ2  Mass rule broken",
+             [val(k, "g") for k in ("dnn_gpu_continuity_residual_mean", "pinn_gpu_continuity_residual_mean",
+                                    "hybrid_gpu_continuity_residual_mean")], None),
+            ("RQ3  Error, Re = 1000",
+             [val(k, "pct") for k in ("re1000_dnn_gpu_test_a_relative_l2_u_mean",
+                                      "re1000_pinn_gpu_test_a_relative_l2_u_mean",
+                                      "re1000_hybrid_gpu_test_a_relative_l2_u_mean")], None),
+            ("RQ4  Training time",
+             [val(k, "s") for k in ("dnn_gpu_total_cost_to_field_seconds", "pinn_gpu_total_cost_to_field_seconds",
+                                    "hybrid_gpu_total_cost_to_field_seconds")], None)]
+    # Best cell per row: the smallest number (all rows are lower-is-better), or the given column
+    for i, (label, cells, best) in enumerate(rows):
+        if best is None:
+            nums_ = [float(c.rstrip("% s")) for c in cells]
+            rows[i] = (label, cells, nums_.index(min(nums_)))
+    row_h = 0.44
+    col_w = [3.07, 1.48, 1.48, 1.49]
+    shape = slide.shapes.add_table(len(rows) + 1, 4, Inches(x), Inches(y), Inches(width),
+                                   Inches(row_h * (len(rows) + 1)))
+    table = shape.table
+    for j, w in enumerate(col_w):
+        table.columns[j].width = Inches(w)
+    header = ["", "Data NN", "PINN", "Hybrid"]
+
+    def set_cell(cell, text, size, color, fill, bold=False, align=PP_ALIGN.CENTER):
+        cell.text = ""
+        p = cell.text_frame.paragraphs[0]
+        p.alignment = align
+        r = p.add_run()
+        r.text = text
+        style_run(r, size, bold, color)
+        cell.fill.solid()
+        cell.fill.fore_color.rgb = fill
+        cell.margin_left = cell.margin_right = Inches(0.06)
+        cell.margin_top = cell.margin_bottom = Inches(0.03)
+        cell.vertical_anchor = MSO_ANCHOR.MIDDLE
+
+    for j, h in enumerate(header):
+        set_cell(table.cell(0, j), h, 20, WHITE, TABLE_HEAD, bold=True)
+    for i, (label, cells, best) in enumerate(rows, start=1):
+        table.rows[i].height = Inches(row_h)
+        band = TABLE_BAND if i % 2 else WHITE
+        set_cell(table.cell(i, 0), label, 18, BODY_COLOR, band, align=PP_ALIGN.LEFT)
+        for j, c in enumerate(cells, start=1):
+            set_cell(table.cell(i, j), c, 20, BODY_COLOR, BETTER if j - 1 == best else band)
+    table.rows[0].height = Inches(row_h)
+    return y + row_h * (len(rows) + 1) + 0.12
 
 
 def column_answer(slide):
     x = COL_X[3]
-    y = panel(slide, x, TOP,
-              "RQ4: The PINN needs no data, but "
-              f"{ratio('pinn_gpu_total_cost_to_field_seconds', 'dnn_gpu_total_cost_to_field_seconds', '{:.1f}')}× "
-              "more training time.",
-              fig="v4_cost",
-              text=[f"The simulation took only {num('fd_n64_solve_seconds_median', '{:.1f}')} s, so data "
-                    "was cheap; the hybrid pays for both. GPU memory: "
-                    f"{num('pinn_gpu_peak_vram_bytes_mean', '{:.0f}', 1 / 2**20)} MB (PINN) vs "
-                    f"{num('dnn_gpu_peak_vram_bytes_mean', '{:.0f}', 1 / 2**20)} MB (data NN)."])
-    y = panel(slide, x, y,
-              "No method wins on everything; each trades accuracy, physics and cost.",
-              text=["• Data NN: most accurate and cheapest, when simulation data already exists.",
-                    "• PINN: needs no data and obeys the physics best, but costs more and fails as the "
-                    "flow speeds up.",
-                    "• Hybrid: accurate at every flow speed "
-                    f"({pct('re1000_hybrid_gpu_test_a_relative_l2_u_mean')} vs "
-                    f"{pct('re1000_pinn_gpu_test_a_relative_l2_u_mean')} for the PINN at Re = 1000) and far "
-                    "closer to the physics than the data NN, but needs data and the most training.",
-                    "• Reusing a trained network helps: a PINN started from the Re = 100 one more than "
-                    "halved its error at Re = 400."],
-              size=BODY_PT)
+    y = col_heading(slide, x, TOP, "Cost")
+    y = lead(slide, x, y, [
+        "RQ4. Training time on one graphics card, including the simulation that makes the data."])
+    y = picture(slide, x, y, "v4_cost")
+    y = caption(slide, x, y, [
+        f"The simulation took only {num('fd_n64_solve_seconds_median', '{:.1f}')} s, so the data NN was "
+        f"{ratio('pinn_gpu_total_cost_to_field_seconds', 'dnn_gpu_total_cost_to_field_seconds', '{:.1f}')}× "
+        "cheaper than the PINN. Checking the physics at thousands of points every step is what "
+        "slows the PINN and the hybrid."])
+    y = col_heading(slide, x, y - 0.2, "Conclusion")
+    y = comparison_table(slide, x, y)
+    y = block(slide, x, y, [
+        "Green: best of the three. No method wins everywhere. With data, the data NN is the most "
+        "accurate and cheapest; without data, the PINN is the only option but fails on fast flows. "
+        "The hybrid is the most balanced: accurate at every speed and close to the physics, at the "
+        "highest training cost."], size=INTRO_PT) + 0.05
+    y = col_heading(slide, x, y, "References")
     y = block(slide, x, y, [
         "[1] Marchi, C. H., Suero, R., and Araki, L. K. 2009. The lid-driven square cavity flow: numerical "
         "solution with a 1024 x 1024 grid. J. Braz. Soc. Mech. Sci. Eng. 31, 3, 186–198.",
@@ -330,8 +402,9 @@ def column_answer(slide):
         "deep learning framework for solving forward and inverse problems involving nonlinear partial "
         "differential equations. J. Comput. Phys. 378, 686–707.",
     ], size=SMALL_PT, space_after=4)
-    COLUMN_END[4] = block(slide, x, y + 0.1, ["Contact: roberto.pollicino@quinnipiac.edu · Adviser: brian.oneil@quinnipiac.edu"],
-                          size=SMALL_PT)
+    y = col_heading(slide, x, y - 0.35, "Contacts")       # the reference block's height estimate is generous
+    COLUMN_END[4] = block(slide, x, y, ["roberto.pollicino@quinnipiac.edu · brian.oneil@quinnipiac.edu"],
+                          size=SMALL_PT + 2, space_after=2)
 
 
 def build():

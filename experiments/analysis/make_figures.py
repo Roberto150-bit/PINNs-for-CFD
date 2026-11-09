@@ -690,7 +690,7 @@ def callout(ax, text, xy, xytext, color=INK):
 
 def fig_v4_accuracy(data):
     """Finding 1: test-A error of u, v, p (%); callout = ratio of the u errors."""
-    fig, ax = plt.subplots(figsize=(WIDTH, 5.6), constrained_layout=True)
+    fig, ax = plt.subplots(figsize=(WIDTH, 4.7), constrained_layout=True)
     methods = [m for m in NETS if m in data]
     width = 0.76 / len(methods)
     plotted = {}
@@ -708,7 +708,7 @@ def fig_v4_accuracy(data):
         plotted[m] = [float(b.get_height()) / 100 for b in bars]
     ratio = plotted["pinn"][0] / plotted["data_driven_nn"][0]
     callout(ax, f"{ratio:.0f}× lower error in u\nfor the data NN", xy=(-(len(methods) - 1) / 2 * width, 100 * plotted["data_driven_nn"][0] + (0.5 if len(methods) < 3 else 3.6)),
-            xytext=(0.35, 0.80) if len(methods) < 3 else (0.27, 0.70), color=COLORS["data_driven_nn"])
+            xytext=(0.35, 0.80) if len(methods) < 3 else (0.30, 0.88), color=COLORS["data_driven_nn"])
     ax.set_xticks(range(3), ["u", "v", "p"])
     ax.set_ylabel("Error (%)")
     ax.set_ylim(0, max(max(v) for v in plotted.values()) * 100 * 1.35)
@@ -720,7 +720,7 @@ def fig_v4_accuracy(data):
 
 def fig_v4_physics(data):
     """Finding 2: RMS violation of mass and momentum conservation; callout = mass ratio."""
-    fig, ax = plt.subplots(figsize=(WIDTH, 5.6), constrained_layout=True)
+    fig, ax = plt.subplots(figsize=(WIDTH, 4.7), constrained_layout=True)
     names = ["continuity", "x_momentum", "y_momentum"]
     methods = [m for m in NETS if m in data]
     width = 0.76 / len(methods)
@@ -815,7 +815,7 @@ def fig_v4_re400(fields, t_show=5.0):
 
 def fig_v4_cost(nums):
     """Finding 5: GPU seconds to a usable flow, split into simulation data and training."""
-    fig, ax = plt.subplots(figsize=(WIDTH, 4.2), constrained_layout=True)
+    fig, ax = plt.subplots(figsize=(WIDTH, 3.5), constrained_layout=True)
     fd = nums["fd_n64_solve_seconds_median"]["value"]
     dnn = nums["dnn_gpu_training_time_seconds_mean"]["value"]
     pinn = nums["pinn_gpu_training_time_seconds_mean"]["value"]
