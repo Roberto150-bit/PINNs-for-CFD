@@ -812,7 +812,7 @@ def fig_v4_re400(fields, t_show=5.0):
 
 def fig_v4_cost(nums):
     """Finding 5: GPU seconds to a usable flow, split into simulation data and training."""
-    fig, ax = plt.subplots(figsize=(WIDTH, 4.4), constrained_layout=True)
+    fig, ax = plt.subplots(figsize=(WIDTH, 4.2), constrained_layout=True)
     fd = nums["fd_n64_solve_seconds_median"]["value"]
     dnn = nums["dnn_gpu_training_time_seconds_mean"]["value"]
     pinn = nums["pinn_gpu_training_time_seconds_mean"]["value"]

@@ -2121,6 +2121,114 @@
   ],
   "description": "Re 1000 pinn GPU runs: max continuity_residual"
  },
+ "re1000_hybrid_gpu_test_a_relative_l2_u_mean": {
+  "value": 0.07907111777398268,
+  "runs": [
+   "hybrid_re1000_gpu_s1",
+   "hybrid_re1000_gpu_s2",
+   "hybrid_re1000_gpu_s3"
+  ],
+  "description": "Re 1000 hybrid GPU runs: mean test_a_relative_l2_u"
+ },
+ "re1000_hybrid_gpu_test_a_relative_l2_u_min": {
+  "value": 0.06928069283138885,
+  "runs": [
+   "hybrid_re1000_gpu_s1",
+   "hybrid_re1000_gpu_s2",
+   "hybrid_re1000_gpu_s3"
+  ],
+  "description": "Re 1000 hybrid GPU runs: min test_a_relative_l2_u"
+ },
+ "re1000_hybrid_gpu_test_a_relative_l2_u_max": {
+  "value": 0.08956570652240503,
+  "runs": [
+   "hybrid_re1000_gpu_s1",
+   "hybrid_re1000_gpu_s2",
+   "hybrid_re1000_gpu_s3"
+  ],
+  "description": "Re 1000 hybrid GPU runs: max test_a_relative_l2_u"
+ },
+ "re1000_hybrid_gpu_test_a_relative_l2_v_mean": {
+  "value": 0.1047055110208289,
+  "runs": [
+   "hybrid_re1000_gpu_s1",
+   "hybrid_re1000_gpu_s2",
+   "hybrid_re1000_gpu_s3"
+  ],
+  "description": "Re 1000 hybrid GPU runs: mean test_a_relative_l2_v"
+ },
+ "re1000_hybrid_gpu_test_a_relative_l2_v_min": {
+  "value": 0.10365175511348795,
+  "runs": [
+   "hybrid_re1000_gpu_s1",
+   "hybrid_re1000_gpu_s2",
+   "hybrid_re1000_gpu_s3"
+  ],
+  "description": "Re 1000 hybrid GPU runs: min test_a_relative_l2_v"
+ },
+ "re1000_hybrid_gpu_test_a_relative_l2_v_max": {
+  "value": 0.10536106307495295,
+  "runs": [
+   "hybrid_re1000_gpu_s1",
+   "hybrid_re1000_gpu_s2",
+   "hybrid_re1000_gpu_s3"
+  ],
+  "description": "Re 1000 hybrid GPU runs: max test_a_relative_l2_v"
+ },
+ "re1000_hybrid_gpu_test_a_relative_l2_p_mean": {
+  "value": 0.15434029365595067,
+  "runs": [
+   "hybrid_re1000_gpu_s1",
+   "hybrid_re1000_gpu_s2",
+   "hybrid_re1000_gpu_s3"
+  ],
+  "description": "Re 1000 hybrid GPU runs: mean test_a_relative_l2_p"
+ },
+ "re1000_hybrid_gpu_test_a_relative_l2_p_min": {
+  "value": 0.14642096280121636,
+  "runs": [
+   "hybrid_re1000_gpu_s1",
+   "hybrid_re1000_gpu_s2",
+   "hybrid_re1000_gpu_s3"
+  ],
+  "description": "Re 1000 hybrid GPU runs: min test_a_relative_l2_p"
+ },
+ "re1000_hybrid_gpu_test_a_relative_l2_p_max": {
+  "value": 0.1677817044972984,
+  "runs": [
+   "hybrid_re1000_gpu_s1",
+   "hybrid_re1000_gpu_s2",
+   "hybrid_re1000_gpu_s3"
+  ],
+  "description": "Re 1000 hybrid GPU runs: max test_a_relative_l2_p"
+ },
+ "re1000_hybrid_gpu_continuity_residual_mean": {
+  "value": 0.05401021776032732,
+  "runs": [
+   "hybrid_re1000_gpu_s1",
+   "hybrid_re1000_gpu_s2",
+   "hybrid_re1000_gpu_s3"
+  ],
+  "description": "Re 1000 hybrid GPU runs: mean continuity_residual"
+ },
+ "re1000_hybrid_gpu_continuity_residual_min": {
+  "value": 0.05153166506700164,
+  "runs": [
+   "hybrid_re1000_gpu_s1",
+   "hybrid_re1000_gpu_s2",
+   "hybrid_re1000_gpu_s3"
+  ],
+  "description": "Re 1000 hybrid GPU runs: min continuity_residual"
+ },
+ "re1000_hybrid_gpu_continuity_residual_max": {
+  "value": 0.05800108270621138,
+  "runs": [
+   "hybrid_re1000_gpu_s1",
+   "hybrid_re1000_gpu_s2",
+   "hybrid_re1000_gpu_s3"
+  ],
+  "description": "Re 1000 hybrid GPU runs: max continuity_residual"
+ },
  "re400_dnn_gpu_test_a_relative_l2_u_mean": {
   "value": 0.023067831286254385,
   "runs": [

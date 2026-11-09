@@ -266,7 +266,7 @@ def trend_evidence():
 def column_rq3(slide):
     x = COL_X[2]
     y = panel(slide, x, TOP,
-              "RQ3: Across flow speeds the data NN stays reliable; the PINN does not.",
+              "RQ3: As the flow speeds up, only the PINN breaks down.",
               fig="v4_trend",
               text=trend_evidence())
     COLUMN_END[3] = panel(slide, x, y,
@@ -301,12 +301,14 @@ def column_answer(slide):
     y = panel(slide, x, y,
               "No method wins on everything; each trades accuracy, physics and cost.",
               text=["• Data NN: most accurate and cheapest, when simulation data already exists.",
-                    "• PINN: needs no data and obeys the physics best, but costs more and needs far more "
-                    "training as the flow speeds up.",
-                    "• Hybrid: in between on accuracy and physics, but it needs the data and the most "
-                    "training time.",
-                    "• Reusing a trained network helps: starting at Re = 400 from the trained Re = 100 PINN "
-                    "more than halved its error."],
+                    "• PINN: needs no data and obeys the physics best, but costs more and fails as the "
+                    "flow speeds up.",
+                    "• Hybrid: accurate at every flow speed "
+                    f"({pct('re1000_hybrid_gpu_test_a_relative_l2_u_mean')} vs "
+                    f"{pct('re1000_pinn_gpu_test_a_relative_l2_u_mean')} for the PINN at Re = 1000) and far "
+                    "closer to the physics than the data NN, but needs data and the most training.",
+                    "• Reusing a trained network helps: a PINN started from the Re = 100 one more than "
+                    "halved its error at Re = 400."],
               size=BODY_PT)
     y = block(slide, x, y, [
         "[1] Marchi, C. H., Suero, R., and Araki, L. K. 2009. The lid-driven square cavity flow: numerical "
