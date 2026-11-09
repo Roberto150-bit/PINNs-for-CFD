@@ -287,7 +287,8 @@ def column_rq12(slide):
         f"runs) the hybrid breaks the rules more ({num('ctrl_re100_dataonly_cont_mean', '{:.2f}')}); it is "
         f"then more accurate at Re = 100 ({pct('ctrl_re100_dataonly_u_mean')} vs "
         f"{pct('ctrl_re100_hybrid_u_mean')}) but less accurate at Re = 1000 "
-        f"({pct('ctrl_re1000_dataonly_u_mean')} vs {pct('ctrl_re1000_hybrid_u_mean')})."])
+        f"({pct('ctrl_re1000_dataonly_u_mean')} vs {pct('ctrl_re1000_hybrid_u_mean')}; in "
+        f"{num('ctrl_re1000_hybrid_better_u_n', '{:.0f}')} of {num('ctrl_re1000_n_runs', '{:.0f}')} runs)."])
 
 
 def column_rq3(slide):

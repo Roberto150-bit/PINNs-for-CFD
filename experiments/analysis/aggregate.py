@@ -301,6 +301,11 @@ def control_numbers():
         ids = sorted(x["run_id"] for g in groups.values() for x in g)
         out[f"ctrl_re{re}_n_runs"] = {"value": len(groups["dataonly"]), "runs": ids,
                                       "description": f"hybrid data-only control at Re {re}: runs with same-seed hybrid and data NN"}
+        out[f"ctrl_re{re}_hybrid_better_u_n"] = {
+            "value": sum(float(h["test_a_relative_l2_u"]) < float(c["test_a_relative_l2_u"])
+                         for h, c in zip(groups["hybrid"], groups["dataonly"])),
+            "runs": ids,
+            "description": f"Re {re}: seeds where the hybrid's test-A u error is below its own data-only control's"}
         for name, rows in groups.items():
             for short, col in (("u", "test_a_relative_l2_u"), ("cont", "continuity_residual")):
                 out[f"ctrl_re{re}_{name}_{short}_mean"] = {
