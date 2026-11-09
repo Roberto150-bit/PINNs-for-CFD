@@ -405,7 +405,7 @@ def column_answer(slide):
         "differential equations. J. Comput. Phys. 378, 686–707.",
     ], size=SMALL_PT, space_after=4)
     y = col_heading(slide, x, y - 0.35, "Contacts")       # the reference block's height estimate is generous
-    COLUMN_END[4] = block(slide, x, y, ["roberto.pollicino@quinnipiac.edu · brian.oneil@quinnipiac.edu"],
+    COLUMN_END[4] = block(slide, x, y, ["Roberto.Pollicino@quinnipiac.edu · Brian.ONeill@quinnipiac.edu"],
                           size=SMALL_PT + 2, space_after=2)
 
 
