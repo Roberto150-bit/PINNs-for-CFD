@@ -22,6 +22,7 @@ Figures
     s6_continuation_re1000   the same at Re 1000, started from the S6 Re 400 PINN
     three_methods       test-A error vs step for data NN, PINN and hybrid (Re 100 and 400)
     spikes              spike count per run (table: analysis_spikes.csv, no figure)
+    hybrid_control      data NN vs data-only control vs hybrid, same seeds (Re 100 and 400)
 The hybrid (data + physics loss) is drawn wherever its runs exist.
 Also writes experiments/results/reynolds_trend.csv.
 """
@@ -136,6 +137,16 @@ def tolist(a):
 
 def rid(d):
     return os.path.basename(d.rstrip("/"))
+
+
+def scored(d):
+    """True when evaluate_all has scored the run (a metrics.json written while
+    the run was still training carries another status and is ignored)."""
+    path = os.path.join(d, "metrics.json")
+    if not os.path.isfile(path):
+        return False
+    with open(path) as f:
+        return json.load(f).get("status") == "evaluated"
 
 
 def legend_entries(axes):
@@ -258,7 +269,7 @@ def fig_error_vs_t(seeds=TREND_SEEDS):
     for ax, re in zip(axes.flat, res):
         values[f"re{re:g}"] = {}
         for method in NETWORKS:
-            dirs = [d for d in existing_runs(re, method, seeds) if os.path.isfile(os.path.join(d, "metrics.json"))]
+            dirs = [d for d in existing_runs(re, method, seeds) if scored(d)]
             if not dirs:
                 continue
             curves = []
@@ -460,7 +471,7 @@ def fig_reynolds_trend(seeds=TREND_SEEDS):
 def causal_dirs(seeds=TREND_SEEDS):
     base = os.path.join(C.experiment_dir(400.0), "causal", "pinn")
     return [os.path.join(base, f"pinn_re400_gpu_s{s}_causal") for s in seeds
-            if os.path.isfile(os.path.join(base, f"pinn_re400_gpu_s{s}_causal", "metrics.json"))]
+            if scored(os.path.join(base, f"pinn_re400_gpu_s{s}_causal"))]
 
 
 def fig_causal(seeds=TREND_SEEDS):
@@ -469,7 +480,7 @@ def fig_causal(seeds=TREND_SEEDS):
     groups = [("data_driven_nn", "Data NN", "-", existing_runs(400.0, "data_driven_nn", seeds)),
               ("pinn", "PINN", "-", existing_runs(400.0, "pinn", seeds)),
               ("pinn", "PINN, causal", "--", causal_dirs(seeds))]
-    hybrid = [d for d in existing_runs(400.0, "hybrid", seeds) if os.path.isfile(os.path.join(d, "metrics.json"))]
+    hybrid = [d for d in existing_runs(400.0, "hybrid", seeds) if scored(d)]
     if hybrid:
         groups.insert(1, ("hybrid", "Hybrid", "-", hybrid))
     if not groups[-1][3]:
@@ -515,7 +526,7 @@ def continuation_dirs(re, seeds=TREND_SEEDS):
     base = os.path.join(C.experiment_dir(re), "continuation", "pinn")
     name = f"pinn_re{re:g}_gpu_s{{}}_from_re{CONTINUATION_FROM[re]:g}"
     return [os.path.join(base, name.format(s)) for s in seeds
-            if os.path.isfile(os.path.join(base, name.format(s), "metrics.json"))]
+            if scored(os.path.join(base, name.format(s)))]
 
 
 def fig_continuation(re=400.0, seeds=TREND_SEEDS):
@@ -663,6 +674,55 @@ def table_spikes(seeds=(1, 2, 3, 4, 5)):
                   f"worst ratio {v['worst_ratio']:.2f}  final/best {v['final_over_best_mean']:.2f}")
 
 
+CONTROL_STEPS = (("data_driven_nn", "Data NN", "standardized outputs, data loss"),
+                 ("control", "Control", "physical outputs, data loss"),
+                 ("hybrid", "Hybrid", "physical outputs, data + physics loss"))
+
+
+def control_dir(re, seed):
+    return os.path.join(C.experiment_dir(re), "control", "hybrid", f"hybrid_re{re:g}_gpu_s{seed}_dataonly")
+
+
+def fig_hybrid_control(res=(100.0, 400.0), seeds=TREND_SEEDS):
+    """Data NN -> data-only control (only the output units change) -> hybrid
+    (only the physics loss is added): test-A error of u and continuity residual
+    per seed, from each run's metrics.json. Drawn once every control run exists."""
+    have = {re: [s for s in seeds if scored(control_dir(re, s))] for re in res}
+    if not all(len(v) == len(seeds) for v in have.values()):
+        print("hybrid_control: skipped (control runs not all scored yet)")
+        return
+    fig, axes = plt.subplots(2, len(res), figsize=(WIDTH, 8.4), layout="constrained", sharex=True,
+                             squeeze=False)
+    values = {"note": "same seeds in every group; each dot one run, line the mean",
+              "groups": {k: d for k, _, d in CONTROL_STEPS}}
+    for j, re in enumerate(res):
+        values[f"re{re:g}"] = {}
+        for i, (key, label, _) in enumerate(CONTROL_STEPS):
+            dirs = [control_dir(re, s) if key == "control" else run_dir(re, key, s) for s in have[re]]
+            ms = [json.load(open(os.path.join(d, "metrics.json"))) for d in dirs]
+            u = [float(m["accuracy"]["test_a"]["relative_l2_u"]) for m in ms]
+            c = [float(m["physical_consistency"]["continuity_residual"]) for m in ms]
+            color = COLORS["hybrid"] if key != "data_driven_nn" else COLORS["data_driven_nn"]
+            for ax, ys in ((axes[0, j], u), (axes[1, j], c)):
+                hollow = key == "control"
+                ax.scatter([i] * len(ys), ys, s=90, alpha=0.85, zorder=3,
+                           facecolors="white" if hollow else color, edgecolors=color, linewidths=2)
+                ax.plot([i - 0.25, i + 0.25], [np.nanmean(ys)] * 2, color=color, zorder=4)
+            values[f"re{re:g}"][key] = {"runs": [rid(d) for d in dirs], "test_a_relative_l2_u": u,
+                                        "continuity_residual": c}
+        axes[0, j].set_title(f"Re = {re:g}", loc="left")
+    for ax in axes.flat:
+        ax.set_yscale("log")
+        plain_log_axis(ax.yaxis, subs=(1.0, 2.0, 5.0))
+        ax.grid(False, axis="x")
+        ax.set_xlim(-0.6, len(CONTROL_STEPS) - 0.4)
+    for ax in axes[1]:
+        ax.set_xticks(range(len(CONTROL_STEPS)), ["Data\nNN", "Con-\ntrol", "Hy-\nbrid"], fontsize=20)
+    axes[0, 0].set_ylabel("Rel. L2, u")
+    axes[1, 0].set_ylabel("Continuity\nresidual")
+    save(fig, "hybrid_control", values)
+
+
 FIGURES = {
     "loss_components": fig_loss_components,
     "generalization": fig_generalization,
@@ -675,6 +735,7 @@ FIGURES = {
     "continuation": lambda: [fig_continuation(re) for re in CONTINUATION_FROM],
     "three_methods": fig_three_methods,
     "spikes": table_spikes,
+    "hybrid_control": fig_hybrid_control,
 }
 
 

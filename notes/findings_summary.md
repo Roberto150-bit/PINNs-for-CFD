@@ -68,6 +68,8 @@ At unseen times (test B, ten held-out snapshots) the errors are similar: 0.014 (
 
 At the same total of 40,000 steps, the warm start (0.153) is better than continued training from random weights (0.212). The Re 400 failure is therefore mostly an optimization problem.
 
+Longer training has a cost in physical consistency. After 100,000 steps the three S5 PINNs at $Re = 400$ have continuity residuals of 1.21, 1.82 and 1.63 at the 50,000 evaluation points, against 0.015–0.060 after 20,000 steps. That is worse than the data NN (0.55). Their x-momentum residuals rose from about 0.03 to 1.0–3.2 [`extended_re400.csv`, `experiment_results_re400.csv`]. The hybrid trained for 100,000 steps shows the same (continuity 0.038 to 0.61). The networks fit the equations at their 20,000 fixed collocation points but not between them, as S2 showed for 5,000 points. The S5 runs at $Re = 100$ have not been scored for physics.
+
 Results at other $Re$:
 - **S6 at $Re = 1000$:** final $u$ 0.412, 0.277 and 0.285, against 0.413, 0.413 and 0.404 from random weights. Two of three seeds improve [`continuation_re1000.csv`].
 - **S6 at $Re = 10$:** no clear effect. The $u$ errors are 0.150, 0.155 and 0.161 against 0.168, 0.151 and 0.158 from random weights, so only one seed improves. $p$ is slightly lower and $v$ slightly higher in every seed [`continuation_re10.csv`, `experiment_results_re10.csv`].
@@ -86,7 +88,7 @@ Results at other $Re$:
 **Caveats.**
 - Only three seeds at $Re = 10$ and 1000 and in the studies.
 - S4–S6 were added after the first $Re = 400$ result. Each was fixed before its own runs, and none changed an existing run.
-- For S5 only $u$ is in the results tables.
+- For S5 at $Re = 100$ only $u$ is available; the physics residuals were scored at $Re = 400$ only.
 
 ## RQ4: Cost ($Re = 100$, one laptop)
 
@@ -147,5 +149,12 @@ The hybrid costs slightly more to train than the PINN, because it computes both 
 
 **Caveats.**
 - Three seeds per Reynolds number in the tables. Of seeds 4–5 at $Re = 100$, seed 4 is in line (test-A $u$ 0.037). Seed 5 ends on a spike exactly at the last step (spike table), so its reported result, 0.118, is worse than the PINN's for that seed (0.076). At $Re = 400$ seeds 4 and 5 are in line (0.054, 0.080). Over all five seeds the hybrid's test-A $u$ error is 0.061 (s.d. 0.032) at $Re = 100$ and 0.066 (s.d. 0.012) at $Re = 400$. At $Re = 100$ that is the largest seed-to-seed spread of the three networks (data NN s.d. 0.0010, PINN 0.011), entirely because of seed 5. [`experiment_results.csv`, `experiment_results_re400.csv`; spike table `experiments/analysis/plots/analysis_spikes.csv`]
-- The hybrid outputs physical $u$, $v$, $p$, while the data NN outputs standardized values. The difference between the hybrid and the data NN therefore mixes the effect of the physics loss with the effect of the output units. A data-only control run (the hybrid code without the physics loss) separates the two; its results are not yet available.
+- The hybrid outputs physical $u$, $v$, $p$, while the data NN outputs standardized values. A data-only control (the hybrid code without the physics loss, seeds 1–3) separates the two effects [`control_re100.csv`, `control_re400.csv`; figure `analysis_hybrid_control.png`]:
+
+| | Data NN | Control (physical outputs, data loss) | Hybrid (+ physics loss) |
+|---|---|---|---|
+| $Re = 100$: test-A $u$ / continuity | 0.017 / 0.547 | 0.030 / 0.448 | 0.050 / 0.173 |
+| $Re = 400$: test-A $u$ / continuity | 0.023 / 0.549 | 0.053 / 0.326 | 0.065 / 0.041 |
+
+  The output units alone make $u$ 1.7 times (Re 100) and 2.3 times (Re 400) less accurate: about half and four fifths of the gap between hybrid and data NN on a logarithmic scale. Against a data-only network with the same outputs, the physics loss itself costs a factor of 1.7 (Re 100) and 1.25 (Re 400) in $u$ error, and lowers the continuity residual by 2.6 and 8 times.
 - The loss weights were not tuned: all start at 1, as in the PINN. In all sixteen runs the data term was the largest at step 2,000, 15 to 52 times the smallest term. That is below the rebalancing threshold of 100, so the weights never changed [each run's `config.json`].
