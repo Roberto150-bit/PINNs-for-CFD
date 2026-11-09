@@ -532,10 +532,12 @@ def fig_continuation(re=400.0, seeds=TREND_SEEDS):
         values[label] = {"runs": [rid(d) for d in dirs], "step": tolist(steps), "mean": tolist(mean),
                          "min": tolist(lo), "max": tolist(hi), "test_a_relative_l2_u": test_a,
                          "test_a_mean": float(np.mean(test_a))}
+    axes[0].set_yscale("log")
+    plain_log_axis(axes[0].yaxis, subs=(1.0, 2.0, 5.0))
     for ax in axes:
-        ax.set_yscale("log")
-        plain_log_axis(ax.yaxis, subs=(1.0, 2.0, 5.0))
         ax.set_ylabel("Rel. L2, u")
+    # final errors on a linear axis from 0, so the size of the difference reads directly
+    axes[1].set_ylim(0, 1.15 * max(max(v["test_a_relative_l2_u"]) for k, v in values.items() if k != "note"))
     axes[0].set_xlabel(f"Training step at Re = {re:g}")
     axes[1].set_xticks(range(len(groups)), ["Random\nstart", f"From\nRe = {src:g}"])
     axes[1].set_xlim(-0.6, len(groups) - 0.4)
