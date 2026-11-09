@@ -195,6 +195,51 @@
    "2"
   ]
  },
+ "s6_re400_base_u_mean": {
+  "value": 0.3487813834501524,
+  "description": "S6: standard Re 400 PINN runs with the same seeds, mean test_a_relative_l2_u",
+  "runs": [
+   "pinn_re400_gpu_s1",
+   "pinn_re400_gpu_s1_from_re100",
+   "pinn_re400_gpu_s2",
+   "pinn_re400_gpu_s2_from_re100",
+   "pinn_re400_gpu_s3",
+   "pinn_re400_gpu_s3_from_re100"
+  ],
+  "printed_as": [
+   "35%"
+  ]
+ },
+ "s6_re400_warm_u_mean": {
+  "value": 0.15309820782242042,
+  "description": "S6: Re 400 PINN started from the trained Re 100 PINN, mean test_a_relative_l2_u",
+  "runs": [
+   "pinn_re400_gpu_s1",
+   "pinn_re400_gpu_s1_from_re100",
+   "pinn_re400_gpu_s2",
+   "pinn_re400_gpu_s2_from_re100",
+   "pinn_re400_gpu_s3",
+   "pinn_re400_gpu_s3_from_re100"
+  ],
+  "printed_as": [
+   "15%"
+  ]
+ },
+ "s6_re400_n_runs": {
+  "value": 3,
+  "description": "S6: warm-started Re 400 PINN runs with a same-seed standard run",
+  "runs": [
+   "pinn_re400_gpu_s1",
+   "pinn_re400_gpu_s1_from_re100",
+   "pinn_re400_gpu_s2",
+   "pinn_re400_gpu_s2_from_re100",
+   "pinn_re400_gpu_s3",
+   "pinn_re400_gpu_s3_from_re100"
+  ],
+  "printed_as": [
+   "3"
+  ]
+ },
  "pinn_gpu_total_cost_to_field_seconds": {
   "value": 781.9692135369447,
   "description": "pinn gpu: total cost to a usable field",

@@ -259,17 +259,19 @@ def column_rq3(slide):
               fig="v4_trend",
               text=trend_evidence())
     COLUMN_END[3] = panel(slide, x, y,
-                          "RQ3: At Re = 400 the PINN obeys the equations but needs far more training "
-                          "to get the flow right.",
+                          "RQ3: At Re = 400 the PINN obeys the equations but needs more training, "
+                          "or a head start, to get the flow right.",
                           fig="v4_re400",
                           text=["Flow at t = 5 (✕ = vortex). After 20,000 steps the PINN conserves mass "
                                 "better than the data NN "
                                 f"({num('re400_pinn_gpu_continuity_residual_mean', '{:.2f}')} vs "
                                 f"{num('re400_dnn_gpu_continuity_residual_mean', '{:.2f}')}) yet puts the "
-                                "vortex by the lid. After 100,000 steps its error in u falls from "
+                                "vortex by the lid. Its error in u falls from "
                                 f"{pct('s5_re400_pinn_u_at_20k_mean')} to {pct('s5_re400_pinn_u_at_100k_mean')} "
-                                f"(mean of {num('s5_re400_pinn_n_runs', '{:.0f}')} seeds): under-trained, "
-                                "not unable."])
+                                f"with 100,000 steps ({num('s5_re400_pinn_n_runs', '{:.0f}')} seeds), and from "
+                                f"{pct('s6_re400_base_u_mean')} to {pct('s6_re400_warm_u_mean')} in 20,000 steps "
+                                "when it starts from the trained Re = 100 PINN "
+                                f"({num('s6_re400_n_runs', '{:.0f}')} seeds)."])
 
 
 def column_answer(slide):
@@ -288,6 +290,8 @@ def column_answer(slide):
               text=["• Data NN: more accurate and cheaper, when simulation data already exists.",
                     "• PINN: needs no data and obeys the physics, but costs more and needs far more "
                     "training as the flow speeds up.",
+                    "• Reusing what a network already learned helps: starting at Re = 400 from the "
+                    "trained Re = 100 PINN more than halved its error.",
                     "• Next: a hybrid trained on a little data plus the physics loss could cut both the "
                     "data and the computing needed (not tested here)."],
               size=BODY_PT)

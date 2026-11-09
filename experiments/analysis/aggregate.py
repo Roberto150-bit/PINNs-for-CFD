@@ -259,7 +259,42 @@ def poster_numbers(summary, fd, det, cost, validation, transient):
         nums[key] = e
     for key, e in extended_numbers().items():
         nums[key] = e
+    for key, e in continuation_numbers().items():
+        nums[key] = e
     return nums
+
+
+def continuation_numbers():
+    """S6 warm start: PINN at Re 400 initialized from the trained Re 100 PINN (same seed).
+    Mean test-A relative L2 of the warm-started runs and of the standard runs with the same
+    seeds. Keys: s6_re400_<warm|base>_<u|v|p>_mean, s6_re400_n_runs."""
+    path = os.path.join(RESULTS, "continuation_re400.csv")
+    base_path = os.path.join(RESULTS, "experiment_results_re400.csv")
+    if not (os.path.exists(path) and os.path.exists(base_path)):
+        return {}
+    with open(path) as f:
+        warm = [r for r in csv.DictReader(f) if r["status"] == "evaluated" and r["test_a_relative_l2_u"]]
+    with open(base_path) as f:
+        base = {r["run_id"]: r for r in csv.DictReader(f)}
+    pairs = []
+    for r in warm:
+        base_id = r["run_id"].replace("_from_re100", "")
+        if base_id in base and base[base_id]["test_a_relative_l2_u"]:
+            pairs.append((r, base[base_id]))
+    if not pairs:
+        return {}
+    ids = sorted(x["run_id"] for p in pairs for x in p)
+    out = {"s6_re400_n_runs": {"value": len(pairs), "runs": ids,
+                               "description": "S6: warm-started Re 400 PINN runs with a same-seed standard run"}}
+    for k in "uvp":
+        col = f"test_a_relative_l2_{k}"
+        out[f"s6_re400_warm_{k}_mean"] = {
+            "value": statistics.mean(float(w[col]) for w, _ in pairs), "runs": ids,
+            "description": f"S6: Re 400 PINN started from the trained Re 100 PINN, mean {col}"}
+        out[f"s6_re400_base_{k}_mean"] = {
+            "value": statistics.mean(float(b[col]) for _, b in pairs), "runs": ids,
+            "description": f"S6: standard Re 400 PINN runs with the same seeds, mean {col}"}
+    return out
 
 
 def re400_numbers():
