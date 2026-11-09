@@ -749,7 +749,7 @@ def fig_v4_physics(data):
 
 def fig_v4_trend(data):
     """Finding 3: error of u vs Reynolds number, every seed as a dot, mean as a line."""
-    fig, ax = plt.subplots(figsize=(WIDTH, 5.4), constrained_layout=True)
+    fig, ax = plt.subplots(figsize=(WIDTH, 5.0), constrained_layout=True)
     res = sorted(data)
     plotted = {}
     offset = {"data_driven_nn": -0.12, "pinn": 0.0, "hybrid": 0.12}
@@ -779,7 +779,7 @@ def fig_v4_trend(data):
     ax.set_ylabel("Error in u (%)")
     ax.set_xlabel("Flow speed (Reynolds number)")
     ax.grid(axis="x", visible=False)
-    ax.legend(frameon=False, loc="center right")
+    fig.legend(*ax.get_legend_handles_labels(), frameon=False, loc="outside lower center", ncols=3)
     return fig, plotted
 
 

@@ -251,8 +251,14 @@ def trend_evidence():
     dnn = ", ".join(pct(key(r, "dnn")) for r in res)
     pinn_res = [r for r in res if key(r, "pinn") in NUMS]
     pinn = ", ".join(pct(key(r, "pinn")) for r in pinn_res)
-    return [f"Every seed is a dot. Error in u at Re = {', '.join(res)}: data NN {dnn}; "
-            f"PINN {pinn} (Re = {', '.join(pinn_res)})."]
+    hyb_res = [r for r in res if NUMS.get(key(r, "hybrid"), {}).get("value") is not None]
+    hyb = ", ".join(pct(key(r, "hybrid")) for r in hyb_res)
+    text = f"Every seed is a dot. Error in u at Re = {', '.join(res)}: data NN {dnn}; PINN {pinn}"
+    if pinn_res != res:
+        text += f" (Re = {', '.join(pinn_res)})"
+    if hyb_res:
+        text += f"; hybrid {hyb}" + ("" if hyb_res == res else f" (Re = {', '.join(hyb_res)})")
+    return [text + "."]
 
 
 def column_rq3(slide):
@@ -275,7 +281,10 @@ def column_rq3(slide):
                                 f"{pct('s6_re400_base_u_mean')} to {pct('s6_re400_warm_u_mean')} in 20,000 steps "
                                 "when it starts from the trained Re = 100 PINN "
                                 f"({num('s6_re400_n_runs', '{:.0f}')} seeds); after the same 40,000 steps "
-                                f"a random start is at {pct('s5_re400_pinn_u_at_40k_mean')}."])
+                                f"a random start is at {pct('s5_re400_pinn_u_at_40k_mean')}. With data added, the "
+                                f"hybrid gets the flow right ({pct('re400_hybrid_gpu_test_a_relative_l2_u_mean')}) "
+                                "and conserves mass like the PINN "
+                                f"({num('re400_hybrid_gpu_continuity_residual_mean', '{:.2f}')})."])
 
 
 def column_answer(slide):
