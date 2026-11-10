@@ -271,7 +271,44 @@ def poster_numbers(summary, fd, det, cost, validation, transient):
         nums[key] = e
     for key, e in control_numbers().items():
         nums[key] = e
+    for key, e in sparse_numbers().items():
+        nums[key] = e
     return nums
+
+
+def sparse_numbers():
+    """S7 (D26): data NN and hybrid trained on 0.1% / 1% of the train split.
+    Keys: s7_re<Re>_<dnn|hybrid>_<frac0p1|frac1>_<u|cont>_mean and _n_runs, and
+    s7_re<Re>_<frac>_hybrid_better_u_n (seeds where the hybrid's u error is below the same-seed
+    data NN's). Written before any hybrid S7 result was seen."""
+    out = {}
+    for re in ("100", "400"):
+        path = os.path.join(RESULTS, f"sparse_re{re}.csv")
+        if not os.path.exists(path):
+            continue
+        with open(path) as f:
+            rows = {r["run_id"]: r for r in csv.DictReader(f)
+                    if r["status"] == "evaluated" and r["test_a_relative_l2_u"]}
+        for tag in ("frac0p1", "frac1"):
+            for short in ("dnn", "hybrid"):
+                sel = [r for k, r in sorted(rows.items()) if k.startswith(f"{short}_re{re}_") and k.endswith(tag)]
+                if not sel:
+                    continue
+                ids = [r["run_id"] for r in sel]
+                key = f"s7_re{re}_{short}_{tag}"
+                out[f"{key}_n_runs"] = {"value": len(sel), "runs": ids,
+                                        "description": f"S7 Re {re} {short} on {tag}: completed runs"}
+                for name, col in (("u", "test_a_relative_l2_u"), ("cont", "continuity_residual")):
+                    out[f"{key}_{name}_mean"] = {"value": statistics.mean(float(r[col]) for r in sel), "runs": ids,
+                                                 "description": f"S7 Re {re} {short} on {tag}: mean {col}"}
+            pairs = [(rows[k], rows[k.replace("hybrid_", "dnn_")]) for k in rows
+                     if k.startswith(f"hybrid_re{re}_") and k.endswith(tag) and k.replace("hybrid_", "dnn_") in rows]
+            if pairs:
+                out[f"s7_re{re}_{tag}_hybrid_better_u_n"] = {
+                    "value": sum(float(h["test_a_relative_l2_u"]) < float(d["test_a_relative_l2_u"]) for h, d in pairs),
+                    "runs": sorted(x["run_id"] for p in pairs for x in p),
+                    "description": f"S7 Re {re} {tag}: seeds where the hybrid's u error is below the data NN's"}
+    return out
 
 
 def control_numbers():

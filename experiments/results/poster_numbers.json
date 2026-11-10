@@ -3889,5 +3889,59 @@
    "hybrid_re1000_gpu_s5_dataonly"
   ],
   "description": "Re 1000, seeds of the control runs: dnn mean continuity_residual"
+ },
+ "s7_re100_dnn_frac0p1_n_runs": {
+  "value": 3,
+  "runs": [
+   "dnn_re100_gpu_s1_frac0p1",
+   "dnn_re100_gpu_s2_frac0p1",
+   "dnn_re100_gpu_s3_frac0p1"
+  ],
+  "description": "S7 Re 100 dnn on frac0p1: completed runs"
+ },
+ "s7_re100_dnn_frac0p1_u_mean": {
+  "value": 0.5426687520258129,
+  "runs": [
+   "dnn_re100_gpu_s1_frac0p1",
+   "dnn_re100_gpu_s2_frac0p1",
+   "dnn_re100_gpu_s3_frac0p1"
+  ],
+  "description": "S7 Re 100 dnn on frac0p1: mean test_a_relative_l2_u"
+ },
+ "s7_re100_dnn_frac0p1_cont_mean": {
+  "value": 0.4836455789266227,
+  "runs": [
+   "dnn_re100_gpu_s1_frac0p1",
+   "dnn_re100_gpu_s2_frac0p1",
+   "dnn_re100_gpu_s3_frac0p1"
+  ],
+  "description": "S7 Re 100 dnn on frac0p1: mean continuity_residual"
+ },
+ "s7_re100_dnn_frac1_n_runs": {
+  "value": 3,
+  "runs": [
+   "dnn_re100_gpu_s1_frac1",
+   "dnn_re100_gpu_s2_frac1",
+   "dnn_re100_gpu_s3_frac1"
+  ],
+  "description": "S7 Re 100 dnn on frac1: completed runs"
+ },
+ "s7_re100_dnn_frac1_u_mean": {
+  "value": 0.13279186807523746,
+  "runs": [
+   "dnn_re100_gpu_s1_frac1",
+   "dnn_re100_gpu_s2_frac1",
+   "dnn_re100_gpu_s3_frac1"
+  ],
+  "description": "S7 Re 100 dnn on frac1: mean test_a_relative_l2_u"
+ },
+ "s7_re100_dnn_frac1_cont_mean": {
+  "value": 0.46436848985427154,
+  "runs": [
+   "dnn_re100_gpu_s1_frac1",
+   "dnn_re100_gpu_s2_frac1",
+   "dnn_re100_gpu_s3_frac1"
+  ],
+  "description": "S7 Re 100 dnn on frac1: mean continuity_residual"
  }
 }
