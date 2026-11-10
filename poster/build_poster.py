@@ -337,15 +337,21 @@ def comparison_table(slide, x, y, width=COL_W):
              [val(k, "pct") for k in ("re1000_dnn_gpu_test_a_relative_l2_u_mean",
                                       "re1000_pinn_gpu_test_a_relative_l2_u_mean",
                                       "re1000_hybrid_gpu_test_a_relative_l2_u_mean")], None),
+            ("Error, 0.1% of the data",
+             [pct("s7_re100_dnn_frac0p1_u_mean"), pct("pinn_gpu_test_a_relative_l2_u_mean"),
+              pct("s7_re100_hybrid_frac0p1_u_mean")], None),
             ("RQ4  Training time",
              [val(k, "s") for k in ("dnn_gpu_total_cost_to_field_seconds", "pinn_gpu_total_cost_to_field_seconds",
                                     "hybrid_gpu_total_cost_to_field_seconds")], None)]
     # Best cell per row: the smallest number (all rows are lower-is-better), or the given column
     for i, (label, cells, best) in enumerate(rows):
         if best is None:
+            # compare the printed values, so equal-looking cells are shaded together
             nums_ = [float(c.rstrip("% s")) for c in cells]
-            rows[i] = (label, cells, nums_.index(min(nums_)))
-    row_h = 0.44
+            rows[i] = (label, cells, {j for j, v in enumerate(nums_) if v == min(nums_)})
+        elif not isinstance(best, set):
+            rows[i] = (label, cells, {best})
+    row_h = 0.40
     col_w = [3.07, 1.48, 1.48, 1.49]
     shape = slide.shapes.add_table(len(rows) + 1, 4, Inches(x), Inches(y), Inches(width),
                                    Inches(row_h * (len(rows) + 1)))
@@ -374,7 +380,7 @@ def comparison_table(slide, x, y, width=COL_W):
         band = TABLE_BAND if i % 2 else WHITE
         set_cell(table.cell(i, 0), label, 18, BODY_COLOR, band, align=PP_ALIGN.LEFT)
         for j, c in enumerate(cells, start=1):
-            set_cell(table.cell(i, j), c, 20, BODY_COLOR, BETTER if j - 1 == best else band)
+            set_cell(table.cell(i, j), c, 20, BODY_COLOR, BETTER if j - 1 in best else band)
     table.rows[0].height = Inches(row_h)
     return y + row_h * (len(rows) + 1) + 0.12
 
@@ -388,15 +394,15 @@ def column_answer(slide):
     y = caption(slide, x, y, [
         f"The simulation took only {num('fd_n64_solve_seconds_median', '{:.1f}')} s, so the data NN was "
         f"{ratio('pinn_gpu_total_cost_to_field_seconds', 'dnn_gpu_total_cost_to_field_seconds', '{:.1f}')}× "
-        "cheaper than the PINN. Checking the physics at thousands of points every step is what "
-        "slows the PINN and the hybrid."])
+        "cheaper than the PINN; checking the physics at thousands of points per step slows the "
+        "PINN and the hybrid."])
     y = col_heading(slide, x, y - 0.2, "Conclusion")
     y = comparison_table(slide, x, y)
     y = block(slide, x, y, [
-        "Green: best of the three. No method wins everywhere. With data, the data NN is the most "
-        "accurate and cheapest; without data, the PINN is the only option but fails on fast flows. "
-        "The hybrid is the most balanced: accurate at every speed and close to the physics, at the "
-        "highest training cost."], size=INTRO_PT) + 0.05
+        "Green: best (Re = 100 unless stated). No method wins everywhere. With plenty of data the "
+        "data NN is best; without data the PINN fails on fast flows. The hybrid is the most "
+        "balanced and needs little data: with 0.1% of it, it matches the PINN (which uses none) "
+        "while the data NN fails."], size=INTRO_PT) + 0.05
     y = col_heading(slide, x, y, "References")
     y = block(slide, x, y, [
         "[1] Marchi, C. H., Suero, R., and Araki, L. K. 2009. The lid-driven square cavity flow: numerical "

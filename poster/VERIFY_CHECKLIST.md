@@ -59,7 +59,9 @@ mean (or read the value). Each run folder holds `metrics.json` (the scored value
 | 35 | 3.9 | 3.92744 | FD 64x64 transient (5,000 steps) solve time, median of repeats (`fd_n64_solve_seconds_median`) | experiments/results/poster_numbers.json (FD timing / validation; see description) | `experiments/experiment_001_re100/finite_difference/fd_re100_n64_transient_timing_r1/`; `experiments/experiment_001_re100/finite_difference/fd_re100_n64_transient_timing_r2/`; `experiments/experiment_001_re100/finite_difference/fd_re100_n64_transient_timing_r3/` |
 | 36 | 781.969, 782 s | 781.969 | pinn gpu: total cost to a usable field (`pinn_gpu_total_cost_to_field_seconds`) | experiments/results/experiment_results.csv (Re 100) | `experiments/experiment_001_re100/pinn/pinn_re100_gpu_s{1-5}/` |
 | 37 | 140.930, 141 s | 140.93 | data_driven_nn gpu: total cost to a usable field (`dnn_gpu_total_cost_to_field_seconds`) | experiments/results/experiment_results.csv (Re 100) | `experiments/experiment_001_re100/data_driven_nn/dnn_re100_gpu_s{1-5}/` |
-| 38 | 886 s | 886.351 | hybrid gpu: total cost to a usable field (`hybrid_gpu_total_cost_to_field_seconds`) | experiments/results/experiment_results.csv (Re 100) | `experiments/experiment_001_re100/hybrid/hybrid_re100_gpu_s{1-5}/` |
+| 38 | 54% | 0.542669 | S7 Re 100 dnn on frac0p1: mean test_a_relative_l2_u (`s7_re100_dnn_frac0p1_u_mean`) | experiments/results/experiment_results.csv (Re 100) | `experiments/experiment_001_re100/data_driven_nn/dnn_re100_gpu_s{1-3}_frac0p1/` |
+| 39 | 8.2% | 0.0819513 | S7 Re 100 hybrid on frac0p1: mean test_a_relative_l2_u (`s7_re100_hybrid_frac0p1_u_mean`) | experiments/results/experiment_results.csv (Re 100) | `experiments/experiment_001_re100/hybrid/hybrid_re100_gpu_s{1-3}_frac0p1/` |
+| 40 | 886 s | 886.351 | hybrid gpu: total cost to a usable field (`hybrid_gpu_total_cost_to_field_seconds`) | experiments/results/experiment_results.csv (Re 100) | `experiments/experiment_001_re100/hybrid/hybrid_re100_gpu_s{1-5}/` |
 
 ## 3. Figures
 

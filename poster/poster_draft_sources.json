@@ -587,6 +587,30 @@
    "141 s"
   ]
  },
+ "s7_re100_dnn_frac0p1_u_mean": {
+  "value": 0.5426687520258129,
+  "description": "S7 Re 100 dnn on frac0p1: mean test_a_relative_l2_u",
+  "runs": [
+   "dnn_re100_gpu_s1_frac0p1",
+   "dnn_re100_gpu_s2_frac0p1",
+   "dnn_re100_gpu_s3_frac0p1"
+  ],
+  "printed_as": [
+   "54%"
+  ]
+ },
+ "s7_re100_hybrid_frac0p1_u_mean": {
+  "value": 0.0819512689360592,
+  "description": "S7 Re 100 hybrid on frac0p1: mean test_a_relative_l2_u",
+  "runs": [
+   "hybrid_re100_gpu_s1_frac0p1",
+   "hybrid_re100_gpu_s2_frac0p1",
+   "hybrid_re100_gpu_s3_frac0p1"
+  ],
+  "printed_as": [
+   "8.2%"
+  ]
+ },
  "hybrid_gpu_total_cost_to_field_seconds": {
   "value": 886.3512805166454,
   "description": "hybrid gpu: total cost to a usable field",
