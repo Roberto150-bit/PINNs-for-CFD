@@ -301,12 +301,13 @@
  },
  "re1000_extended_hybrid": {
   "runs": [
-   "hybrid_re1000_gpu_s1_steps100k"
+   "hybrid_re1000_gpu_s1_steps100k",
+   "hybrid_re1000_gpu_s2_steps100k"
   ],
-  "continuity_r0_mean": 0.338578999042511,
-  "continuity_r0.02_mean": 0.056963346898555756,
-  "continuity_r0.05_mean": 0.022721905261278152,
-  "continuity_r0.1_mean": 0.01757296361029148
+  "continuity_r0_mean": 0.5333856642246246,
+  "continuity_r0.02_mean": 0.06242067366838455,
+  "continuity_r0.05_mean": 0.02379836793988943,
+  "continuity_r0.1_mean": 0.01575327292084694
  },
  "re1000_continuation_pinn": {
   "runs": [

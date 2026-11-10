@@ -105,7 +105,7 @@ The residuals by automatic differentiation are averages over random points, and 
 | 1000 | Hybrid | 20,000 steps | 1,2,3,4,5 | 0.052 (0.0042) | 0.040 (0.0043) | 0.031 (0.0037) | 0.028 (0.0037) |
 | 1000 | Control | control | 1,2,3,4,5 | 0.257 (0.018) | 0.224 (0.011) | 0.190 (0.0084) | 0.151 (0.010) |
 | 1000 | PINN | 100,000 steps (S5) | 1,2,3 | 1.03 (0.760) | 0.285 (0.280) | 0.015 (0.0086) | 0.0064 (0.0016) |
-| 1000 | Hybrid | 100,000 steps (S5) | 1 | 0.339 | 0.057 | 0.023 | 0.018 |
+| 1000 | Hybrid | 100,000 steps (S5) | 1,2 | 0.533 (0.275) | 0.062 (0.0077) | 0.024 (0.0015) | 0.016 (0.0026) |
 | 1000 | PINN | warm start (S6) | 1,2,3 | 1.27 (0.794) | 0.112 (0.105) | 0.0083 (0.0019) | 0.007 (0.002) |
 
 Continuity residual (RMS, automatic differentiation) at the 50,000 evaluation points, and without the points closer than $r$ to either lid corner (post-hoc, added after the S5 and S6 values were seen; all points: 50,000; $r \ge 0.05$: 49,793). Mean (s.d.). Source: `experiments/analysis/plots/analysis_corner_excluded.csv`.
@@ -267,7 +267,7 @@ Sources: `experiments/results/causal_re400.csv`, `experiment_results_re400.csv`.
 
 **Figure.** `analysis_s4_causal.png`.
 
-**S5: training five times longer.** At $Re = 400$ the PINN's error falls in every seed but stays far above the data NN's; at $Re = 100$ the PINN barely changes and at $Re = 1000$ (three seeds) it barely improves ($u$ 0.410 to 0.375, per-seed ratios 0.94, 0.99 and 0.81; $v$ and $p$ stay near 1). Measured over all evaluation points, the long-trained networks violate continuity much more than after 20,000 steps. Nearly all of that comes from the two lid corners, where the wall velocity is discontinuous and the exact solution is singular: without the points within 0.05 of a lid corner, the long-trained PINNs satisfy continuity better than the 20,000-step PINNs at $Re = 400$; at $Re = 1000$ seeds 1 and 2 are about as good as after 20,000 steps (0.009 and 0.011 against 0.009), seed 3 is worse (0.025 against 0.010) (table in Section 4.3). The hybrid at $Re = 400$ (three seeds) gains less: $u$ falls from 0.065 to 0.046, by a factor 0.57 and 0.61 in seeds 1 and 3 and not at all in seed 2 (1.01); away from the lid corners ($r \ge 0.05$) its continuity residual falls from 0.026 to 0.019, still about twice the long-trained PINN's (0.0083). The one hybrid trained for 100,000 steps at $Re = 1000$ (seed 1) gains as much as the PINN at $Re = 400$ (ratio 0.35): $u$ 0.078 to 0.027, $v$ 0.105 to 0.030, $p$ 0.146 to 0.042, with continuity away from the lid corners 0.030 to 0.023. Its $u$ error is then within a factor of two of the data NN's at that $Re$ (0.016, five seeds); one seed only.
+**S5: training five times longer.** At $Re = 400$ the PINN's error falls in every seed but stays far above the data NN's; at $Re = 100$ the PINN barely changes and at $Re = 1000$ (three seeds) it barely improves ($u$ 0.410 to 0.375, per-seed ratios 0.94, 0.99 and 0.81; $v$ and $p$ stay near 1). Measured over all evaluation points, the long-trained networks violate continuity much more than after 20,000 steps. Nearly all of that comes from the two lid corners, where the wall velocity is discontinuous and the exact solution is singular: without the points within 0.05 of a lid corner, the long-trained PINNs satisfy continuity better than the 20,000-step PINNs at $Re = 400$; at $Re = 1000$ seeds 1 and 2 are about as good as after 20,000 steps (0.009 and 0.011 against 0.009), seed 3 is worse (0.025 against 0.010) (table in Section 4.3). The hybrid at $Re = 400$ (three seeds) gains less: $u$ falls from 0.065 to 0.046, by a factor 0.57 and 0.61 in seeds 1 and 3 and not at all in seed 2 (1.01); away from the lid corners ($r \ge 0.05$) its continuity residual falls from 0.026 to 0.019, still about twice the long-trained PINN's (0.0083). The hybrid trained for 100,000 steps at $Re = 1000$ improves in both seeds (ratios 0.35 and 0.58): $u$ 0.078 to 0.027 and 0.069 to 0.040, $v$ 0.105 to 0.030 and 0.105 to 0.031, $p$ 0.146 to 0.042 and 0.149 to 0.034, with continuity away from the lid corners 0.030 to 0.023 and 0.030 to 0.025. Its mean $u$ error (0.034) is then about twice the data NN's at that $Re$ (0.016, five seeds); two seeds only.
 
 <!-- table:s5 -->
 | $Re$ | Network | Runs | Seeds | Test A $u$ | Test A $v$ | Test A $p$ | Continuity | $u$ ratio per seed (new / old) |
@@ -278,8 +278,8 @@ Sources: `experiments/results/causal_re400.csv`, `experiment_results_re400.csv`.
 | 400 | Hybrid | 100,000 steps | 1,2,3 | 0.046 (0.008) | 0.045 (0.0044) | 0.203 (0.0027) | 0.703 (0.279) | 0.57, 1.01, 0.61 |
 | 1000 | PINN | 20,000 steps, same seeds | 1,2,3 | 0.410 (0.0052) | 0.983 (0.0091) | 1.02 (0.029) | 0.010 (6.0e-04) |  |
 | 1000 | PINN | 100,000 steps | 1,2,3 | 0.375 (0.043) | 0.892 (0.121) | 1.04 (0.065) | 1.03 (0.760) | 0.94, 0.99, 0.81 |
-| 1000 | Hybrid | 20,000 steps, same seeds | 1 | 0.078 | 0.105 | 0.146 | 0.058 |  |
-| 1000 | Hybrid | 100,000 steps | 1 | 0.027 | 0.030 | 0.042 | 0.339 | 0.35 |
+| 1000 | Hybrid | 20,000 steps, same seeds | 1,2 | 0.074 (0.0064) | 0.105 (1.8e-04) | 0.148 (0.0017) | 0.055 (0.0039) |  |
+| 1000 | Hybrid | 100,000 steps | 1,2 | 0.034 (0.0094) | 0.030 (6.2e-04) | 0.038 (0.0053) | 0.533 (0.275) | 0.35, 0.58 |
 
 Scored at the final step (100,000) at 50,000 fresh points. Sources: `experiments/results/extended_re*.csv`, `experiment_results*.csv`.
 
@@ -290,12 +290,12 @@ Scored at the final step (100,000) at 50,000 fresh points. Sources: `experiments
 | 400, PINN | 3 | 0.349 | 0.212 | 0.141 |
 | 400, Hybrid | 3 | 0.065 | 0.047 | 0.046 |
 | 1000, PINN | 3 | 0.410 | 0.396 | 0.375 |
-| 1000, Hybrid | 1 | 0.078 | 0.049 | 0.027 |
+| 1000, Hybrid | 2 | 0.074 | 0.042 | 0.034 |
 
 Test-A $u$ from the runs' evaluation log (mean over runs). Source: `experiments/results/poster_numbers.json`.
 <!-- /table:s5 -->
 
-The hybrid at $Re = 1000$ has one seed. The 100,000-step runs at $Re = 100$ have no physics evaluation.
+The hybrid at $Re = 1000$ has two seeds (seed 3 was planned but not run); both improve with longer training ($u$ ratios 0.35 and 0.58). The 100,000-step runs at $Re = 100$ have no physics evaluation.
 
 **S6: starting from a trained PINN at a neighbouring Reynolds number.** At $Re = 400$ every seed started from the $Re = 100$ PINN ends at less than half the error of the random start. At $Re = 1000$, started from those $Re = 400$ runs, two of three seeds improve and one does not change. At $Re = 10$ there is no clear effect. The warm-start runs show the same lid-corner rise in the all-points residual as S5.
 
@@ -346,15 +346,15 @@ Same subset of training rows for every seed and both networks (`experiments/data
 **Caveats for S4–S6.**
 - S4–S6 were added after the first $Re = 400$ result. Each was planned before its own runs and none changed an existing run.
 - S6 runs train for more steps in total than the main runs (40,000 at $Re = 400$ and 10, 60,000 at $Re = 1000$, counting the starting network). At the same total of 40,000 steps, the S5 runs at $Re = 400$ reach 0.212 (S5 table, from the evaluation log), against 0.152 for the warm start (5 seeds), so the warm start helps beyond the extra steps.
-- Three seeds in most studies; five for S6 at $Re = 400$, one for the 100,000-step hybrid at $Re = 1000$.
+- Three seeds in most studies; five for S6 at $Re = 400$, two for the 100,000-step hybrid at $Re = 1000$.
 
 ## 4.8 Limitations
 
 - One problem: the two-dimensional lid-driven cavity on $t \in [0, 5]$, at four Reynolds numbers, on one $64 \times 64$ grid of reference points.
 - The data NN and the hybrid are scored on the same FD solution they were trained on (test A: unseen points at seen times; test B: unseen times). No network was asked to predict a flow at a Reynolds number, geometry or boundary condition it was not trained on.
 - The FD reference converges below second order in space, and the $64 \times 64$ and $128 \times 128$ transients differ by up to 0.142 near the lid corners at $Re = 100$ (methodology Section 1.3). At $Re = 1000$ the reference is a $127 \times 127$ solution, and the $64 \times 64$ FD solution has a test-A error of 0.251 in $u$ against it.
-- One architecture ($5 \times 64$, tanh), one optimizer setting (Adam, learning rate $10^{-3}$) and one training length (20,000 steps) for the main comparison. The loss weights were not tuned. S5 shows that longer training lowers the error of the PINN at $Re = 400$ (every seed) and of the hybrid (two of three seeds at $Re = 400$, the one seed at $Re = 1000$), so the main results describe the networks at a fixed budget, not at convergence.
-- Five seeds per setting in the main design and three in most studies; one seed for the 100,000-step hybrid at $Re = 1000$. Standard deviations from so few runs are uncertain.
+- One architecture ($5 \times 64$, tanh), one optimizer setting (Adam, learning rate $10^{-3}$) and one training length (20,000 steps) for the main comparison. The loss weights were not tuned. S5 shows that longer training lowers the error of the PINN at $Re = 400$ (every seed) and of the hybrid (two of three seeds at $Re = 400$, both seeds at $Re = 1000$), so the main results describe the networks at a fixed budget, not at convergence.
+- Five seeds per setting in the main design and three in most studies; two seeds for the 100,000-step hybrid at $Re = 1000$. Standard deviations from so few runs are uncertain.
 - The hybrid differs from the data NN in its output units as well as its loss; the data-only control measures the first effect separately (Section 4.6).
 - The PDE residuals are RMS values dominated by a few points at the lid corners, where the exact solution is singular; the corner-excluded values (Section 4.3) were added after the S5 and S6 results were seen.
 - All timings come from one laptop; runs that shared the GPU are excluded from the cost results.
@@ -363,7 +363,7 @@ Same subset of training rows for every seed and both networks (`experiments/data
 ## 4.9 Future work
 
 Questions raised by these results and not tested here:
-- Whether the hybrid at $Re = 1000$ gains as much from longer training in other seeds as in seed 1 (one seed only, Section 4.7), and whether the PINN at $Re = 10$ changes with 100,000 steps (planned under S5, not run).
+- Whether the hybrid at $Re = 1000$ gains from longer training in further seeds (two seeds only, Section 4.7), and whether the PINN at $Re = 10$ changes with 100,000 steps (planned under S5, not run).
 - Whether tuned or adaptive loss weights change the hybrid's accuracy gap to the data NN; only the fixed starting weights and the one-time check at step 2,000 were used, and causal weighting (S4) was tested for the PINN only.
 - Whether a hybrid with standardized outputs closes the part of the gap that the control attributes to the output units.
 - Whether a treatment of the lid-corner singularity (for example a regularized lid velocity) changes the PINN's failure at $Re = 400$ and 1000 or the corner-dominated residuals.

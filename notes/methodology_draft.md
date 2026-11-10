@@ -189,7 +189,7 @@ All additional studies use the main settings except for the one factor studied. 
 | S2 | How many collocation points does the PINN need? | 5,000 and 10,000 instead of 20,000 | PINN, $Re = 100$, seeds 1–3 | same |
 | S3 | Does network size matter? | $4 \times 50$ and $6 \times 100$ instead of $5 \times 64$ | both networks, $Re = 100$, seeds 1–3 | same |
 | S4 | Does causal weighting in time help the PINN? | residual weighted by time chunk (Wang, Sankaran and Perdikaris, 2022, Algorithm 1, published schedule) | PINN, $Re = 400$, seeds 1–3 | `experiments/experiment_002_re400/causal/` |
-| S5 | Are the networks under-trained? | 100,000 steps instead of 20,000 | data NN and PINN at $Re = 100$, PINN at $Re = 400$, seeds 1–3; PINN at $Re = 1000$, seeds 1–3; hybrid at $Re = 400$, seeds 1–3, and at $Re = 1000$, seed 1 | `experiments/experiment_00*/extended/` |
+| S5 | Are the networks under-trained? | 100,000 steps instead of 20,000 | data NN and PINN at $Re = 100$, PINN at $Re = 400$, seeds 1–3; PINN at $Re = 1000$, seeds 1–3; hybrid at $Re = 400$, seeds 1–3, and at $Re = 1000$, seeds 1–2 (seed 3 planned, not run) | `experiments/experiment_00*/extended/` |
 | S6 | Does starting from a solution at a lower $Re$ help the PINN? | initial weights from the trained PINN at the lower $Re$ (same seed), optimizer state fresh | $Re = 400$ from $Re = 100$, seeds 1–5; $Re = 1000$ from the S6 $Re = 400$ runs, seeds 1–3; $Re = 10$ from $Re = 100$, seeds 1–3 | `experiments/experiment_00*/continuation/` |
 | S7 | Does the hybrid's physics loss make up for missing data? | 0.1% (118 rows) and 1% (1,176 rows) of the training rows | data NN and hybrid, $Re = 100$ and 400, seeds 1–3 | `experiments/experiment_00{1,2}_re{100,400}/sparse/` |
 
