@@ -4021,5 +4021,137 @@
    "hybrid_re100_gpu_s3_frac1"
   ],
   "description": "S7 Re 100 frac1: seeds where the hybrid's u error is below the data NN's"
+ },
+ "s7_re400_dnn_frac0p1_n_runs": {
+  "value": 3,
+  "runs": [
+   "dnn_re400_gpu_s1_frac0p1",
+   "dnn_re400_gpu_s2_frac0p1",
+   "dnn_re400_gpu_s3_frac0p1"
+  ],
+  "description": "S7 Re 400 dnn on frac0p1: completed runs"
+ },
+ "s7_re400_dnn_frac0p1_u_mean": {
+  "value": 0.7016698718706322,
+  "runs": [
+   "dnn_re400_gpu_s1_frac0p1",
+   "dnn_re400_gpu_s2_frac0p1",
+   "dnn_re400_gpu_s3_frac0p1"
+  ],
+  "description": "S7 Re 400 dnn on frac0p1: mean test_a_relative_l2_u"
+ },
+ "s7_re400_dnn_frac0p1_cont_mean": {
+  "value": 0.5324014724534318,
+  "runs": [
+   "dnn_re400_gpu_s1_frac0p1",
+   "dnn_re400_gpu_s2_frac0p1",
+   "dnn_re400_gpu_s3_frac0p1"
+  ],
+  "description": "S7 Re 400 dnn on frac0p1: mean continuity_residual"
+ },
+ "s7_re400_hybrid_frac0p1_n_runs": {
+  "value": 3,
+  "runs": [
+   "hybrid_re400_gpu_s1_frac0p1",
+   "hybrid_re400_gpu_s2_frac0p1",
+   "hybrid_re400_gpu_s3_frac0p1"
+  ],
+  "description": "S7 Re 400 hybrid on frac0p1: completed runs"
+ },
+ "s7_re400_hybrid_frac0p1_u_mean": {
+  "value": 0.17215028230755788,
+  "runs": [
+   "hybrid_re400_gpu_s1_frac0p1",
+   "hybrid_re400_gpu_s2_frac0p1",
+   "hybrid_re400_gpu_s3_frac0p1"
+  ],
+  "description": "S7 Re 400 hybrid on frac0p1: mean test_a_relative_l2_u"
+ },
+ "s7_re400_hybrid_frac0p1_cont_mean": {
+  "value": 0.046818291261882056,
+  "runs": [
+   "hybrid_re400_gpu_s1_frac0p1",
+   "hybrid_re400_gpu_s2_frac0p1",
+   "hybrid_re400_gpu_s3_frac0p1"
+  ],
+  "description": "S7 Re 400 hybrid on frac0p1: mean continuity_residual"
+ },
+ "s7_re400_frac0p1_hybrid_better_u_n": {
+  "value": 3,
+  "runs": [
+   "dnn_re400_gpu_s1_frac0p1",
+   "dnn_re400_gpu_s2_frac0p1",
+   "dnn_re400_gpu_s3_frac0p1",
+   "hybrid_re400_gpu_s1_frac0p1",
+   "hybrid_re400_gpu_s2_frac0p1",
+   "hybrid_re400_gpu_s3_frac0p1"
+  ],
+  "description": "S7 Re 400 frac0p1: seeds where the hybrid's u error is below the data NN's"
+ },
+ "s7_re400_dnn_frac1_n_runs": {
+  "value": 3,
+  "runs": [
+   "dnn_re400_gpu_s1_frac1",
+   "dnn_re400_gpu_s2_frac1",
+   "dnn_re400_gpu_s3_frac1"
+  ],
+  "description": "S7 Re 400 dnn on frac1: completed runs"
+ },
+ "s7_re400_dnn_frac1_u_mean": {
+  "value": 0.1715437449371807,
+  "runs": [
+   "dnn_re400_gpu_s1_frac1",
+   "dnn_re400_gpu_s2_frac1",
+   "dnn_re400_gpu_s3_frac1"
+  ],
+  "description": "S7 Re 400 dnn on frac1: mean test_a_relative_l2_u"
+ },
+ "s7_re400_dnn_frac1_cont_mean": {
+  "value": 0.48551851006815605,
+  "runs": [
+   "dnn_re400_gpu_s1_frac1",
+   "dnn_re400_gpu_s2_frac1",
+   "dnn_re400_gpu_s3_frac1"
+  ],
+  "description": "S7 Re 400 dnn on frac1: mean continuity_residual"
+ },
+ "s7_re400_hybrid_frac1_n_runs": {
+  "value": 3,
+  "runs": [
+   "hybrid_re400_gpu_s1_frac1",
+   "hybrid_re400_gpu_s2_frac1",
+   "hybrid_re400_gpu_s3_frac1"
+  ],
+  "description": "S7 Re 400 hybrid on frac1: completed runs"
+ },
+ "s7_re400_hybrid_frac1_u_mean": {
+  "value": 0.08643062308692122,
+  "runs": [
+   "hybrid_re400_gpu_s1_frac1",
+   "hybrid_re400_gpu_s2_frac1",
+   "hybrid_re400_gpu_s3_frac1"
+  ],
+  "description": "S7 Re 400 hybrid on frac1: mean test_a_relative_l2_u"
+ },
+ "s7_re400_hybrid_frac1_cont_mean": {
+  "value": 0.036815612542435226,
+  "runs": [
+   "hybrid_re400_gpu_s1_frac1",
+   "hybrid_re400_gpu_s2_frac1",
+   "hybrid_re400_gpu_s3_frac1"
+  ],
+  "description": "S7 Re 400 hybrid on frac1: mean continuity_residual"
+ },
+ "s7_re400_frac1_hybrid_better_u_n": {
+  "value": 3,
+  "runs": [
+   "dnn_re400_gpu_s1_frac1",
+   "dnn_re400_gpu_s2_frac1",
+   "dnn_re400_gpu_s3_frac1",
+   "hybrid_re400_gpu_s1_frac1",
+   "hybrid_re400_gpu_s2_frac1",
+   "hybrid_re400_gpu_s3_frac1"
+  ],
+  "description": "S7 Re 400 frac1: seeds where the hybrid's u error is below the data NN's"
  }
 }
