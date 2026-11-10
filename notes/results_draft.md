@@ -316,7 +316,9 @@ The $Re = 1000$ runs start from the S6 $Re = 400$ runs of the same seed. Sources
 
 **S7: less training data (data NN and hybrid, $Re = 100$ and 400).** Does the hybrid's physics loss make up for missing data? Both networks train on 0.1% (118 rows) or 1% (1,176 rows) of the training rows, the same rows for every seed and both networks (methodology Section 8). Results are added as each setting's seeds 1–3 are scored; settings not yet scored are marked pending.
 
-Data NN at $Re = 100$ (seeds 1–3): with 0.1% of the rows its test-A $u$ error is 0.543, with 1% 0.133, against 0.017 with all rows and 0.084 for the PINN without data; the 1% runs reproduce S1 exactly (identical training logs). Its continuity residual stays near 0.5 at every fraction (0.484, 0.464, 0.547), so less data makes the data NN less accurate but not less consistent with continuity. *Hybrid and $Re = 400$: pending.*
+Data NN at $Re = 100$ (seeds 1–3): with 0.1% of the rows its test-A $u$ error is 0.543, with 1% 0.133, against 0.017 with all rows and 0.084 for the PINN without data; the 1% runs reproduce S1 exactly (identical training logs). Its continuity residual stays near 0.5 at every fraction (0.484, 0.464, 0.547), so less data makes the data NN less accurate but not less consistent with continuity.
+
+Hybrid at $Re = 100$ with 0.1% of the rows (seeds 1–3): test-A $u$ error 0.082, against 0.543 for the data NN on the same rows, 0.050 for the hybrid with all rows and 0.084 for the PINN without data. Its continuity residual is 0.029, lower than with all rows (0.173) and than the PINN's (0.080). *Hybrid with 1% of the rows and $Re = 400$: pending.*
 
 <!-- table:s7 -->
 | $Re$ | Network | Training data | Seeds | Test A $u$ | Test A $v$ | Test A $p$ | Test B $u$ | Continuity | x-momentum |
@@ -324,8 +326,8 @@ Data NN at $Re = 100$ (seeds 1–3): with 0.1% of the rows its test-A $u$ error 
 | 100 | Data NN | 0.1% (118 rows) | 1,2,3 | 0.543 (0.026) | 0.458 (0.012) | 0.860 (0.027) | 0.531 (0.027) | 0.484 (0.012) | 0.428 (0.036) |
 | 100 | Data NN | 1% (1,176 rows) | 1,2,3 | 0.133 (0.0057) | 0.115 (0.0032) | 0.466 (0.018) | 0.090 (0.0051) | 0.464 (0.044) | 1.50 (0.142) |
 | 100 | Data NN | 100% (main runs) | 1,2,3 | 0.017 (0.0014) | 0.018 (0.0011) | 0.113 (0.0012) | 0.015 (0.0015) | 0.547 (0.076) | 5.62 (0.090) |
-| 100 | Hybrid | 0.1% (118 rows) | 1,2 | pending | pending | pending | pending | pending | pending |
-| 100 | Hybrid | 1% (1,176 rows) | 1 | pending | pending | pending | pending | pending | pending |
+| 100 | Hybrid | 0.1% (118 rows) | 1,2,3 | 0.082 (0.010) | 0.093 (0.0035) | 0.314 (0.012) | 0.075 (0.011) | 0.029 (0.0027) | 0.063 (0.026) |
+| 100 | Hybrid | 1% (1,176 rows) | 1,2 | pending | pending | pending | pending | pending | pending |
 | 100 | Hybrid | 100% (main runs) | 1,2,3 | 0.050 (0.0036) | 0.053 (0.0062) | 0.169 (0.0023) | 0.045 (0.0034) | 0.173 (0.032) | 1.01 (0.745) |
 | 100 | PINN | no data (main runs) | 1,2,3 | 0.084 (0.015) | 0.168 (0.030) | 0.266 (0.0065) | 0.079 (0.015) | 0.080 (0.039) | 0.110 (0.058) |
 | 400 | Data NN | 0.1% (118 rows) | – | pending | pending | pending | pending | pending | pending |

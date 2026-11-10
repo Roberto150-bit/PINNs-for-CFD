@@ -77,7 +77,7 @@ Results at other $Re$:
 
 **Sensitivity at $Re = 100$** (3 seeds, `sensitivity_re100.csv`):
 - With 1% of the data the data NN (0.133) is worse than the PINN without data (0.082); with 10% it reaches 0.050.
-- S7 (less data, seeds 1–3): with 0.1% of the rows (118) the data NN's $u$ error is 0.543 at $Re = 100$, and its continuity residual stays near 0.5 at 0.1%, 1% and 100% (0.484, 0.464, 0.547) [`sparse_re100.csv`, `experiment_results.csv`]. Hybrid and $Re = 400$ pending.
+- S7 (less data, seeds 1–3): with 0.1% of the rows (118) the data NN's $u$ error is 0.543 at $Re = 100$, and its continuity residual stays near 0.5 at 0.1%, 1% and 100% (0.484, 0.464, 0.547) [`sparse_re100.csv`, `experiment_results.csv`]. With the same 118 rows the hybrid's $u$ error is 0.082 (0.050 with all rows, PINN 0.084) and its continuity residual 0.029. Hybrid with 1% of the rows and $Re = 400$ pending.
 - A PINN with 5,000 collocation points has a continuity residual of 1.26 at the evaluation points, mostly from the lid corners: without the points within 0.05 of a lid corner it is 0.028, against 0.017 with 20,000 points [`analysis_corner_excluded.csv`].
 - A larger network ($6 \times 100$) does not help either method. One data NN seed ended on a loss spike (0.102).
 
