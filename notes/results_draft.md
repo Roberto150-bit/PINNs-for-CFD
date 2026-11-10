@@ -325,7 +325,7 @@ Data NN at $Re = 100$ (seeds 1–3): with 0.1% of the rows its test-A $u$ error 
 | 100 | Data NN | 1% (1,176 rows) | 1,2,3 | 0.133 (0.0057) | 0.115 (0.0032) | 0.466 (0.018) | 0.090 (0.0051) | 0.464 (0.044) | 1.50 (0.142) |
 | 100 | Data NN | 100% (main runs) | 1,2,3 | 0.017 (0.0014) | 0.018 (0.0011) | 0.113 (0.0012) | 0.015 (0.0015) | 0.547 (0.076) | 5.62 (0.090) |
 | 100 | Hybrid | 0.1% (118 rows) | 1 | pending | pending | pending | pending | pending | pending |
-| 100 | Hybrid | 1% (1,176 rows) | – | pending | pending | pending | pending | pending | pending |
+| 100 | Hybrid | 1% (1,176 rows) | 1 | pending | pending | pending | pending | pending | pending |
 | 100 | Hybrid | 100% (main runs) | 1,2,3 | 0.050 (0.0036) | 0.053 (0.0062) | 0.169 (0.0023) | 0.045 (0.0034) | 0.173 (0.032) | 1.01 (0.745) |
 | 100 | PINN | no data (main runs) | 1,2,3 | 0.084 (0.015) | 0.168 (0.030) | 0.266 (0.0065) | 0.079 (0.015) | 0.080 (0.039) | 0.110 (0.058) |
 | 400 | Data NN | 0.1% (118 rows) | – | pending | pending | pending | pending | pending | pending |
