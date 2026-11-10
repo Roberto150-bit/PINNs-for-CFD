@@ -11,6 +11,7 @@ already holds a performance.json, so the batch can be restarted safely.
     python experiments/run_batch.py --extended         (study S5, 100,000 steps)
     python experiments/run_batch.py --hybrid           (hybrid network: data + physics loss, Re 10-1000)
     python experiments/run_batch.py --hybrid-control   (hybrid with data loss only: control, Re 100 and 400)
+    python experiments/run_batch.py --sparse           (S7: data NN and hybrid on 1% / 0.1% of the data)
     python experiments/run_batch.py --day              (2026-11-09: seeds 4-5 at Re 10/1000, controls, 100k runs)
     python experiments/run_batch.py --extended-trend   (S5 extension: PINN Re 1000 and Re 10, 100,000 steps)
     python experiments/run_batch.py --trend fd         (Reynolds trend: FD at Re 10 and 1000)
@@ -127,6 +128,40 @@ def hybrid_jobs():
     out.append((f"{EXP}/hybrid/{rid}",
                 [PY, "models/hybrid/src/train.py", "--device", "gpu", "--seed", "1", "--re", "400",
                  "--steps", str(EXTENDED_STEPS), "--run-id", rid, "--exp-dir", EXP]))
+    return out
+
+
+def sparse_jobs():
+    """S7 (D26): less training data. Data NN and hybrid trained on 1% and 0.1% of the train
+    split (the same fixed subset for every seed and both methods), Re 100 and 400, seeds 1-3,
+    everything else as the main runs. Question: does the hybrid's physics loss make up for
+    missing data? Order: all data NN runs (short), then the hybrid with the scarcest data and
+    seed 1 first. GPU not shared. The data NN Re 100 1% runs repeat S1 (determinism check)."""
+    fracs = ((0.001, "frac0p1"), (0.01, "frac1"))
+    out = []
+    for re in (100.0, 400.0):
+        EXP = f"{C.experiment_dir(re)}/sparse"
+        for frac, tag in fracs:
+            for s in (1, 2, 3):
+                rid = f"dnn_re{re:g}_gpu_s{s}_{tag}"
+                out.append((f"{EXP}/data_driven_nn/{rid}",
+                            [PY, "models/data_driven_nn/src/train.py", "--device", "gpu", "--seed", str(s),
+                             "--re", f"{re:g}", "--train-fraction", str(frac), "--run-id", rid, "--exp-dir", EXP]))
+    for s in (1, 2, 3):
+        for frac, tag in fracs:
+            for re in (100.0, 400.0):
+                EXP = f"{C.experiment_dir(re)}/sparse"
+                rid = f"hybrid_re{re:g}_gpu_s{s}_{tag}"
+                out.append((f"{EXP}/hybrid/{rid}",
+                            [PY, "models/hybrid/src/train.py", "--device", "gpu", "--seed", str(s),
+                             "--re", f"{re:g}", "--train-fraction", str(frac), "--run-id", rid, "--exp-dir", EXP]))
+    # then: hybrid 100k steps at Re 1000, seeds 2-3 (seed 1 reached 0.027; is it repeatable?)
+    EXP = f"{C.experiment_dir(1000.0)}/extended"
+    for s in (2, 3):
+        rid = f"hybrid_re1000_gpu_s{s}_steps{EXTENDED_STEPS // 1000}k"
+        out.append((f"{EXP}/hybrid/{rid}",
+                    [PY, "models/hybrid/src/train.py", "--device", "gpu", "--seed", str(s), "--re", "1000",
+                     "--steps", str(EXTENDED_STEPS), "--run-id", rid, "--exp-dir", EXP]))
     return out
 
 
@@ -335,6 +370,7 @@ def main():
     parser.add_argument("--hybrid", action="store_true")
     parser.add_argument("--hybrid-control", action="store_true")
     parser.add_argument("--day", action="store_true", help="runs of 2026-11-09 (D24)")
+    parser.add_argument("--sparse", action="store_true", help="S7: less training data (D26)")
     parser.add_argument("--trend",choices=["fd", "nn"], default=None)
     parser.add_argument("--causal", action="store_true")
     parser.add_argument("--continuation", type=float, nargs="?", const=400.0, default=None,
@@ -359,6 +395,8 @@ def main():
         job_list = causal_jobs()
     elif args.trend:
         job_list = trend_jobs(args.trend, args.trend_re)
+    elif args.sparse:
+        job_list = sparse_jobs()
     elif args.day:
         job_list = day_jobs()
     elif args.hybrid_control:
@@ -376,6 +414,8 @@ def main():
     for run_dir, cmd in job_list:
         name = os.path.basename(run_dir)
         if args.hybrid and "/extended/" not in run_dir:
+            LOG_DIR = os.path.join(os.path.dirname(os.path.dirname(run_dir)), "logs")
+        elif args.sparse:
             LOG_DIR = os.path.join(os.path.dirname(os.path.dirname(run_dir)), "logs")
         elif args.day and "/extended/" not in run_dir and "/control/" not in run_dir:
             LOG_DIR = os.path.join(os.path.dirname(os.path.dirname(run_dir)), "logs")

@@ -44,6 +44,8 @@ def main():
     parser.add_argument("--tag", default=None, help="suffix added to the run id (e.g. timing)")
     parser.add_argument("--shared-gpu", action="store_true",
                         help="another job uses the GPU at the same time: timings are flagged as not valid")
+    parser.add_argument("--train-fraction", type=float, default=1.0,
+                        help="use this fraction of the train split, same subset as the data NN (study S7)")
     parser.add_argument("--data-only", action="store_true",
                         help="control: data loss only, physical outputs (no physics terms)")
     parser.add_argument("--run-id", default=None)
@@ -76,6 +78,10 @@ def main():
     X_all = data["inputs"].astype("float32")            # physical (x, y, t); scaled inside the network wrapper
     Y_all = data["targets"]
     idx_train = data["idx_train"]
+    if args.train_fraction < 1.0:
+        # Identical subset to the data NN's --train-fraction (fixed split seed for every run)
+        n_keep = int(round(args.train_fraction * len(idx_train)))
+        idx_train = np.sort(np.random.default_rng(C.SPLIT_SEED).choice(idx_train, n_keep, replace=False))
     y_mean = Y_all[idx_train].mean(axis=0)
     y_std = Y_all[idx_train].std(axis=0)
     X_train = tf.constant(X_all[idx_train])
@@ -155,7 +161,7 @@ def main():
                          "batch": f"data: {batch} FD points per step (shuffled per epoch); physics: full point set",
                          "batches_per_epoch": batches_per_epoch, "timing_run": args.tag == "timing"},
             "data": {"fd_data_in_loss": True, "input_variables": ["x", "y", "t"],
-                     "target_variables": ["u", "v", "p"], "training_samples": int(n_train),
+                     "target_variables": ["u", "v", "p"], "training_samples": int(n_train), "train_fraction": args.train_fraction,
                      "validation_samples": int(len(data["idx_val"])), "dataset": C.dataset_path(args.re),
                      "input_scaling": "[-1, 1]", "target_mean": y_mean.tolist(), "target_std": y_std.tolist(),
                      "data_loss": "mean of per-output MSE, each output divided by its train-split std",
