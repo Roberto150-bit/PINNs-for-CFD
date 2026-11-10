@@ -4,7 +4,7 @@ Draft of the Results chapter. The method is described in `notes/methodology_draf
 
 **Conventions.** Three neural networks (NNs) are compared: the data-driven NN (data NN), trained on finite-difference (FD) data; the physics-informed neural network (PINN), trained on the governing equations only; and the hybrid network, trained on both. The four research questions (RQ1–RQ4) are accuracy, physical consistency, robustness and cost. Errors are relative $L_2$ errors against the $64 \times 64$ FD reference at the final training step. Test A is the held-out 15% of the space-time points, test B the ten held-out snapshots. Tables show the mean over seeds with the sample standard deviation in brackets and list the seeds used; every number comes from the file named under the table. Tables are generated from those files, not typed.
 
-All runs of the main design and of studies S1–S6 are scored. Study S7 (less training data, Section 4.7) is running; its numbers are marked as pending until every seed of a setting is scored.
+All runs of the main design and of studies S1–S7 are scored.
 
 ## 4.1 Reference solution
 
@@ -314,11 +314,11 @@ The $Re = 1000$ runs start from the S6 $Re = 400$ runs of the same seed. Sources
 
 **Figures.** `analysis_s6_continuation.png`, `analysis_s6_continuation_re1000.png`.
 
-**S7: less training data (data NN and hybrid, $Re = 100$ and 400).** Does the hybrid's physics loss make up for missing data? Both networks train on 0.1% (118 rows) or 1% (1,176 rows) of the training rows, the same rows for every seed and both networks (methodology Section 8). Results are added as each setting's seeds 1–3 are scored; settings not yet scored are marked pending.
+**S7: less training data (data NN and hybrid, $Re = 100$ and 400).** Does the hybrid's physics loss make up for missing data? Both networks train on 0.1% (118 rows) or 1% (1,176 rows) of the training rows, the same rows for every seed and both networks (methodology Section 8). Seeds 1–3 are scored for every setting.
 
 Data NN at $Re = 100$ (seeds 1–3): with 0.1% of the rows its test-A $u$ error is 0.543, with 1% 0.133, against 0.017 with all rows and 0.084 for the PINN without data; the 1% runs reproduce S1 exactly (identical training logs). Its continuity residual stays near 0.5 at every fraction (0.484, 0.464, 0.547), so less data makes the data NN less accurate but not less consistent with continuity.
 
-Hybrid at $Re = 100$ with 0.1% of the rows (seeds 1–3): test-A $u$ error 0.082, against 0.543 for the data NN on the same rows, 0.050 for the hybrid with all rows and 0.084 for the PINN without data. Its continuity residual is 0.029, lower than with all rows (0.173) and than the PINN's (0.080). With 1% of the rows the hybrid's $u$ error is 0.056 (data NN 0.133) and its continuity residual 0.056. So at $Re = 100$ the hybrid's $u$ error rises from 0.050 to 0.056 and 0.082 as the data drops from 100% to 1% and 0.1%, while the data NN's rises from 0.017 to 0.133 and 0.543. *$Re = 400$: pending.*
+Hybrid at $Re = 100$ with 0.1% of the rows (seeds 1–3): test-A $u$ error 0.082, against 0.543 for the data NN on the same rows, 0.050 for the hybrid with all rows and 0.084 for the PINN without data. Its continuity residual is 0.029, lower than with all rows (0.173) and than the PINN's (0.080). With 1% of the rows the hybrid's $u$ error is 0.056 (data NN 0.133) and its continuity residual 0.056. So at $Re = 100$ the hybrid's $u$ error rises from 0.050 to 0.056 and 0.082 as the data drops from 100% to 1% and 0.1%, while the data NN's rises from 0.017 to 0.133 and 0.543. At $Re = 400$ (seeds 1–3) the data NN's test-A $u$ error is 0.702 with 0.1% of the rows and 0.172 with 1%, against 0.023 with all rows; its continuity residual is 0.532, 0.486 and 0.549. The hybrid's is 0.172 with 0.1% and 0.086 with 1%, against 0.065 with all rows, and 0.349 for the PINN without data; its continuity residual is 0.047, 0.037 and 0.041 (PINN 0.038). At both $Re$ the hybrid has the lower $u$ error at 0.1% and 1% of the rows, the data NN with all rows. With 0.1% and 1% of the rows the hybrid's continuity residual is below 0.06 at both $Re$ (0.029, 0.056, 0.047, 0.037) and the data NN's between 0.46 and 0.54.
 
 <!-- table:s7 -->
 | $Re$ | Network | Training data | Seeds | Test A $u$ | Test A $v$ | Test A $p$ | Test B $u$ | Continuity | x-momentum |
@@ -330,11 +330,11 @@ Hybrid at $Re = 100$ with 0.1% of the rows (seeds 1–3): test-A $u$ error 0.082
 | 100 | Hybrid | 1% (1,176 rows) | 1,2,3 | 0.056 (0.0012) | 0.066 (0.0038) | 0.220 (0.0018) | 0.049 (0.0011) | 0.056 (0.013) | 0.079 (0.011) |
 | 100 | Hybrid | 100% (main runs) | 1,2,3 | 0.050 (0.0036) | 0.053 (0.0062) | 0.169 (0.0023) | 0.045 (0.0034) | 0.173 (0.032) | 1.01 (0.745) |
 | 100 | PINN | no data (main runs) | 1,2,3 | 0.084 (0.015) | 0.168 (0.030) | 0.266 (0.0065) | 0.079 (0.015) | 0.080 (0.039) | 0.110 (0.058) |
-| 400 | Data NN | 0.1% (118 rows) | – | pending | pending | pending | pending | pending | pending |
-| 400 | Data NN | 1% (1,176 rows) | – | pending | pending | pending | pending | pending | pending |
+| 400 | Data NN | 0.1% (118 rows) | 1,2,3 | 0.702 (0.0099) | 0.498 (0.014) | 0.931 (0.0071) | 0.696 (0.0093) | 0.532 (0.059) | 0.279 (0.017) |
+| 400 | Data NN | 1% (1,176 rows) | 1,2,3 | 0.172 (0.014) | 0.166 (0.0069) | 0.531 (0.050) | 0.124 (0.0089) | 0.486 (0.015) | 0.730 (0.056) |
 | 400 | Data NN | 100% (main runs) | 1,2,3 | 0.023 (0.002) | 0.025 (0.0016) | 0.158 (0.004) | 0.020 (0.0011) | 0.549 (0.030) | 2.08 (0.555) |
-| 400 | Hybrid | 0.1% (118 rows) | – | pending | pending | pending | pending | pending | pending |
-| 400 | Hybrid | 1% (1,176 rows) | – | pending | pending | pending | pending | pending | pending |
+| 400 | Hybrid | 0.1% (118 rows) | 1,2,3 | 0.172 (0.016) | 0.334 (0.042) | 0.635 (0.031) | 0.149 (0.017) | 0.047 (0.0094) | 0.070 (0.011) |
+| 400 | Hybrid | 1% (1,176 rows) | 1,2,3 | 0.086 (0.008) | 0.103 (0.0064) | 0.320 (0.0055) | 0.068 (0.0047) | 0.037 (0.0014) | 0.060 (0.004) |
 | 400 | Hybrid | 100% (main runs) | 1,2,3 | 0.065 (0.011) | 0.074 (0.0071) | 0.231 (0.017) | 0.053 (0.0077) | 0.041 (0.0043) | 0.177 (0.188) |
 | 400 | PINN | no data (main runs) | 1,2,3 | 0.349 (0.022) | 0.883 (0.098) | 0.859 (0.114) | 0.345 (0.021) | 0.038 (0.023) | 0.034 (0.0025) |
 
