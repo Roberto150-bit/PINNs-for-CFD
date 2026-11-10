@@ -21,7 +21,7 @@ python models/data_driven_nn/src/train.py --device gpu --seed 1 [--re 400]
 
 Options used by the studies:
 
-- `--train-fraction 0.1` — train on a fraction of the training rows (S1)
+- `--train-fraction 0.1` — train on a fixed subset of the training rows (S1, S7); the subset depends only on the split seed, so it is the same for every seed and for the hybrid (rows listed in `experiments/data/README.md`); the mini-batch is the whole subset when it has fewer than 4,096 rows
 - `--hidden-layers 6 --neurons 100` — network size (S3)
 - `--steps 100000` — longer training (S5)
 - `--shared-gpu` — the GPU is shared with another job; the run is marked `"timing_valid": false` and its times are not used as cost results

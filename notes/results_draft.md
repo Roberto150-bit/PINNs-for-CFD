@@ -2,9 +2,9 @@
 
 Draft of the Results chapter. The method is described in `notes/methodology_draft.md`; a short version of the findings is in `notes/findings_summary.md`.
 
-**Conventions.** Errors are relative $L_2$ errors against the $64 \times 64$ finite-difference (FD) reference at the final training step. Test A is the held-out 15% of the space-time points, test B the ten held-out snapshots. Tables show the mean over seeds with the sample standard deviation in brackets and list the seeds used; every number comes from the file named under the table. Tables are generated from those files, not typed.
+**Conventions.** Three neural networks (NNs) are compared: the data-driven NN (data NN), trained on finite-difference (FD) data; the physics-informed neural network (PINN), trained on the governing equations only; and the hybrid network, trained on both. The four research questions (RQ1–RQ4) are accuracy, physical consistency, robustness and cost. Errors are relative $L_2$ errors against the $64 \times 64$ FD reference at the final training step. Test A is the held-out 15% of the space-time points, test B the ten held-out snapshots. Tables show the mean over seeds with the sample standard deviation in brackets and list the seeds used; every number comes from the file named under the table. Tables are generated from those files, not typed.
 
-All runs planned for these results are scored; no number below is pending.
+All runs of the main design and of studies S1–S6 are scored. Study S7 (less training data, Section 4.7) is running; its numbers are marked as pending until every seed of a setting is scored.
 
 ## 4.1 Reference solution
 
@@ -46,7 +46,7 @@ Mean (sample s.d.) over the seeds listed; relative $L_2$ error at the final step
 - The data NN is scored on the same FD solution it was trained on: test A interpolates between training points, test B between training snapshots. The result shows how well the network represents a solved flow, not how it would do without the solver.
 - Test B errors are similar to or smaller than test A errors for every network, so held-out times are not harder than held-out points here.
 - At $Re = 1000$ the reference is the $127 \times 127$ solution at every second grid point, because the $64 \times 64$ FD solution is itself 0.251 off in $u$ [`experiment_results_re1000.csv`]. The data NN at $Re = 1000$ is also trained on the $127 \times 127$ solution.
-- Pressure errors are larger than velocity errors for every network. The FD pressure has sharp peaks at the lid corners, and pressure is compared after removing each snapshot's mean.
+- Pressure errors are larger than the $u$ errors for every network, and larger than the $v$ errors except for the PINN at $Re = 400$ (test A: 0.889 against 0.905). The FD pressure has sharp peaks at the two lid corners: after each snapshot's mean is removed (as in the evaluation), the 18 grid points nearest the lid corners hold 46–54% of the sum of $p^2$ at every $Re$ [`experiments/data/README.md`]. A relative pressure error therefore depends strongly on how well these few points are fitted.
 
 ## 4.3 RQ2: Physical consistency
 
@@ -159,7 +159,7 @@ Spike: an evaluation step $\ge$ 1,000 at which the test-A $u$ error is more than
 **Finding.** For one flow on this grid, the FD solver is far cheaper than training any network. A trained network evaluates the full field faster than the FD solver, so training pays off only after many evaluations of the same flow.
 
 <!-- table:cost -->
-| $Re$ | Network (GPU) | Seeds with valid timing | Training time (s) | Time per step (s) | Full-field inference (s) | Peak VRAM (MiB) |
+| $Re$ | Network (GPU) | Seeds with valid timing | Training time (s) | Time per step (s) | Full-field inference (s) | Peak GPU memory (MiB) |
 |---|---|---|---|---|---|---|
 | 10 | Data NN | 4,5 | 144 (6.28) | 0.0071 (3.2e-04) | 0.010 (4.0e-04) | 122 (0) |
 | 10 | PINN | 4,5 | 813 (24.1) | 0.040 (0.0012) | 0.010 (4.1e-04) | 706 (1.91) |
@@ -190,7 +190,7 @@ Source: `experiments/results/poster_numbers.json`.
 **Figures.** Poster version: `v4_cost__*.png`.
 
 **Caveats.**
-- All times come from one laptop (Intel i5-12450H, RTX 4060 Laptop GPU). FD ran on the CPU, the networks on the GPU.
+- All times come from one laptop (Intel i5-12450H central processing unit, CPU; NVIDIA RTX 4060 Laptop graphics processing unit, GPU). FD ran on the CPU, the networks on the GPU. MiB = $2^{20}$ bytes.
 - The data NN's cost to a usable field includes the FD solve that produces its data.
 - Runs that shared the GPU are excluded. At $Re = 10$ and 1000 the data NN and PINN seeds 1–3 shared the GPU, so their cost is not reported; seeds 4–5 are timed on a free GPU.
 - At $Re = 1000$ a fair cost must count the $127 \times 127$ solve behind the reference.
@@ -314,7 +314,55 @@ The $Re = 1000$ runs start from the S6 $Re = 400$ runs of the same seed. Sources
 
 **Figures.** `analysis_s6_continuation.png`, `analysis_s6_continuation_re1000.png`.
 
+**S7: less training data (data NN and hybrid, $Re = 100$ and 400).** Does the hybrid's physics loss make up for missing data? Both networks train on 0.1% (118 rows) or 1% (1,176 rows) of the training rows, the same rows for every seed and both networks (methodology Section 8). Results are added as each setting's seeds 1–3 are scored; settings not yet scored are marked pending.
+
+Data NN at $Re = 100$ (seeds 1–3): with 0.1% of the rows its test-A $u$ error is 0.543, with 1% 0.133, against 0.017 with all rows and 0.084 for the PINN without data; the 1% runs reproduce S1 exactly (identical training logs). Its continuity residual stays near 0.5 at every fraction (0.484, 0.464, 0.547), so less data makes the data NN less accurate but not less consistent with continuity. *Hybrid and $Re = 400$: pending.*
+
+<!-- table:s7 -->
+| $Re$ | Network | Training data | Seeds | Test A $u$ | Test A $v$ | Test A $p$ | Test B $u$ | Continuity | x-momentum |
+|---|---|---|---|---|---|---|---|---|---|
+| 100 | Data NN | 0.1% (118 rows) | 1,2,3 | 0.543 (0.026) | 0.458 (0.012) | 0.860 (0.027) | 0.531 (0.027) | 0.484 (0.012) | 0.428 (0.036) |
+| 100 | Data NN | 1% (1,176 rows) | 1,2,3 | 0.133 (0.0057) | 0.115 (0.0032) | 0.466 (0.018) | 0.090 (0.0051) | 0.464 (0.044) | 1.50 (0.142) |
+| 100 | Data NN | 100% (main runs) | 1,2,3 | 0.017 (0.0014) | 0.018 (0.0011) | 0.113 (0.0012) | 0.015 (0.0015) | 0.547 (0.076) | 5.62 (0.090) |
+| 100 | Hybrid | 0.1% (118 rows) | – | pending | pending | pending | pending | pending | pending |
+| 100 | Hybrid | 1% (1,176 rows) | – | pending | pending | pending | pending | pending | pending |
+| 100 | Hybrid | 100% (main runs) | 1,2,3 | 0.050 (0.0036) | 0.053 (0.0062) | 0.169 (0.0023) | 0.045 (0.0034) | 0.173 (0.032) | 1.01 (0.745) |
+| 100 | PINN | no data (main runs) | 1,2,3 | 0.084 (0.015) | 0.168 (0.030) | 0.266 (0.0065) | 0.079 (0.015) | 0.080 (0.039) | 0.110 (0.058) |
+| 400 | Data NN | 0.1% (118 rows) | – | pending | pending | pending | pending | pending | pending |
+| 400 | Data NN | 1% (1,176 rows) | – | pending | pending | pending | pending | pending | pending |
+| 400 | Data NN | 100% (main runs) | 1,2,3 | 0.023 (0.002) | 0.025 (0.0016) | 0.158 (0.004) | 0.020 (0.0011) | 0.549 (0.030) | 2.08 (0.555) |
+| 400 | Hybrid | 0.1% (118 rows) | – | pending | pending | pending | pending | pending | pending |
+| 400 | Hybrid | 1% (1,176 rows) | – | pending | pending | pending | pending | pending | pending |
+| 400 | Hybrid | 100% (main runs) | 1,2,3 | 0.065 (0.011) | 0.074 (0.0071) | 0.231 (0.017) | 0.053 (0.0077) | 0.041 (0.0043) | 0.177 (0.188) |
+| 400 | PINN | no data (main runs) | 1,2,3 | 0.349 (0.022) | 0.883 (0.098) | 0.859 (0.114) | 0.345 (0.021) | 0.038 (0.023) | 0.034 (0.0025) |
+
+Same subset of training rows for every seed and both networks (`experiments/data/README.md`); validation and test sets unchanged. A setting is listed once seeds 1-3 are all scored. Mean (s.d.). Sources: `experiments/results/sparse_re*.csv`, `experiment_results*.csv`.
+<!-- /table:s7 -->
+
+**Figure.** `analysis_s7_sparse.png`: test-A error of $u$ and continuity residual against the fraction of training data (0.1%, 1%, 100%), every seed, with the PINN (no data) for reference.
+
 **Caveats for S4–S6.**
 - S4–S6 were added after the first $Re = 400$ result. Each was planned before its own runs and none changed an existing run.
 - S6 runs train for more steps in total than the main runs (40,000 at $Re = 400$ and 10, 60,000 at $Re = 1000$, counting the starting network). At the same total of 40,000 steps, the S5 runs at $Re = 400$ reach 0.212 (S5 table, from the evaluation log), against 0.152 for the warm start (5 seeds), so the warm start helps beyond the extra steps.
-- Three seeds or fewer in every study.
+- Three seeds in most studies; five for S6 at $Re = 400$, one for the 100,000-step hybrid at $Re = 1000$.
+
+## 4.8 Limitations
+
+- One problem: the two-dimensional lid-driven cavity on $t \in [0, 5]$, at four Reynolds numbers, on one $64 \times 64$ grid of reference points.
+- The data NN and the hybrid are scored on the same FD solution they were trained on (test A: unseen points at seen times; test B: unseen times). No network was asked to predict a flow at a Reynolds number, geometry or boundary condition it was not trained on.
+- The FD reference converges below second order in space, and the $64 \times 64$ and $128 \times 128$ transients differ by up to 0.142 near the lid corners at $Re = 100$ (methodology Section 1.3). At $Re = 1000$ the reference is a $127 \times 127$ solution, and the $64 \times 64$ FD solution has a test-A error of 0.251 in $u$ against it.
+- One architecture ($5 \times 64$, tanh), one optimizer setting (Adam, learning rate $10^{-3}$) and one training length (20,000 steps) for the main comparison. The loss weights were not tuned. S5 shows that longer training lowers the error of the PINN at $Re = 400$ (every seed) and of the hybrid (two of three seeds at $Re = 400$, the one seed at $Re = 1000$), so the main results describe the networks at a fixed budget, not at convergence.
+- Five seeds per setting in the main design and three in most studies; one seed for the 100,000-step hybrid at $Re = 1000$. Standard deviations from so few runs are uncertain.
+- The hybrid differs from the data NN in its output units as well as its loss; the data-only control measures the first effect separately (Section 4.6).
+- The PDE residuals are RMS values dominated by a few points at the lid corners, where the exact solution is singular; the corner-excluded values (Section 4.3) were added after the S5 and S6 results were seen.
+- All timings come from one laptop; runs that shared the GPU are excluded from the cost results.
+- The Reynolds-number trend, the hybrid, the control and studies S4–S7 were added after the first results at $Re = 100$ and 400. Each was planned and its scoring fixed before its own runs; no existing run was changed.
+
+## 4.9 Future work
+
+Questions raised by these results and not tested here:
+- Whether the hybrid at $Re = 1000$ gains as much from longer training in other seeds as in seed 1 (one seed only, Section 4.7), and whether the PINN at $Re = 10$ changes with 100,000 steps (planned under S5, not run).
+- Whether tuned or adaptive loss weights change the hybrid's accuracy gap to the data NN; only the fixed starting weights and the one-time check at step 2,000 were used, and causal weighting (S4) was tested for the PINN only.
+- Whether a hybrid with standardized outputs closes the part of the gap that the control attributes to the output units.
+- Whether a treatment of the lid-corner singularity (for example a regularized lid velocity) changes the PINN's failure at $Re = 400$ and 1000 or the corner-dominated residuals.
+- Whether any of the networks can predict flows at Reynolds numbers they were not trained on (for example with $Re$ as an input), which the FD solver does by construction.

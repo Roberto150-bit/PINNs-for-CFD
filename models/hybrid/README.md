@@ -36,6 +36,7 @@ python models/hybrid/src/train.py --device gpu --seed 1 [--re 400]
 Options:
 
 - `--data-only` — control run: the hybrid code with the data loss only (physics terms not computed, no weight check), physical outputs. Hybrid vs control isolates the physics loss; control vs data NN isolates the output units.
+- `--train-fraction 0.01` — train on the same fixed subset of the training rows as the data NN with the same option (S7); the physics points are unchanged and the mini-batch is the whole subset when it has fewer than 4,096 rows
 - `--steps 100000` — longer training (as S5)
 - `--shared-gpu` — the GPU is shared with another job; the run is marked `"timing_valid": false` and its times are not used as cost results
 - `--run-id`, `--exp-dir`, `--tag` — override the run id, the output folder, or add a suffix to the run id

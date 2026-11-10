@@ -5,7 +5,7 @@ Lid-driven cavity, $(x, y, t) \rightarrow (u, v, p)$ on $t \in [0, 5]$. Three me
 - a physics-informed neural network (PINN), trained on the equations only;
 - a hybrid network, trained on both.
 
-All networks use the same $5 \times 64$ architecture, optimizer and 20,000 training steps. Errors are test-A relative $L_2$ errors at the final training step. Means are over seeds 1–5 at every Reynolds number, unless a table says otherwise. Sources: `experiments/results/experiment_results*.csv` (main runs), `sensitivity_re100.csv`, `causal_re400.csv`, `continuation_re*.csv` and `poster_numbers.json`. The method is described in `notes/methodology_draft.md`.
+The four research questions (RQ1–RQ4) are accuracy, physical consistency, robustness and cost. All networks use the same $5 \times 64$ architecture, optimizer and 20,000 training steps. Errors are test-A relative $L_2$ errors at the final training step. Means are over seeds 1–5 at every Reynolds number, unless a table says otherwise. Sources: `experiments/results/experiment_results*.csv` (main runs), `sensitivity_re100.csv`, `causal_re400.csv`, `continuation_re*.csv` and `poster_numbers.json`. The method is described in `notes/methodology_draft.md`.
 
 ## RQ1: Accuracy
 
@@ -28,13 +28,13 @@ At unseen times (test B, ten held-out snapshots) the errors are similar: 0.014 (
 **Caveats.**
 - The data NN is trained on the same FD solution it is scored against: test A interpolates between training points, and test B between training snapshots. It does not show how the data NN would do without a solver run.
 - At $Re = 1000$ the reference is a $127 \times 127$ solve, because the $64 \times 64$ FD solution itself is 0.251 off [`experiment_results_re1000.csv`].
-- Pressure errors are larger for both networks; the FD pressure has sharp peaks at the lid corners.
+- Pressure errors are larger for both networks; the FD pressure has sharp peaks at the lid corners. After each snapshot's mean is removed, the 18 grid points nearest the two lid corners hold 46–54% of the sum of $p^2$ at every $Re$ [`experiments/data/README.md`].
 
 ## RQ2: Physical consistency
 
 **Finding.** The PINN satisfies the equations far better, even where it is inaccurate. The data NN is accurate but its fields are not divergence free. A small physics residual does not mean the flow is right: at $Re = 400$ and 1000 the PINN has its smallest residuals while its flow is wrong.
 
-| $Re$ | Continuity residual (RMS), data NN | PINN | Ratio |
+| $Re$ | Continuity residual (root mean square, RMS), data NN | PINN | Ratio |
 |---|---|---|---|
 | 10 | 0.569 | 0.018 | 31× |
 | 100 | 0.546 | 0.071 | 8× |
@@ -56,7 +56,7 @@ At unseen times (test B, ten held-out snapshots) the errors are similar: 0.014 (
   - data NN $u$ error 0.0154–0.0181 (s.d. 0.0010);
   - PINN 0.072–0.100 (s.d. 0.011).
 - Across Reynolds numbers, only the data NN is robust: 0.016–0.023. The PINN goes from 0.082 at $Re = 100$ to 0.161 at $Re = 10$ and 0.36–0.42 at $Re \ge 400$. All seeds fail in the same way, so the failure is systematic, not bad luck.
-- The data NN's test error shows occasional short-lived rises during training, from which it recovers. The PINN's error decreases smoothly. The spike table is in `experiments/analysis/plots/analysis_spikes.csv` (definition in the methodology draft, Section 5); its counts are not yet in the results tables.
+- The data NN's test error shows occasional short-lived rises during training, from which it recovers. The PINN's error decreases smoothly. The spike table is in `experiments/analysis/plots/analysis_spikes.csv` (definition in the methodology draft, Section 5); the counts per setting are in the results draft, Section 4.4.
 
 **What changes the PINN at $Re = 400$** (seeds 1–3, $u$ error, same-seed standard runs 0.349):
 
@@ -77,6 +77,7 @@ Results at other $Re$:
 
 **Sensitivity at $Re = 100$** (3 seeds, `sensitivity_re100.csv`):
 - With 1% of the data the data NN (0.133) is worse than the PINN without data (0.082); with 10% it reaches 0.050.
+- S7 (less data, seeds 1–3): with 0.1% of the rows (118) the data NN's $u$ error is 0.543 at $Re = 100$, and its continuity residual stays near 0.5 at 0.1%, 1% and 100% (0.484, 0.464, 0.547) [`sparse_re100.csv`, `experiment_results.csv`]. Hybrid and $Re = 400$ pending.
 - A PINN with 5,000 collocation points has a continuity residual of 1.26 at the evaluation points, mostly from the lid corners: without the points within 0.05 of a lid corner it is 0.028, against 0.017 with 20,000 points [`analysis_corner_excluded.csv`].
 - A larger network ($6 \times 100$) does not help either method. One data NN seed ended on a loss spike (0.102).
 
@@ -86,7 +87,7 @@ Results at other $Re$:
 - `analysis_s1_data.png`, `analysis_s2_collocation.png`, `analysis_s3_size.png`
 
 **Caveats.**
-- Only three seeds in the studies.
+- Three seeds in most studies (five for S6 at $Re = 400$, one for the 100,000-step hybrid at $Re = 1000$).
 - S4–S6 were added after the first $Re = 400$ result. Each was fixed before its own runs, and none changed an existing run.
 - For S5 at $Re = 100$ only $u$ is available; the physics residuals were scored at $Re = 400$ only.
 
@@ -115,7 +116,7 @@ Results at other $Re$:
 
 ## Hybrid network (data + physics loss)
 
-**Finding.** At every Reynolds number the hybrid lies between the other two networks in accuracy. Unlike the PINN, its error hardly changes with $Re$. At $Re = 400$ and 1000, where the PINN converges to a wrong flow, the hybrid recovers the flow, and its continuity residual at the evaluation points stays close to the PINN's (away from the lid corners it is about twice the PINN's, 0.026 against 0.012 at $Re = 400$, seeds 1–3 [`analysis_corner_excluded.csv`]). It does not reach the data NN's accuracy at any Reynolds number.
+**Finding.** At every Reynolds number the hybrid lies between the other two networks in accuracy. Unlike the PINN, its error hardly changes with $Re$. At $Re = 400$ and 1000, where the PINN converges to a wrong flow, the hybrid recovers the flow. Its continuity residual at the evaluation points is close to the PINN's at $Re = 400$ (0.041 against 0.038, seeds 1–3) but about five times the PINN's at $Re = 1000$ (0.054 against 0.010) [table below]; away from the lid corners it is about twice the PINN's at $Re = 400$ (0.026 against 0.012, seeds 1–3 [`analysis_corner_excluded.csv`]). It does not reach the data NN's accuracy at any Reynolds number.
 
 Test-A error of $u$ and continuity residual, seeds 1–3, the same seeds for all three networks [`experiment_results*.csv`]:
 

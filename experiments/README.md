@@ -8,18 +8,18 @@ Each experiment is a self-contained record: shared configuration, computing envi
 
 | Folder | Content |
 |---|---|
-| `experiment_001_re100/` | $Re = 100$: main runs (all three networks, seeds 1-5), determinism cost, sensitivity studies S1-S3 (`sensitivity/`), S5 (`extended/`), hybrid data-only control (`control/`) |
-| `experiment_002_re400/` | $Re = 400$: main runs (seeds 1-5), S5 (`extended/`, PINN and hybrid), causal weighting S4 (`causal/`), $Re$ continuation S6 (`continuation/`), hybrid control (`control/`) |
+| `experiment_001_re100/` | $Re = 100$: main runs (all three networks, seeds 1-5), determinism cost, sensitivity studies S1-S3 (`sensitivity/`), S5 (`extended/`), S7 (`sparse/`), hybrid data-only control (`control/`) |
+| `experiment_002_re400/` | $Re = 400$: main runs (seeds 1-5), S5 (`extended/`, PINN and hybrid), causal weighting S4 (`causal/`), $Re$ continuation S6 (`continuation/`), S7 (`sparse/`), hybrid control (`control/`) |
 | `experiment_003_re10/` | $Re = 10$: Reynolds trend (FD and all three networks), S6 from $Re = 100$ (`continuation/`), hybrid control (`control/`) |
 | `experiment_004_re1000/` | $Re = 1000$: Reynolds trend (FD and all three networks), S6 from the S6 $Re = 400$ runs (`continuation/`), S5 (`extended/`, PINN and hybrid), hybrid control (`control/`) |
 | `benchmarks/` | Marchi et al. (2009) and Hou et al. (1995) tables |
-| `data/` | space-time datasets built from the $64 \times 64$ FD transient, one per $Re$ |
+| `data/` | space-time datasets built from the $64 \times 64$ FD transient, one per $Re$; dataset card in `data/README.md` |
 | `analysis/` | evaluation and figure scripts; figures in `analysis/plots/` |
 | `results/` | generated tables (CSV / JSON) |
 
 Inside an experiment folder each method has its own subfolder (`finite_difference/`, `data_driven_nn/`, `pinn/`, `hybrid/`) with one folder per run, and `logs/` holds the batch logs. A network run folder contains `config.json`, `history.csv`, `eval_history.csv`, `metrics.json`, `performance.json`, `predictions.npz`, `model.keras` and, on the GPU, `gpu_monitor.csv`.
 
-Run ids follow `<method>_re<Re>_<device>_s<seed>[_<tag>]`, e.g. `pinn_re400_gpu_s2` or `dnn_re100_gpu_s1_frac10` (S1, 10% of the training rows), `hybrid_re400_gpu_s1_dataonly` (hybrid control) or `pinn_re400_gpu_s1_from_re100` (S6). A study keeps its runs in a subfolder of the experiment, with the method subfolders inside it.
+Run ids follow `<method>_re<Re>_<device>_s<seed>[_<tag>]`, e.g. `pinn_re400_gpu_s2` or `dnn_re100_gpu_s1_frac10` (S1, 10% of the training rows), `hybrid_re400_gpu_s1_frac0p1` (S7, 0.1%), `hybrid_re400_gpu_s1_dataonly` (hybrid control) or `pinn_re400_gpu_s1_from_re100` (S6). A study keeps its runs in a subfolder of the experiment, with the method subfolders inside it.
 
 ## Studies
 
@@ -31,6 +31,7 @@ Run ids follow `<method>_re<Re>_<device>_s<seed>[_<tag>]`, e.g. `pinn_re400_gpu_
 | S4 | causal weighting of the PDE residual, PINN | seeds 1-3, $Re = 400$ | `experiment_002_re400/causal/` |
 | S5 | longer training (100,000 steps) | data NN and PINN at $Re = 100$, PINN at $Re = 400$ and $1000$, hybrid at $Re = 400$ and $1000$ | `experiment_00X/extended/` |
 | S6 | $Re$ continuation: PINN started from the trained PINN at a neighbouring $Re$ | $Re = 400$ from $100$ (seeds 1-5), $Re = 1000$ from S6 $Re = 400$ and $Re = 10$ from $100$ (seeds 1-3) | `experiment_00X/continuation/` |
+| S7 | less training data: does the hybrid's physics loss make up for missing data? | data NN and hybrid on 0.1% (118 rows) and 1% (1,176 rows) of the training rows, seeds 1-3, $Re = 100$ and $400$ (same rows for every seed and both networks, `data/README.md`) | `experiment_00{1,2}_re{100,400}/sparse/` |
 | control | hybrid with the data loss only, to separate the physics loss from the output units | seeds 1-3 at $Re = 100$ and $400$ (`--hybrid-control`) and at $Re = 10$ and $1000$ (`--day`); seeds 4-5 at all four $Re$ (train.py directly, command in `models/hybrid/README.md`) | `experiment_00X/control/` |
 
 
@@ -52,6 +53,7 @@ python experiments/run_batch.py --causal                 # S4 at Re 400
 python experiments/run_batch.py --continuation           # S6: Re 400 started from Re 100
 python experiments/run_batch.py --continuation 1000      # S6: Re 1000 started from the S6 Re 400 runs
 python experiments/run_batch.py --continuation 10        # S6: Re 10 started from Re 100
+python experiments/run_batch.py --sparse                 # S7: data NN and hybrid on 0.1% and 1% of the training rows
 ```
 
 `--no-start-after HH:MM` starts no new job after that clock time.

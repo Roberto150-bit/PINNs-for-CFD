@@ -29,7 +29,7 @@ python experiments/analysis/aggregate.py                  # summary tables
 python experiments/analysis/training_analysis.py          # analysis figures
 ```
 
-The other Reynolds numbers, the studies S1-S6 and the hybrid control are listed with their commands in `experiments/README.md`.
+The other Reynolds numbers, the studies S1-S7 and the hybrid control are listed with their commands in `experiments/README.md`.
 
 **NOTE:** This repository will evolve as the thesis progress.
 

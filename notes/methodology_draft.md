@@ -1,6 +1,6 @@
 # Methodology (draft)
 
-This draft describes how the three neural-network methods were compared with a finite-difference (FD) reference on the lid-driven cavity. Every number is followed by the file it comes from, in square brackets. Paths are relative to the repository root.
+This draft describes how three neural-network (NN) methods were compared with a finite-difference (FD) reference on the lid-driven cavity: a data-driven NN trained on FD data, a physics-informed neural network (PINN) trained on the governing equations only, and a hybrid network trained on both. Every number is followed by the file it comes from, in square brackets. Paths are relative to the repository root.
 
 ## 1. Problem and reference solution
 
@@ -27,7 +27,7 @@ The reference solutions come from an FD solver on a collocated uniform grid [`mo
 | Option | Original solver | Solver used for the comparison |
 |---|---|---|
 | Advection | first-order backward differences | second-order central differences |
-| Pressure Poisson equation | 50 Jacobi iterations per step | direct sparse LU solve |
+| Pressure Poisson equation | 50 Jacobi iterations per step | direct sparse LU (lower-upper) factorization |
 | Pressure boundary condition | $p = 0$ on the lid | $\partial p / \partial n = 0$ on all walls, zero mean pressure |
 | Time stepping | explicit pressure-source scheme | incremental pressure-correction projection |
 | Lid start | impulsive | $\tanh(10t)$ ramp |
@@ -78,7 +78,7 @@ One dataset is built per Reynolds number from the $64 \times 64$ transient refer
 - **Test B (prediction at unseen times):** ten whole snapshots, $t = 0.5, 1.0, \dots, 5.0$, never used in training: 40,960 rows.
 - **Test A (interpolation within the training snapshots):** 15% of the remaining rows, drawn at random.
 
-The remaining rows (the 41 other snapshots) are split at random 70% / 15% / 15% into training, validation and test A. With split seed 0 the counts are 117,555 training, 25,190 validation, 25,191 test-A and 40,960 test-B rows [`experiments/data/dataset_re100_n64.json`]. The split is identical for every network and every seed. The training set is used only by the methods that learn from data (the data-driven NN and the hybrid). Inputs are scaled to $[-1, 1]$ in each coordinate [`models/common/dataset.py`].
+The remaining rows (the 41 other snapshots) are split at random 70% / 15% / 15% into training, validation and test A. With split seed 0 the counts are 117,555 training, 25,190 validation, 25,191 test-A and 40,960 test-B rows [`experiments/data/dataset_re100_n64.json`]. The split is identical for every network, every seed and every $Re$. The training set is used only by the methods that learn from data (the data-driven NN and the hybrid). Inputs are scaled to $[-1, 1]$ in each coordinate [`models/common/dataset.py`]. The datasets contain no missing values or repeated points; their target statistics per split, checksums and the exact rows of the reduced training sets of S1 and S7 are listed in the dataset card [`experiments/data/README.md`; split checks in `tests/test_dataset.py`].
 
 ## 3. The three networks
 
@@ -93,8 +93,8 @@ The three networks differ only in their loss function. Everything else is shared
 | Trainable parameters | 17,091 |
 | Initialization | Glorot uniform, seeded per layer from the run seed |
 | Optimizer | Adam, learning rate $10^{-3}$, default Keras parameters |
-| Training length | 20,000 optimizer steps, no early stopping |
-| Seeds | 1 to 5 at $Re = 100$ and 400; 1 to 3 at $Re = 10$ and 1000 |
+| Training length | 20,000 optimizer steps, no early stopping (100,000 in study S5) |
+| Seeds | 1 to 5 at every $Re$ (1 to 3 in the additional studies) |
 | Data split / training points | fixed (seed 0) for every run, so seeds differ only in initialization and, for the data-using networks, batch order |
 
 ### 3.2 Data-driven neural network
@@ -133,10 +133,10 @@ To separate the two effects, a control run trains the hybrid code with the data 
 
 ## 4. Training protocol
 
-- Every run trains for exactly 20,000 steps. **Results are taken at the final step**, also when a run ends on a temporary rise in error; there is no early stopping and no selection of the best checkpoint.
+- Every run trains for exactly 20,000 steps (100,000 in study S5). **Results are taken at the final step**, also when a run ends on a temporary rise in error; there is no early stopping and no selection of the best checkpoint.
 - The test-A error is logged every 500 steps and the loss terms every 10 steps (`eval_history.csv`, `history.csv` in each run folder). These logs are used for monitoring and for the training-curve figures only, never to choose a result.
-- Deterministic GPU operations are enabled (`tf.config.experimental.enable_op_determinism`). On one run per network this changed the time per step by a factor of 0.87 (data NN) and 1.00 (PINN) [`experiments/experiment_001_re100/determinism_cost/`].
-- All main runs were trained on the GPU, one job at a time. Runs that shared the GPU with another job are flagged in their `config.json` (`"timing_valid": false`); their accuracy is used, their times are not.
+- Deterministic operations on the graphics processing unit (GPU) are enabled (`tf.config.experimental.enable_op_determinism`). On one run per network this changed the time per step by a factor of 0.87 (data NN) and 1.00 (PINN) [`experiments/experiment_001_re100/determinism_cost/`].
+- All main runs were trained on the GPU, one job at a time (the central processing unit, CPU, was used only for timing comparisons and the FD solves). Runs that shared the GPU with another job are flagged in their `config.json` (`"timing_valid": false`); their accuracy is used, their times are not.
 - As a sanity check before the main runs, the data NN was trained on 1,000 training points to confirm that it can overfit them (loss reduced at least 100 times within 5,000 steps, MSE of $u$ and $v$ below $10^{-3}$).
 
 ## 5. Evaluation metrics
@@ -149,7 +149,7 @@ One script scores every run of every method in the same way [`experiments/analys
 
   on test A, test B and the full field. Pressure is defined only up to a constant, so each snapshot's mean pressure is subtracted from both fields first. The error is also reported per snapshot (51 values) to show how it develops in time.
 - **Physical consistency:**
-  - For the networks: the RMS of $r_c$, $r_x$ and $r_y$ by automatic differentiation at 50,000 random interior points that were not used in training (fixed seed).
+  - For the networks: the root mean square (RMS) of $r_c$, $r_x$ and $r_y$ by automatic differentiation at 50,000 random interior points that were not used in training (fixed seed).
   - For every method, FD included: the continuity residual by the same second-order central stencil on the $64 \times 64$ grid. It is computed over the full interior and over a core region three points from the walls.
 - **Constraints:** the RMS boundary error on the wall nodes (lid corners excluded) over all snapshots, and the RMS initial-condition error of $u$ and $v$ at $t = 0$.
 - **Flow structure:** the primary-vortex centre at $t = 5$. It is the minimum of the stream function $\psi(x, y) = \int_0^y u \, dy'$ (trapezoidal rule along each column), refined between grid points by a quadratic fit in each direction [`experiments/analysis/fd_validation.py`, `stream_function`, `vortex_center`]. Distances are given in grid spacings $\Delta x = 1/63$. $\psi_{min}$ measures the vortex strength.
@@ -160,8 +160,8 @@ The evaluator was checked on cases with known answers: FD scored against itself 
 ## 6. Seeds and repeatability
 
 Each configuration is trained with several seeds:
-- five (1 to 5) at $Re = 100$ and 400;
-- three (1 to 3) at $Re = 10$ and 1000 and in the additional studies.
+- five (1 to 5) for every network and the data-only control at every $Re$;
+- three (1 to 3) in the additional studies, except where Section 8 lists fewer.
 
 The seed sets the weight initialization and, for the data-using networks, the mini-batch order. The data split and the PINN training points are fixed for every run. Results are reported as the mean over seeds together with every individual seed (or the standard deviation), so that run-to-run variation is visible. With deterministic operations, two runs with the same seed and settings give identical results. For example, the first 20,000 steps of the 100,000-step S5 run at $Re = 400$ (seed 1) reproduce the 20,000-step main run with the same seed: the logged test-A errors of $u$, $v$ and $p$ agree exactly at all 41 evaluation steps (0.3565 for $u$ at step 20,000) [`experiments/experiment_002_re400/extended/pinn/pinn_re400_gpu_s1_steps100k/eval_history.csv`, `experiments/experiment_002_re400/pinn/pinn_re400_gpu_s1/eval_history.csv`].
 
@@ -191,21 +191,22 @@ All additional studies use the main settings except for the one factor studied. 
 | S4 | Does causal weighting in time help the PINN? | residual weighted by time chunk (Wang, Sankaran and Perdikaris, 2022, Algorithm 1, published schedule) | PINN, $Re = 400$, seeds 1–3 | `experiments/experiment_002_re400/causal/` |
 | S5 | Are the networks under-trained? | 100,000 steps instead of 20,000 | data NN and PINN at $Re = 100$, PINN at $Re = 400$, seeds 1–3; PINN at $Re = 1000$, seeds 1–3; hybrid at $Re = 400$, seeds 1–3, and at $Re = 1000$, seed 1 | `experiments/experiment_00*/extended/` |
 | S6 | Does starting from a solution at a lower $Re$ help the PINN? | initial weights from the trained PINN at the lower $Re$ (same seed), optimizer state fresh | $Re = 400$ from $Re = 100$, seeds 1–5; $Re = 1000$ from the S6 $Re = 400$ runs, seeds 1–3; $Re = 10$ from $Re = 100$, seeds 1–3 | `experiments/experiment_00*/continuation/` |
+| S7 | Does the hybrid's physics loss make up for missing data? | 0.1% (118 rows) and 1% (1,176 rows) of the training rows | data NN and hybrid, $Re = 100$ and 400, seeds 1–3 | `experiments/experiment_00{1,2}_re{100,400}/sparse/` |
 
 S4 uses 32 time chunks; the causality parameter steps through $10^{-2}, 10^{-1}, 1, 10, 100$ whenever every chunk weight exceeds 0.99 [`models/pinn/src/config.py`].
 
 S6 runs have more training in total than the main runs: 40,000 steps at $Re = 400$ and 10, and 60,000 at $Re = 1000$. They are therefore also compared with S5 runs at the same total number of steps where those exist.
 
-The hybrid network (Section 3.4) is run like the other two networks, seeds 1–5 at every Reynolds number, with the data-only control (Section 3.4), seeds 1–5 at every Reynolds number [`experiments/experiment_00*/control/`].
+S7 trains on a fixed subset of the training rows. The subset is drawn with the split seed (0), not the run seed, so it is the same for every seed, both networks and every $Re$; the 0.1% and 1% subsets are separate draws (they share no row), and the 1% subset is the one used in S1 [`experiments/data/README.md`; `tests/test_dataset.py`]. The output scaling of the data loss (Section 3.2, 3.4) uses the mean and standard deviation of the subset. When the subset has fewer than 4,096 rows, every step uses the whole subset as its mini-batch. The hybrid's physics points are unchanged, and the validation and test sets are the full ones. The results at 0.1% and 1% are compared with the main runs (100%) with the same seeds, and with the PINN, which uses no data. The study was planned and its scoring fixed before its runs [`experiments/run_batch.py`, `sparse_jobs`].
+
+The hybrid network (Section 3.4) is run like the other two networks, seeds 1–5 at every Reynolds number, and so is the data-only control (Section 3.4) [`experiments/experiment_00*/control/`].
 
 A final set of runs completes the design so that every network has five seeds at every Reynolds number:
 - seeds 4–5 of the data NN, the PINN and the hybrid at $Re = 10$ and 1000 (seeds 1–3 of the data NN and the PINN there shared the GPU, so only their accuracy is used; seeds 4–5 are timed on a free GPU);
 - the data-only control at $Re = 10$ and 1000, seeds 1–3, and seeds 4–5 at all four Reynolds numbers;
 - the 100,000-step runs listed under S5 for the hybrid and for the PINN at $Re = 1000$ (seeds 2–3).
 
-These runs were planned and their scoring fixed before they started; no setting of an earlier run was changed. The PINN at $Re = 10$ with 100,000 steps, planned under S5, was not run.
-
-Its results are scored by the same evaluator [`experiments/results/experiment_results*.csv`].
+These runs were planned and their scoring fixed before they started; no setting of an earlier run was changed. The PINN at $Re = 10$ with 100,000 steps, planned under S5, was not run. All of these runs are scored by the same evaluator as the main runs [`experiments/results/experiment_results*.csv`].
 
 ## 9. Hardware and software
 
@@ -232,4 +233,4 @@ All runs used one laptop [`experiments/experiment_001_re100/environment.json`]:
 6. The Reynolds-number trend ($Re = 10$, 1000), studies S4–S6 and the hybrid network were added after the first results at $Re = 100$ and 400. Each was planned and its scoring fixed before its own runs. No setting of an existing run was changed after its results were seen. The same holds for the runs that complete five seeds at $Re = 10$ and 1000, the controls at those Reynolds numbers and the extra 100,000-step runs (Section 8), which were added last. The control was added after the first hybrid results had been seen (item 7).
 7. The hybrid network outputs physical values, whereas the data NN outputs standardized values (Section 3.4). This is a second difference between the two besides the loss; the data-only control run measures its effect.
 8. The weight check at step 2,000 never changed the PINN weights at $Re = 100$: the largest-to-smallest ratios were 21.8, 57.5, 18.3, 66.5 and 46.8 [`notes/week-04.md`, item 17]. Whether it changed weights in other runs is recorded in each `config.json`.
-9. The PDE residuals are RMS values over 50,000 random points, so a few points with very large residuals can dominate them. This happens at the two corners where the moving lid meets the side walls: the wall velocity jumps from 1 to 0 there, and the exact solution is singular. For the networks trained longer than 20,000 steps (S5, and S6 at $Re = 400$ and 1000), at least 99.9% of the squared continuity residual of the PINNs, and 99.5–99.97% of that of the hybrids, comes from the 0.4% of the points that lie within 0.05 of these corners; for some 20,000-step runs the share is also large (91% for `pinn_re400_gpu_s1`, 99% for `hybrid_re400_gpu_s4`). A version of the residual without the points within 0.02, 0.05 and 0.1 of either lid corner is therefore reported next to the primary value (`experiments/analysis/plots/analysis_corner_excluded.csv`). It was added after the S5 and S6 residuals had been seen; the primary value is unchanged.
+9. The partial differential equation (PDE) residuals are RMS values over 50,000 random points, so a few points with very large residuals can dominate them. This happens at the two corners where the moving lid meets the side walls: the wall velocity jumps from 1 to 0 there, and the exact solution is singular. For the networks trained longer than 20,000 steps (S5, and S6 at $Re = 400$ and 1000), at least 99.9% of the squared continuity residual of the PINNs, and 99.5–99.97% of that of the hybrids, comes from the 0.4% of the points that lie within 0.05 of these corners; for some 20,000-step runs the share is also large (91% for `pinn_re400_gpu_s1`, 99% for `hybrid_re400_gpu_s4`). A version of the residual without the points within 0.02, 0.05 and 0.1 of either lid corner is therefore reported next to the primary value (`experiments/analysis/plots/analysis_corner_excluded.csv`). It was added after the S5 and S6 residuals had been seen; the primary value is unchanged.

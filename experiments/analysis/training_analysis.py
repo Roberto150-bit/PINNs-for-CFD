@@ -25,6 +25,8 @@ Figures
     spikes              spike count per run (table: analysis_spikes.csv, no figure)
     hybrid_control      data NN vs data-only control vs hybrid, same seeds (Re 100 and 400)
     hybrid_control_re10_re1000   the same at Re 10 and 1000
+    s7_sparse           S7, less training data: data NN and hybrid on 0.1%, 1%, 100% of the
+                        train split (Re 100 and 400), test-A error of u and continuity residual
     corner_excluded     PDE residual RMS without the lid-corner neighbourhoods (table:
                         analysis_corner_excluded.csv, no figure; CPU, about 2 minutes)
 The hybrid (data + physics loss) is drawn wherever its runs exist.
@@ -728,6 +730,105 @@ def fig_hybrid_control(res=(100.0, 400.0), seeds=(1, 2, 3, 4, 5), name="hybrid_c
     save(fig, name, values)
 
 
+S7_FRACTIONS = ((0.1, "frac0p1"), (1.0, "frac1"), (100.0, None))   # percent of the train split
+S7_SEEDS = (1, 2, 3)
+S7_METHODS = ("data_driven_nn", "hybrid")
+S7_OFFSET = {"data_driven_nn": 0.93, "hybrid": 1.07}
+
+
+def s7_dir(re, method, seed, tag):
+    if tag is None:                     # 100%: the main run with the same seed
+        return run_dir(re, method, seed)
+    return os.path.join(C.experiment_dir(re), "sparse", method, f"{SHORT[method]}_re{re:g}_gpu_s{seed}_{tag}")
+
+
+def fig_s7_sparse(res=(100.0, 400.0), seeds=S7_SEEDS):
+    """S7, less training data: test-A error of u and continuity residual against the
+    fraction of the train split (0.1%, 1%, 100%) for the data NN and the hybrid, every
+    seed a dot, the mean a line (only where every seed is scored). Dashed: PINN (no
+    data), mean of the same seeds. Runs not yet scored are left out and listed."""
+    metrics = (("relative_l2_u", "Rel. L2, u"), ("continuity_residual", "Continuity\nresidual"))
+    fig, axes = plt.subplots(2, len(res), figsize=(WIDTH, 8.4), layout="constrained", sharex=True,
+                             sharey="row", squeeze=False)
+    values = {"note": "x = percent of the train split; 100% = main runs; dots = seeds, line = mean of "
+                      "groups with every seed scored; metric values from each run's metrics.json",
+              "seeds": list(seeds)}
+    xs = [f for f, _ in S7_FRACTIONS]
+    any_plotted = False
+    for j, re in enumerate(res):
+        values[f"re{re:g}"] = {}
+        for method in S7_METHODS:
+            color = COLORS[method]
+            entry = {"percent": xs, "runs": [], "missing": [], "test_a_relative_l2_u": [],
+                     "continuity_residual": [], "mean_u": [], "mean_continuity": [],
+                     "not_plotted": {"test_a_relative_l2_v": [], "test_a_relative_l2_p": [],
+                                     "test_b_relative_l2_u": [], "x_momentum_residual": []}}
+            means = {k: [] for k, _ in metrics}
+            for frac, tag in S7_FRACTIONS:
+                dirs = [s7_dir(re, method, s, tag) for s in seeds]
+                done = [d for d in dirs if scored(d)]
+                entry["runs"].append([rid(d) for d in done])
+                entry["missing"].append([rid(d) for d in dirs if d not in done])
+                ms = [json.load(open(os.path.join(d, "metrics.json"))) for d in done]
+                u = [float(m["accuracy"]["test_a"]["relative_l2_u"]) for m in ms]
+                c = [float(m["physical_consistency"]["continuity_residual"]) for m in ms]
+                entry["test_a_relative_l2_u"].append(u)
+                entry["continuity_residual"].append(c)
+                for k, src in (("test_a_relative_l2_v", ("accuracy", "test_a", "relative_l2_v")),
+                               ("test_a_relative_l2_p", ("accuracy", "test_a", "relative_l2_p")),
+                               ("test_b_relative_l2_u", ("accuracy", "test_b", "relative_l2_u")),
+                               ("x_momentum_residual", ("physical_consistency", "x_momentum_residual"))):
+                    vals = []
+                    for m in ms:
+                        v = m
+                        for key in src:
+                            v = v[key]
+                        vals.append(float(v))
+                    entry["not_plotted"][k].append(vals)
+                complete = len(done) == len(seeds)
+                for (key, _), ys in zip(metrics, (u, c)):
+                    means[key].append(float(np.mean(ys)) if complete else np.nan)
+                for ax, ys in ((axes[0, j], u), (axes[1, j], c)):
+                    if ys:
+                        any_plotted = True
+                        ax.scatter([frac * S7_OFFSET[method]] * len(ys), ys, s=70, color=color, alpha=0.6,
+                                   edgecolor="white", linewidth=1, zorder=3)
+            entry["mean_u"] = tolist(means["relative_l2_u"])
+            entry["mean_continuity"] = tolist(means["continuity_residual"])
+            for i, (key, _) in enumerate(metrics):
+                xm = [x * S7_OFFSET[method] for x in xs]
+                axes[i, j].plot(xm, means[key], color=color, marker="o", ms=10, zorder=4,
+                                label=LABELS[method] if i == 0 else None)
+            values[f"re{re:g}"][method] = entry
+        # PINN without data: mean of the same seeds
+        pinn = [run_dir(re, "pinn", s) for s in seeds if scored(run_dir(re, "pinn", s))]
+        pm = [json.load(open(os.path.join(d, "metrics.json"))) for d in pinn]
+        ref = {"runs": [rid(d) for d in pinn],
+               "mean_u": float(np.mean([m["accuracy"]["test_a"]["relative_l2_u"] for m in pm])),
+               "mean_continuity": float(np.mean([m["physical_consistency"]["continuity_residual"] for m in pm]))}
+        values[f"re{re:g}"]["pinn_no_data"] = ref
+        axes[0, j].axhline(ref["mean_u"], color=COLORS["pinn"], ls="--", label="PINN, no data" if j == 0 else None)
+        axes[1, j].axhline(ref["mean_continuity"], color=COLORS["pinn"], ls="--")
+        axes[0, j].set_title(f"Re = {re:g}", loc="left")
+    if not any_plotted:
+        plt.close(fig)
+        print("s7_sparse: skipped (no S7 run scored yet)")
+        return
+    for ax in axes.flat:
+        ax.set_xscale("log"), ax.set_yscale("log")
+        ax.set_xlim(0.05, 250)
+        ax.xaxis.set_minor_locator(matplotlib.ticker.NullLocator())
+        plain_log_axis(ax.yaxis, subs=(1.0, 2.0, 5.0))
+    for ax in axes[1]:
+        ax.set_xticks(xs, ["0.1%", "1%", "100%"], fontsize=20)
+        ax.set_xlabel("Training data used", fontsize=20)
+    axes[0, 0].set_ylabel(metrics[0][1])
+    axes[1, 0].set_ylabel(metrics[1][1])
+    handles, labels = legend_entries(axes)
+    fig.legend(handles, labels, loc="outside lower center", ncols=3, frameon=False, fontsize=20)
+    save(fig, "s7_sparse", values)
+
+
 CORNER_RADII = (0.0, 0.02, 0.05, 0.1)   # fixed 2026-11-09 10:16, after the S5/S6 residuals were seen
 CORNER_GROUPS = ("", "extended", "continuation", "control", "sensitivity")
 
@@ -817,6 +918,7 @@ FIGURES = {
     "hybrid_control": lambda: [fig_hybrid_control(),
                                fig_hybrid_control((10.0, 1000.0), name="hybrid_control_re10_re1000")],
     "corner_excluded": table_corner_excluded,
+    "s7_sparse": fig_s7_sparse,
 }
 
 
